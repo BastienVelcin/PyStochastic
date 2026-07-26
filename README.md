@@ -1,4 +1,4 @@
-# PyStochastic - 1.0.0
+# PyStochastic - WIP
 
 ## Quick summary
 
