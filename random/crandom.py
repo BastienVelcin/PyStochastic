@@ -19,13 +19,13 @@ from dist import density
 # - Beta                                                                                              #
 # - Weibull                                                                                           #
 # - Frechet                                                                                           #
-#                                                                                                     #
-# TO DO :                                                                                             #
-#                                                                                                     #
 # - Cauchy                                                                                            #
 # - Gumbel                                                                                            #
 # - Kumaraswamy                                                                                       #
 # - Fisher                                                                                            #
+#                                                                                                     #
+# TO DO :                                                                                             #
+#                                                                                                     #
 # - Wigner                                                                                            #
 # - Logit-Normal                                                                                      #
 # - Power                                                                                             #
@@ -53,7 +53,6 @@ def exponential(alpha=1,n=1):
         raise ValueError("The parameter should be greater than 0.")
 
     '''
-
     :param alpha: parameter for the exponential distribution
     :param n: number of samples
 
@@ -84,12 +83,11 @@ def normal(mean=0, sd=1,n=1):
 def gamma(p=1, theta=1,n=1):
 
     '''
-
     :param p: shape parameter
     :param theta: inverse intensity parameter
     :param n: number of samples
 
-    The normal function returns n samples of a gamma distribution of parameters (p, theta).
+    The gamma function returns n samples of a gamma distribution of parameters (p, theta).
     '''
 
     if p <= 0:
@@ -103,7 +101,6 @@ def gamma(p=1, theta=1,n=1):
 def beta(a=1,b=1,n=1):
 
     '''
-
     :param a: first shape parameter
     :param b: second shape parameter
     :param n: number of samples
@@ -119,7 +116,6 @@ def beta(a=1,b=1,n=1):
 def weibull(k=1, l=1, n=1):
 
     '''
-
     :param k: shape parameter
     :param l: scale parameter
     :param n: number of samples
@@ -133,7 +129,6 @@ def weibull(k=1, l=1, n=1):
 def frechet(a=1,s=1,m=0,n=1):
 
     '''
-
     :param a: shape parameter
     :param s: scale parameter
     :param m: position parameter
@@ -145,3 +140,57 @@ def frechet(a=1,s=1,m=0,n=1):
     U = uniform(0, 1, n)
     return m+s*(-np.log(U))**(-1/a)
 
+def cauchy(x=0,a=1,n=1):
+
+    '''
+        :param x: position parameter
+        :param a: scale parameter
+        :param n: number of samples
+
+        The cauchy function returns n samples of a Cauchy distribution of parameters (x,a).
+    '''
+
+    U = uniform(0, 1, n)
+    return a*np.tan(np.pi*U - np.pi/2)+x
+
+def gumbel(mu=0,beta=1,n=1):
+
+    '''
+    :param mu: position parameter
+    :param beta: scale parameter
+    :param n: number of samples
+
+    The gumbel function returns n samples of a Gumbel distribution of parameters (mu, beta).
+    '''
+
+    U = uniform(0, 1, n)
+    return mu-beta*np.log(-np.log(U))
+
+def kumaraswamy(a=1,b=1,n=1):
+
+    '''
+    :param a: first shape parameter
+    :param b: second shape parameter
+    :param n: number of samples
+
+    The kumaraswamy function returns n samples of a Kumaraswamy distribution of parameters (a,b).
+    '''
+
+    U = uniform(0, 1, n)
+    return (1-(1-U)**(1/b))**(1/a)
+
+def fisher(d1=1,d2=1,n=1):
+
+    '''
+    :param a: first degree of freedom
+    :param b: second degree of freedom
+    :param n: number of samples
+
+    The fisher function returns n samples of a Fisher distribution of parameters (d1,d2).
+    '''
+
+    U = gamma(d1/2,2,n)
+    V = gamma(d2 / 2, 2, n)
+    return (U*d2)/(V*d1)
+
+de
