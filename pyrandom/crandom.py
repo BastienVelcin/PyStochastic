@@ -4,7 +4,6 @@ import sys
 import scipy
 import scipy as sp
 
-from dist import density
 
 
 #######################################################################################################
@@ -23,15 +22,8 @@ from dist import density
 # - Gumbel                                                                                            #
 # - Kumaraswamy                                                                                       #
 # - Fisher                                                                                            #
-#                                                                                                     #
-# TO DO :                                                                                             #
-#                                                                                                     #
-# - Wigner                                                                                            #
-# - Logit-Normal                                                                                      #
-# - Power                                                                                             #
-# - Wald                                                                                              #
-# - Lévy                                                                                              #
 # - Pareto                                                                                            #
+# - Rayleigh                                                                                          #
 #######################################################################################################
 
 def uniform(a=0,b=1,n=1):
@@ -193,4 +185,25 @@ def fisher(d1=1,d2=1,n=1):
     V = gamma(d2 / 2, 2, n)
     return (U*d2)/(V*d1)
 
-de
+def pareto(a=1,b=1,n=1):
+
+    '''
+
+    :param a: position parameter
+    :param b: shape parameter
+    :param n: number of samples
+    The pareto function returns n samples of a Pareto distribution of parameters (a,b).
+    '''
+
+    U = uniform(0,1,n)
+    return b/(U**(1/a))
+
+def rayleigh(s=1,n=1):
+
+    '''
+        :param s: scale parameter
+        :param n: number of samples
+        The rayleigh function returns n samples of a Rayleigh distribution of parameter s.
+        '''
+    U = uniform(0, 1, n)
+    return s*np.sqrt(-np.log(U))

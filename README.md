@@ -8,11 +8,11 @@ PyStochastic is a Python library designed for stochastic calculous and stochasti
 
 ### Random Modules
 
-#### Continuous Random Module - Crandom (`random/crandom.py`)
+#### Continuous Random Module - Crandom (`pyrandom/crandom.py`)
 
 The crandom module allows to generate samples of differents continuous probability distributions, from general ones (uniform, normal, exponential, ...) to more specific ones (Weibull, Frechet, Fisher, ...).
 
-#### Discrete Random Module - Drandom (`random/drandom.py`)
+#### Discrete Random Module - Drandom (`pyrandom/drandom.py`)
 
 The crandom module allows to generate samples of differents discrete probability distributions.
 
