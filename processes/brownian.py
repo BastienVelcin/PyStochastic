@@ -66,13 +66,7 @@ class Brownian:
                 f"Time step: {self.h}\n "
                 f"Covariance matrix: \n"
                 f"{self.var}")
-        '''
-        print()
-        print("")
-        print(f"Dimension: {self.dim}")
-        print(f"Time horizon: {self.n}")
-        print(f"Time step: {self.h}")
-        print(f"Covariance matrix: {self.var}")'''
+
 def brownian_motion(var=np.array(1),d=1, h=0.01, n=1000):
     '''
     Simulate a d-dimensional Brownian motion.
