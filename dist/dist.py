@@ -41,8 +41,8 @@ class Distribution(ABC):
         pass
 
     def plot_pdf(self):
-        lo_bound = -5
-        up_bound = 5
+        lo_bound = -2
+        up_bound = 2
         supp = self.support()
         if supp[0] > -np.inf:
             lo_bound = supp[0]
@@ -227,7 +227,9 @@ class Gamma(Distribution):
             print("Probability density function :")
             print(f"| ({self.theta**self.k} * x^{self.k-1} *  exp(-{self.theta}*x))/Gamma({self.k})")
         else:
-            return ((self.theta**self.k)*(x**(self.k-1)*np.exp(-self.theta*x))/scipy.special.gamma(self.k))
+            if x<0:
+                return 0
+            return ((self.theta**self.k)*(x**(self.k-1))*np.exp(-self.theta*x))/scipy.special.gamma(self.k)
 
     def cdf(self, x=None):
         if x is None:
@@ -255,4 +257,3 @@ class Gamma(Distribution):
         print(f"| mean : {self.mean()}")
         print(f"| Variance : {self.variance()}")
         print(f"| Entropy : {self.entropy()}")
-

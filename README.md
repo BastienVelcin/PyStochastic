@@ -17,7 +17,7 @@ The crandom module allows to generate samples of differents continuous probabili
 The crandom module allows to generate samples of differents discrete probability distributions.
 
 ### Stochastic Processes
-#### Sdandard Wiener / Brownian Motion Module - SBrownian (`processes/sbrownian.py`)
+#### Sdandard Wiener / Brownian Motion Module - SBrownian (`processes/brownian.py`)
 #### Geometric Brownian Motion Module - GBrownian (`processes/gbrownian.py`)
 #### Ornstein-Uhlenbeck Module - OrnUhl (`processes/ornhul.py`)
 #### Poisson Process Module - Poisson (`processes/poisson.py`)
