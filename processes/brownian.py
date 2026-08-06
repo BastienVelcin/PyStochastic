@@ -1,6 +1,5 @@
 import numpy as np
 import pyrandom.crandom
-import matplotlib
 import plotly.graph_objects as go
 from main import is_pos_def
 
@@ -17,17 +16,19 @@ class Brownian:
             raise ValueError("The covariance matrix is not positive-definite.")
 
         self.dim = dim
-        self.path = brownian_motion(self.var,self.dim,h,n)
+        self.sim = brownian_motion(self.var, self.dim,h,n)
+        self.path = self.sim[0]
+        self.increments =self.sim[1]
         self.h = h
         self.n = n
         self.t = np.arange(0, (n + 1) * self.h, self.h)
 
     def simulate(self):
-        self.path = brownian_motion(self.var, self.dim, self.h, self.n)
-        return self.path[0]
+        self.sim = brownian_motion(self.var, self.dim, self.h, self.n)
+        self.path = self.sim[0]
+        self.increments = self.sim[1]
+        return self.path
 
-    def increments(self):
-        return self.path[1]
     def plot(self):
         if self.dim > 3:
             raise ValueError("The path can be plotted only for 1D, 2D and 3D.")

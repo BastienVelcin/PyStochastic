@@ -21,7 +21,7 @@ class Milstein:
             raise NotImplementedError(
                 "Milstein is currently implemented only for autonomous one-dimensional SDEs."
             )
-        x_0 = np.array(x_0)
+        x_0 = np.atleast_1d(x_0)
         self.mu = mu
         self.sigma = sigma
         self.x_0 = x_0
@@ -29,7 +29,7 @@ class Milstein:
         self.t_n = t_n
         self.n_steps = n_steps
         self.n_simulations = n_simulations
-        self.dim = np.size(x_0)
+        self.dim = 1
         self.t = np.linspace(t_0,t_n,n_steps+1)
         self.dt = (t_n-t_0)/n_steps
 

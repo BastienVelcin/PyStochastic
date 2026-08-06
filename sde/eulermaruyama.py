@@ -1,7 +1,7 @@
 import numpy as np
 import plotly.graph_objects as go
 import processes.brownian
-
+from main import default_drift, default_diffusion
 
 class EulerMaruyama:
     '''
@@ -16,8 +16,8 @@ class EulerMaruyama:
     - n_steps : number of time steps
     - n_simulations : number of simulations
     '''
-    def __init__(self, mu,sigma, x_0=np.array(0), t_0=0,t_n=1, n_steps=1000,n_simulations=1):
-        x_0 = np.array(x_0)
+    def __init__(self, mu=default_drift,sigma=default_diffusion, x_0=np.array(0), t_0=0,t_n=1, n_steps=1000,n_simulations=1):
+        x_0 = np.atleast_1d(x_0)
         self.mu = mu
         self.sigma = sigma
         self.x_0 = x_0
@@ -29,16 +29,16 @@ class EulerMaruyama:
         self.t = np.linspace(t_0,t_n,n_steps+1)
         self.dt = (t_n-t_0)/n_steps
 
-    def solve(self, plot=True):
+    def solve(self, plot=False):
 
-        Y = np.zeros((self.n_simulations,self.n_steps,self.dim))
+        Y = np.zeros((self.n_simulations,self.n_steps+1,self.dim))
         Y[:,0,:] = self.x_0
         fig = go.Figure()
         for sim in range(self.n_simulations):
-            dW = processes.brownian.Brownian(np.eye(self.dim), self.dim, self.dt, self.n_steps).increments()
-            for i in range(1,self.n_steps):
+            dW = processes.brownian.Brownian(np.eye(self.dim), self.dim, self.dt, self.n_steps).increments
+            for i in range(1,self.n_steps+1):
 
-                Y[sim,i,:] = Y[sim,i-1,:] + self.mu(Y[sim,i-1,:],self.t[i-1])*self.dt + self.sigma(Y[sim,i-1,:],self.t[i-1]) * dW[i-1,:]
+                Y[sim,i,:] = Y[sim,i-1,:] + self.mu(Y[sim,i-1,:],self.t[i-1])*self.dt + self.sigma(Y[sim,i-1,:],self.t[i-1]) @ dW[i-1,:]
 
         if plot == True and self.dim <= 3:
             for sim in range(self.n_simulations):

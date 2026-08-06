@@ -7,6 +7,11 @@ import numpy as np
 def is_pos_def(x):
     return np.all(np.linalg.eigvals(x) > 0)
 
+def default_drift(x, t):
+    return 1
+
+def default_diffusion(x, t):
+    return 1
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
