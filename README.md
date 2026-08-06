@@ -19,7 +19,7 @@ The crandom module allows to generate samples of differents discrete probability
 ### Stochastic Processes
 #### Sdandard Wiener / Brownian Motion Module - SBrownian (`processes/brownian.py`)
 #### Geometric Brownian Motion Module - GBrownian (`processes/GeometricBrownianMotion.py`)
-#### Ornstein-Uhlenbeck Module - OrnUhl (`processes/ornhul.py`)
+#### Ornstein-Uhlenbeck Module - OrnUhl (`processes/ornuhl.py`)
 #### Poisson Process Module - Poisson (`processes/poisson.py`)
 #### Vasicek Model Module - Vasicek (`processes/vasicek.py`)
 #### Cox-Ingersoll-Ross Model Module - CIR (`processes/cir.py`)
