@@ -7,6 +7,7 @@ import numpy as np
 def is_pos_def(x):
     return np.all(np.linalg.eigvals(x) > 0)
 
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print_hi('PyCharm')

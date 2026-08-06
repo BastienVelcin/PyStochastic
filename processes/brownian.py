@@ -24,7 +24,10 @@ class Brownian:
 
     def simulate(self):
         self.path = brownian_motion(self.var, self.dim, self.h, self.n)
-        return self.path
+        return self.path[0]
+
+    def increments(self):
+        return self.path[1]
     def plot(self):
         if self.dim > 3:
             raise ValueError("The path can be plotted only for 1D, 2D and 3D.")
@@ -93,7 +96,8 @@ def brownian_motion(var=np.array(1),d=1, h=0.01, n=1000):
     Z = np.stack(N,axis=0)
 
     W = np.zeros((n+1,d))
+    increments = np.zeros((n,d))
     dW = np.sqrt(h) * L @ Z
     for k in range(n):
         W[k + 1] = W[k] + dW[:, k]
-    return W
+    return W,np.transpose(dW)
