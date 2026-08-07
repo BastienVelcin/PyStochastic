@@ -5,7 +5,7 @@ from main import is_pos_def
 
 
 class Brownian:
-    def __init__(self, var=None,dim=1,h=0.01,n=1000):
+    def __init__(self, var=None,dim=1,t_0=0, t_n=1,n_steps=1000):
         if var is None:
             var = np.eye(dim)
         self.var = np.array(var)
@@ -16,12 +16,13 @@ class Brownian:
             raise ValueError("The covariance matrix is not positive-definite.")
 
         self.dim = dim
-        self.sim = brownian_motion(self.var, self.dim,h,n)
+        self.t_0 = t_0
+        self.t_n = t_n
+        self.n_steps = n_steps
+        self.sim = brownian_motion(self.var, self.dim,self.t_0,self.t_n,self.n_steps)
         self.path = self.sim[0]
         self.increments =self.sim[1]
-        self.h = h
-        self.n = n
-        self.t = np.arange(0, (n + 1) * self.h, self.h)
+        self.t = np.linspace(self.t_0,self.t_n,self.n_steps+1)
 
     def simulate(self):
         self.sim = brownian_motion(self.var, self.dim, self.h, self.n)
@@ -66,12 +67,12 @@ class Brownian:
     def __repr__(self):
         return (f"Brownian Motion\n------------------------\n "
                 f"Dimension : {self.dim}\n "
-                f"Time horizon: {self.n*self.h}\n "
-                f"Time step: {self.h}\n "
+                f"Time horizon: {self.t_n}\n "
+                f"Time step: {(self.t_0-self.t_n)/self.n}\n "
                 f"Covariance matrix: \n"
                 f"{self.var}")
 
-def brownian_motion(var=np.array(1),d=1, h=0.01, n=1000):
+def brownian_motion(var=np.array(1),d=1, t_0 = 0, t_n = 1, n_steps = 1000):
     '''
     Simulate a d-dimensional Brownian motion.
 
@@ -81,8 +82,10 @@ def brownian_motion(var=np.array(1),d=1, h=0.01, n=1000):
         Covariance matrix.
     d : int
         Dimension.
-    h : float
-        Time step.
+    t_0 : float
+        First time.
+    t_n : float
+        Time horizon
     n : int
         Number of time steps.
 
@@ -91,14 +94,16 @@ def brownian_motion(var=np.array(1),d=1, h=0.01, n=1000):
     ndarray
         Simulated Brownian path of shape (n+1,d).
     '''
+
+    h = (t_n-t_0)/n_steps
     L = np.linalg.cholesky(var)
 
-    N = [pyrandom.crandom.normal(0,1,n) for _ in range(d)]
+    N = [pyrandom.crandom.normal(0,1,n_steps) for _ in range(d)]
     Z = np.stack(N,axis=0)
 
-    W = np.zeros((n+1,d))
-    increments = np.zeros((n,d))
+    W = np.zeros((n_steps+1,d))
+    increments = np.zeros((n_steps,d))
     dW = np.sqrt(h) * L @ Z
-    for k in range(n):
+    for k in range(n_steps):
         W[k + 1] = W[k] + dW[:, k]
     return W,np.transpose(dW)

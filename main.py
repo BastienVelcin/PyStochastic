@@ -13,9 +13,19 @@ def default_drift(x, t):
 def default_diffusion(x, t):
     return 1
 
+def quadrature(f,a,b,n):
+    approx = 0
+    dt = (b-a)/n
+    t = np.linspace(a,b,n)
+    for i in range(1,n):
+        approx += dt*(f(t[i-1])+f(t[i]))/2
+    return approx
+
+mat_quad = np.vectorize(quadrature)
+
+def carre(x):
+    return x**2
 # Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 

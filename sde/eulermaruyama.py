@@ -37,9 +37,7 @@ class EulerMaruyama:
         for sim in range(self.n_simulations):
             dW = processes.brownian.Brownian(np.eye(self.dim), self.dim, self.dt, self.n_steps).increments
             for i in range(1,self.n_steps+1):
-
                 Y[sim,i,:] = Y[sim,i-1,:] + self.mu(Y[sim,i-1,:],self.t[i-1])*self.dt + self.sigma(Y[sim,i-1,:],self.t[i-1]) @ dW[i-1,:]
-
         if plot == True and self.dim <= 3:
             for sim in range(self.n_simulations):
                 if self.dim == 1:

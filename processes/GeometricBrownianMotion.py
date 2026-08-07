@@ -22,6 +22,7 @@ class GeometricBrownianMotion:
     - n_simulations : number of simulations
     '''
     def __init__(self, mu=1, sigma=1, S_0=1,t_0=0, t_n=1, n_steps=1000):
+
         self.mu = np.atleast_1d(mu)
         self.sigma = np.atleast_2d(sigma)
         self.S_0 = np.atleast_1d(S_0)
@@ -30,7 +31,7 @@ class GeometricBrownianMotion:
         self.n_steps = n_steps
         self.dim = np.size(S_0)
         self.t = np.linspace(t_0, t_n, n_steps+1)
-
+        self.path = None
         if not(np.shape(self.sigma)[0] == np.shape(self.sigma)[1] == self.dim == np.size(self.mu)):
             raise ValueError("The dimension of the volatility matrix, of the drift and of the starting point must coincide.")
 
@@ -43,18 +44,21 @@ class GeometricBrownianMotion:
     def simulate(self, method="exact"):
         if method == "euler-maruyama":
             self.path = EulerMaruyama(self.drift, self.diffusion, self.S_0, self.t_0, self.t_n, self.n_steps, 1).solve()[0, :, :]
-
-        else:
+        elif method == "exact":
             self.path = np.zeros((self.n_steps+1, self.dim))
             W = Brownian(np.eye(self.dim), self.dim, self.t[1] - self.t[0], self.n_steps)
             for i in range(0, self.n_steps+1):
                 self.path[i, :] = self.S_0 * np.exp(
                     (self.mu - np.sum(self.sigma ** 2, axis=1) / 2) * self.t[i] + self.sigma   @ W.path[i,:])
+        else:
+            raise ValueError("The method must be either 'euler-maruyama' or 'exact'.")
         return self.path
 
     def plot(self):
         if self.dim > 3:
             raise ValueError("The path can be plotted only for 1D, 2D and 3D.")
+        if self.path is None:
+            raise ValueError("The path has not been simulated yet. Please run the simulate method first.")
         fig = go.Figure()
 
         if self.dim == 1:
