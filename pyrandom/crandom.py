@@ -1,10 +1,6 @@
 import numpy as np
 import sys
 
-import scipy
-import scipy as sp
-
-
 
 #######################################################################################################
 # CRANDOM MODULE                                                                                      #
@@ -37,19 +33,19 @@ def uniform(a=0,b=1,n=1):
     '''
 
     (a,b) = (min(a,b),max(a,b))
-    u = np.array([np.random.uniform(0,1)*(b-a)+a for i in range(n)])
-    return u
+    return np.random.uniform(0, 1, size=n)*(b-a)+a
 
 def exponential(alpha=1,n=1):
-    if alpha < 0:
+    '''
+        :param alpha: parameter for the exponential distribution
+        :param n: number of samples
+
+        The exponential function returns n samples of an alpha-exponential distribution, with the generalized inverse density function.
+    '''
+
+    if alpha <= 0:
         raise ValueError("The parameter should be greater than 0.")
 
-    '''
-    :param alpha: parameter for the exponential distribution
-    :param n: number of samples
-
-    The exponential function returns n samples of an alpha-exponential distribution, with the generalized inverse density function.
-    '''
 
     return (-1 / alpha)*np.log(1 - uniform(0,1,n))
 
@@ -72,7 +68,7 @@ def normal(mean=0, sd=1,n=1):
 
     return (np.sqrt(-2*np.log(U))*np.cos(2*np.pi*V))*sd + mean
 
-def gamma(p=1, theta=1,n=1):
+def _gamma_frac_reject(p, size):
 
     '''
     :param p: shape parameter
@@ -82,13 +78,36 @@ def gamma(p=1, theta=1,n=1):
     The gamma function returns n samples of a gamma distribution of parameters (p, theta).
     '''
 
+    t = np.e / (np.e + p)
+    out = np.empty(0)
+    while out.size < size:
+        m = size - out.size
+        U0 = np.random.uniform(0, 1, m)
+        U1 = np.random.uniform(0, 1, m)
+        W  = np.random.uniform(0, 1, m)
+        branch1 = U0 <= t
+
+        X = np.where(branch1, U1**(1/p), 1 - np.log(U1))
+        accept = np.where(branch1, W <= np.exp(-X), W <= X**(p - 1))
+
+        out = np.concatenate([out, X[accept]])
+    return out[:size]
+
+def gamma(p=1, theta=1, n=1):
     if p <= 0:
         raise ValueError("The first parameter should be greater than 0.")
     if theta <= 0:
         raise ValueError("The second parameter should be greater than 0.")
 
-    E = exponential(1/theta,n)
-    return np.array(sum(E))
+    p_int, p_frac = int(np.floor(p)), p - int(np.floor(p))
+
+    int_part = np.zeros(n)
+    for _ in range(p_int):
+        int_part += exponential(1, n)
+
+    frac_part = _gamma_frac_reject(p_frac, n) if p_frac > 1e-12 else np.zeros(n)
+
+    return theta * (int_part + frac_part)
 
 def beta(a=1,b=1,n=1):
 

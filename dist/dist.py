@@ -4,7 +4,6 @@ import scipy
 
 import pyrandom.crandom
 import numpy as np
-from scipy import special
 
 class Distribution(ABC):
 
@@ -181,7 +180,7 @@ class Normal(Distribution):
             print("Probability density function :")
             print(f"| (1/{self.sd}*sqrt(2*pi)) * exp(-(x-{self.mu})^2 / 2*{self.sd}^2)")
         else:
-            return (1/(self.sd*np.sqrt(2*np.pi)))*np.exp(-(x-self.mu)**2 / 2*(self.sd)**2)
+            return (1/(self.sd*np.sqrt(2*np.pi)))*np.exp(-(x - self.mu)**2 / (2*self.sd**2))
 
     def cdf(self, x=None):
         if x is None:
