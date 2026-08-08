@@ -33,7 +33,7 @@ class CIR:
 
     def simulate(self, method="exact"):
         if method == "euler-maruyama":
-            if (2 * self.a * self.b < sigma ** 2):
+            if (2 * self.a * self.b < self.sigma ** 2):
                 raise ValueError(
                     "The model parameters are inconsistent with the model. Please choose a, b and sigma such that 2*a*b >= sigma^2"
                 )
