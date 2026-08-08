@@ -32,31 +32,32 @@ def uniform(a=0,b=1,n=1):
     The uniform function returns n samples of a uniform distribution on (a,b).
     '''
 
-    (a,b) = (min(a,b),max(a,b))
+    if a > b:
+        raise ValueError("The lower bound should be inferior or equal to the upper bound.")
+
     return np.random.uniform(0, 1, size=n)*(b-a)+a
 
 def exponential(alpha=1,n=1):
     '''
-        :param alpha: parameter for the exponential distribution
-        :param n: number of samples
+    :param alpha: parameter for the exponential distribution
+    :param n: number of samples
 
-        The exponential function returns n samples of an alpha-exponential distribution, with the generalized inverse density function.
+    The exponential function returns n samples of an alpha-exponential distribution, with the generalized inverse density function.
     '''
 
     if alpha <= 0:
         raise ValueError("The parameter should be greater than 0.")
-
 
     return (-1 / alpha)*np.log(1 - uniform(0,1,n))
 
 def normal(mean=0, sd=1,n=1):
 
     '''
-        :param mean: mean of the normal distribution
-        :param sd: standard deviation of the normal distribution
-        :param n: number of samples
+    :param mean: mean of the normal distribution
+    :param sd: standard deviation of the normal distribution
+    :param n: number of samples
 
-        The normal function returns n samples of a normal distribution of parameters (mean, sd^2) with the Box-Muller method
+    The normal function returns n samples of a normal distribution of parameters (mean, sd^2) with the Box-Muller method
     '''
 
     if sd <= 0:
@@ -72,10 +73,10 @@ def _gamma_frac_reject(p, size):
 
     '''
     :param p: shape parameter
-    :param theta: inverse intensity parameter
+    :param theta: form / inverse intensity parameter
     :param n: number of samples
 
-    The gamma function returns n samples of a gamma distribution of parameters (p, theta).
+    The _gamma_frac_reject provides the rejection sampling for the gamma function.
     '''
 
     t = np.e / (np.e + p)
@@ -94,10 +95,20 @@ def _gamma_frac_reject(p, size):
     return out[:size]
 
 def gamma(p=1, theta=1, n=1):
+
+    '''
+
+    :param p: shape parameter
+    :param theta: form / inverse intensity parameter
+    :param n: number of samples
+
+    The gamma function returns n samples of a gamma distribution of parameters (p,theta),
+    '''
+
     if p <= 0:
-        raise ValueError("The first parameter should be greater than 0.")
+        raise ValueError("The shape parameter should be greater than 0.")
     if theta <= 0:
-        raise ValueError("The second parameter should be greater than 0.")
+        raise ValueError("The form parameter should be greater than 0.")
 
     p_int, p_frac = int(np.floor(p)), p - int(np.floor(p))
 
@@ -120,6 +131,11 @@ def beta(a=1,b=1,n=1):
     X ~ Gamma(a,1), Y ~ Gamma(b,1) ==> X/(X+Y) ~ Beta(a,b)
     '''
 
+    if a <= 0:
+        raise ValueError("The first shape parameter should be greater than 0.")
+    if b <= 0:
+        raise ValueError("The second shape parameter should be greater than 0.")
+
     X = gamma(a,1,n)
     Y = gamma(b,1,n)
     return X/(X+Y)
@@ -133,6 +149,11 @@ def weibull(k=1, l=1, n=1):
 
     The weibull function returns n samples of a Weibull distribution of parameters (k,l).
     '''
+
+    if k <= 0:
+        raise ValueError("The shape parameter should be greater than 0.")
+    if l <= 0:
+        raise ValueError("The scale parameter should be greater than 0.")
 
     U = uniform(0,1,n)
     return l*(-np.log(1-U))**(1/k)
@@ -148,18 +169,26 @@ def frechet(a=1,s=1,m=0,n=1):
     The frechet function returns n samples of a Fréchet distribution of parameters (a,s,m).
     '''
 
+    if a <= 0:
+        raise ValueError("The shape parameter should be greater than 0.")
+    if s <= 0:
+        raise ValueError("The scale parameter should be greater than 0.")
+
     U = uniform(0, 1, n)
     return m+s*(-np.log(U))**(-1/a)
 
 def cauchy(x=0,a=1,n=1):
 
     '''
-        :param x: position parameter
-        :param a: scale parameter
-        :param n: number of samples
+    :param x: position parameter
+    :param a: scale parameter
+    :param n: number of samples
 
-        The cauchy function returns n samples of a Cauchy distribution of parameters (x,a).
+    The cauchy function returns n samples of a Cauchy distribution of parameters (x,a).
     '''
+
+    if a <= 0:
+        raise ValueError("The scale parameter should be greater than 0.")
 
     U = uniform(0, 1, n)
     return a*np.tan(np.pi*U - np.pi/2)+x
@@ -174,6 +203,9 @@ def gumbel(mu=0,beta=1,n=1):
     The gumbel function returns n samples of a Gumbel distribution of parameters (mu, beta).
     '''
 
+    if beta <= 0:
+        raise ValueError("The scale parameter should be greater than 0.")
+
     U = uniform(0, 1, n)
     return mu-beta*np.log(-np.log(U))
 
@@ -186,6 +218,11 @@ def kumaraswamy(a=1,b=1,n=1):
 
     The kumaraswamy function returns n samples of a Kumaraswamy distribution of parameters (a,b).
     '''
+
+    if a <= 0:
+        raise ValueError("The first shape parameter should be greater than 0.")
+    if b <= 0:
+        raise ValueError("The second shape parameter should be greater than 0.")
 
     U = uniform(0, 1, n)
     return (1-(1-U)**(1/b))**(1/a)
@@ -200,6 +237,11 @@ def fisher(d1=1,d2=1,n=1):
     The fisher function returns n samples of a Fisher distribution of parameters (d1,d2).
     '''
 
+    if a <= 0:
+        raise ValueError("The first degree of freedom should be greater than 0.")
+    if b <= 0:
+        raise ValueError("The second degree of freedom should be greater than 0.")
+
     U = gamma(d1/2,2,n)
     V = gamma(d2 / 2, 2, n)
     return (U*d2)/(V*d1)
@@ -207,12 +249,17 @@ def fisher(d1=1,d2=1,n=1):
 def pareto(a=1,b=1,n=1):
 
     '''
-
     :param a: position parameter
     :param b: shape parameter
     :param n: number of samples
+
     The pareto function returns n samples of a Pareto distribution of parameters (a,b).
     '''
+
+    if a <= 0:
+        raise ValueError("The position parameter should be greater than 0.")
+    if b <= 0:
+        raise ValueError("The shape parameter should be greater than 0.")
 
     U = uniform(0,1,n)
     return b/(U**(1/a))
@@ -220,9 +267,14 @@ def pareto(a=1,b=1,n=1):
 def rayleigh(s=1,n=1):
 
     '''
-        :param s: scale parameter
-        :param n: number of samples
-        The rayleigh function returns n samples of a Rayleigh distribution of parameter s.
-        '''
+    :param s: scale parameter
+    :param n: number of samples
+
+    The rayleigh function returns n samples of a Rayleigh distribution of parameter s.
+    '''
+
+    if s <= 0:
+        raise ValueError("The scale parameter should be greater than 0.")
+
     U = uniform(0, 1, n)
     return s*np.sqrt(-np.log(U))
