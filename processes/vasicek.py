@@ -1,7 +1,7 @@
 import numpy as np
-from sde.eulermaruyama import EulerMaruyama
-import pyrandom.crandom
 import plotly.graph_objects as go
+from ..sde.eulermaruyama import EulerMaruyama
+from ..pyrandom import crandom
 
 class Vasicek:
     def __init__(self,reversion_speed=1,mean=1,volatility=1,r_0=0,t_0=0, t_n=1, n_steps=1000, n_simulations=1):
@@ -41,7 +41,7 @@ class Vasicek:
             self.path = np.zeros((self.n_simulations, self.n_steps+1, 1))
             self.path[:,0] = self.r_0
             for sim in range(self.n_simulations):
-                Z = pyrandom.crandom.normal(0, 1, self.n_steps)
+                Z = crandom.normal(0, 1, self.n_steps)
                 for i in range(1,self.n_steps+1):
                     self.path[sim,i] = (self.mean+ (self.path[sim,i-1] - self.mean) * np.exp(-self.reversion_speed * self.dt) + self.volatility * np.sqrt((1 - np.exp(-2 * self.reversion_speed * self.dt)) / (2 * self.reversion_speed)) * Z[i-1])
         else:

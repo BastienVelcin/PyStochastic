@@ -1,7 +1,7 @@
 import numpy as np
 import plotly.graph_objects as go
-import processes.brownian
-from main import default_drift, default_diffusion
+from ..processes import brownian
+from ..utils import default_drift, default_diffusion
 
 class EulerMaruyama:
     '''
@@ -35,7 +35,7 @@ class EulerMaruyama:
         Y[:,0,:] = self.x_0
         fig = go.Figure()
         for sim in range(self.n_simulations):
-            dW = processes.brownian.Brownian(np.eye(self.dim), self.dim, self.t_0, self.t_n, self.n_steps).increments
+            dW = brownian.Brownian(np.eye(self.dim), self.dim, self.t_0, self.t_n, self.n_steps).increments
             for i in range(1,self.n_steps+1):
                 Y[sim,i,:] = Y[sim,i-1,:] + self.mu(Y[sim,i-1,:],self.t[i-1])*self.dt + self.sigma(Y[sim,i-1,:],self.t[i-1]) @ dW[i-1,:]
         if plot == True and self.dim <= 3:

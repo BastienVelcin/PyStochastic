@@ -1,6 +1,6 @@
 import numpy as np
 import plotly.graph_objects as go
-import processes.brownian
+from ..processes import brownian
 
 
 class Milstein:
@@ -42,7 +42,7 @@ class Milstein:
         Y[:,0,:] = self.x_0
         fig = go.Figure()
         for sim in range(self.n_simulations):
-            dW = processes.brownian.Brownian(np.eye(self.dim), self.dim, self.dt, self.n_steps).increments()
+            dW = brownian.Brownian(np.eye(self.dim), self.dim, self.dt, self.n_steps).increments()
             for i in range(1,self.n_steps):
                 Y[sim,i,:] = Y[sim,i-1,:] + self.mu(Y[sim,i-1,:])*self.dt + self.sigma(Y[sim,i-1,:]) * dW[i-1,:] + (1/2)*self.sigma(Y[sim,i-1,:])*self.approx_derivative_diffusion(Y[sim,i-1,:])*(dW[i-1,:]**2-self.dt)
 

@@ -1,7 +1,7 @@
 import numpy as np
-import pyrandom.crandom
 import plotly.graph_objects as go
-from main import is_pos_def
+from ..pyrandom import crandom
+from ..utils import is_pos_def
 
 
 class Brownian:
@@ -98,7 +98,7 @@ def brownian_motion(var=np.array(1),d=1, t_0 = 0, t_n = 1, n_steps = 1000):
     h = (t_n-t_0)/n_steps
     L = np.linalg.cholesky(var)
 
-    N = [pyrandom.crandom.normal(0,1,n_steps) for _ in range(d)]
+    N = [crandom.normal(0,1,n_steps) for _ in range(d)]
     Z = np.stack(N,axis=0)
 
     W = np.zeros((n_steps+1,d))

@@ -1,8 +1,7 @@
 import numpy as np
-from sde.eulermaruyama import EulerMaruyama
-import pyrandom.crandom
 import plotly.graph_objects as go
-
+from ..pyrandom import crandom
+from ..sde.eulermaruyama import EulerMaruyama
 class OrnsteinUhlenbeck:
     def __init__(self,mean=0,sigma=1,theta=1,r_0=0,t_0=0, t_n=1, n_steps=1000,n_simulations=1):
         self.mean = np.atleast_1d(mean)
@@ -40,7 +39,7 @@ class OrnsteinUhlenbeck:
             self.path = np.zeros((self.n_simulations,self.n_steps+1, 1))
             self.path[:,0] = self.r_0
             for sim in range(self.n_simulations):
-                Z = pyrandom.crandom.normal(0, 1, self.n_steps)
+                Z = crandom.normal(0, 1, self.n_steps)
                 for i in range(1,self.n_steps+1):
                     self.path[sim,i] = (self.mean+ (self.path[sim,i-1] - self.mean) * np.exp(-self.theta * self.dt) + self.sigma * np.sqrt((1 - np.exp(-2 * self.theta * self.dt)) / (2 * self.theta)) * Z[i-1])
         else:

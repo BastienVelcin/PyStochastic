@@ -1,8 +1,8 @@
 import numpy as np
-from sde.eulermaruyama import EulerMaruyama
-import pyrandom.crandom
 import plotly.graph_objects as go
 import scipy
+from ..sde.eulermaruyama import EulerMaruyama
+
 class CIR:
     def __init__(self, a=1, b=1, sigma=1, r_0=0, t_0=0, t_n=1, n_steps=1000,n_simulations=1):
         self.a = a

@@ -1,11 +1,7 @@
 import numpy as np
-import pyrandom.crandom
-import matplotlib
 import plotly.graph_objects as go
-from main import is_pos_def
-from sde.eulermaruyama import EulerMaruyama
-from processes.brownian import Brownian
-from main import default_drift, default_diffusion
+from ..sde.eulermaruyama import EulerMaruyama
+from .brownian import Brownian
 
 class GeometricBrownianMotion:
     '''

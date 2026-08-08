@@ -1,8 +1,6 @@
 import numpy as np
-from sde.eulermaruyama import EulerMaruyama
-import pyrandom.crandom
 import plotly.graph_objects as go
-from pyrandom.crandom import exponential
+from ..pyrandom import crandom
 
 class Poisson:
     def __init__(self,intensity=1,t_0=0, t_n=10, n_steps=1000, n_simulations=1):
@@ -19,7 +17,7 @@ class Poisson:
         for sim in range(self.n_simulations):
             T = [0]
             while T[-1] < self.t_n:
-                E = exponential(self.intensity).item()
+                E = crandom.exponential(self.intensity).item()
                 T.append(T[-1] + E)
             T = np.array(T)
             for i in range(self.n_steps+1):
