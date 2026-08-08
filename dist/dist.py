@@ -215,7 +215,7 @@ class Gamma(Distribution):
         if k <=0:
             raise ValueError("The form parameter should be greater than 0.")
         if theta <=0:
-            raise ValueError("The scale parameter should be greater than 0.")
+            raise ValueError("The rate parameter should be greater than 0.")
 
         self.k = k
         self.theta = theta

@@ -73,7 +73,7 @@ def _gamma_frac_reject(p, size):
 
     '''
     :param p: shape parameter
-    :param theta: form / inverse intensity parameter
+    :param theta: rate parameter
     :param n: number of samples
 
     The _gamma_frac_reject provides the rejection sampling for the gamma function.
@@ -99,7 +99,7 @@ def gamma(p=1, theta=1, n=1):
     '''
 
     :param p: shape parameter
-    :param theta: form / inverse intensity parameter
+    :param theta: rate parameter
     :param n: number of samples
 
     The gamma function returns n samples of a gamma distribution of parameters (p,theta),
@@ -108,7 +108,7 @@ def gamma(p=1, theta=1, n=1):
     if p <= 0:
         raise ValueError("The shape parameter should be greater than 0.")
     if theta <= 0:
-        raise ValueError("The form parameter should be greater than 0.")
+        raise ValueError("The rate parameter should be greater than 0.")
 
     p_int, p_frac = int(np.floor(p)), p - int(np.floor(p))
 
@@ -118,7 +118,7 @@ def gamma(p=1, theta=1, n=1):
 
     frac_part = _gamma_frac_reject(p_frac, n) if p_frac > 1e-12 else np.zeros(n)
 
-    return theta * (int_part + frac_part)
+    return (int_part + frac_part)/theta
 
 def beta(a=1,b=1,n=1):
 
@@ -237,13 +237,13 @@ def fisher(d1=1,d2=1,n=1):
     The fisher function returns n samples of a Fisher distribution of parameters (d1,d2).
     '''
 
-    if a <= 0:
+    if d1 <= 0:
         raise ValueError("The first degree of freedom should be greater than 0.")
-    if b <= 0:
+    if d2 <= 0:
         raise ValueError("The second degree of freedom should be greater than 0.")
 
-    U = gamma(d1/2,2,n)
-    V = gamma(d2 / 2, 2, n)
+    U = gamma(d1/2,0.5,n)
+    V = gamma(d2 / 2, 0.5, n)
     return (U*d2)/(V*d1)
 
 def pareto(a=1,b=1,n=1):
@@ -277,4 +277,4 @@ def rayleigh(s=1,n=1):
         raise ValueError("The scale parameter should be greater than 0.")
 
     U = uniform(0, 1, n)
-    return s*np.sqrt(-np.log(U))
+    return s*np.sqrt(-2*np.log(U))
