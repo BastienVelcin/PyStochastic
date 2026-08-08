@@ -3,14 +3,15 @@ from sde.eulermaruyama import EulerMaruyama
 import pyrandom.crandom
 import plotly.graph_objects as go
 
-class OrnsteinUhlenbeck:
-    def __init__(self,mean=0,sigma=1,theta=1,r_0=0,t_0=0, t_n=1, n_steps=1000,n_simulations=1):
+class Vasicek:
+    def __init__(self,reversion_speed=1,mean=1,volatility=1,r_0=0,t_0=0, t_n=1, n_steps=1000, n_simulations=1):
+        self.reversion_speed = np.atleast_2d(reversion_speed)
         self.mean = np.atleast_1d(mean)
-        self.sigma = np.atleast_2d(sigma)
-        self.theta = np.atleast_2d(theta)
+        self.volatility = np.atleast_2d(volatility)
 
-        if np.any(self.sigma < 0) or np.any(self.theta < 0):
+        if np.any(self.reversion_speed <= 0) or np.any(self.volatility < 0):
             raise ValueError("The sigma and theta parameters should be greater than 0.")
+
 
         self.r_0 = np.atleast_1d(r_0)
         self.t_0 = t_0
@@ -22,14 +23,14 @@ class OrnsteinUhlenbeck:
         self.dt = (t_n-t_0)/n_steps
         self.path = None
 
-        if not(np.shape(self.sigma)[0] == np.shape(self.sigma)[1] == self.dim == np.shape(self.theta)[0] == np.shape(self.theta)[1] ==  self.r_0.size):
+        if not(np.shape(self.reversion_speed)[0] == np.shape(self.reversion_speed)[1] == self.dim == np.shape(self.volatility)[0] == np.shape(self.volatility)[1]  == self.r_0.size):
             raise ValueError("The dimension of the the mean, signa, theta, and of the starting point must coincide.")
 
     def drift(self,x,t):
-        return self.theta @ (self.mean-x)
+        return self.reversion_speed @ (self.mean-x)
 
     def diffusion(self,x,t):
-        return self.sigma
+        return self.volatility
 
     def simulate(self, method="euler-maruyama"):
         if method == "euler-maruyama":
@@ -37,12 +38,12 @@ class OrnsteinUhlenbeck:
         elif method == "exact":
             if self.dim > 1:
                 raise ValueError("The exact method is only implemented for 1D processes.")
-            self.path = np.zeros((self.n_simulations,self.n_steps+1, 1))
+            self.path = np.zeros((self.n_simulations, self.n_steps+1, 1))
             self.path[:,0] = self.r_0
             for sim in range(self.n_simulations):
                 Z = pyrandom.crandom.normal(0, 1, self.n_steps)
                 for i in range(1,self.n_steps+1):
-                    self.path[sim,i] = (self.mean+ (self.path[sim,i-1] - self.mean) * np.exp(-self.theta * self.dt) + self.sigma * np.sqrt((1 - np.exp(-2 * self.theta * self.dt)) / (2 * self.theta)) * Z[i-1])
+                    self.path[sim,i] = (self.mean+ (self.path[sim,i-1] - self.mean) * np.exp(-self.reversion_speed * self.dt) + self.volatility * np.sqrt((1 - np.exp(-2 * self.reversion_speed * self.dt)) / (2 * self.reversion_speed)) * Z[i-1])
         else:
             raise ValueError("The method must be either 'euler-maruyama' or 'exact'.")
         return self.path

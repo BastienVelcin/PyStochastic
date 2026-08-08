@@ -21,7 +21,7 @@ class GeometricBrownianMotion:
     - n_steps : number of time steps
     - n_simulations : number of simulations
     '''
-    def __init__(self, mu=1, sigma=1, S_0=1,t_0=0, t_n=1, n_steps=1000):
+    def __init__(self, mu=1, sigma=1, S_0=1,t_0=0, t_n=1, n_steps=1000, n_simulations=1):
 
         self.mu = np.atleast_1d(mu)
         self.sigma = np.atleast_2d(sigma)
@@ -29,6 +29,7 @@ class GeometricBrownianMotion:
         self.t_0 = t_0
         self.t_n = t_n
         self.n_steps = n_steps
+        self.n_simulations = n_simulations
         self.dim = np.size(S_0)
         self.t = np.linspace(t_0, t_n, n_steps+1)
         self.path = None
@@ -43,13 +44,14 @@ class GeometricBrownianMotion:
 
     def simulate(self, method="exact"):
         if method == "euler-maruyama":
-            self.path = EulerMaruyama(self.drift, self.diffusion, self.S_0, self.t_0, self.t_n, self.n_steps, 1).solve()[0, :, :]
+            self.path = EulerMaruyama(self.drift, self.diffusion, self.S_0, self.t_0, self.t_n, self.n_steps, self.n_simulations).solve()
         elif method == "exact":
-            self.path = np.zeros((self.n_steps+1, self.dim))
-            W = Brownian(np.eye(self.dim), self.dim, self.t[1] - self.t[0], self.n_steps)
-            for i in range(0, self.n_steps+1):
-                self.path[i, :] = self.S_0 * np.exp(
-                    (self.mu - np.sum(self.sigma ** 2, axis=1) / 2) * self.t[i] + self.sigma   @ W.path[i,:])
+            self.path = np.zeros((self.n_simulations,self.n_steps+1, self.dim))
+            for sim in range(self.n_simulations):
+                W = Brownian(np.eye(self.dim), self.dim, self.t_0, self.t_n, self.n_steps)
+                for i in range(0, self.n_steps+1):
+                    self.path[sim,i, :] = self.S_0 * np.exp(
+                        (self.mu - np.sum(self.sigma ** 2, axis=1) / 2) * self.t[i] + self.sigma   @ W.path[i,:])
         else:
             raise ValueError("The method must be either 'euler-maruyama' or 'exact'.")
         return self.path
@@ -62,13 +64,15 @@ class GeometricBrownianMotion:
         fig = go.Figure()
 
         if self.dim == 1:
-            fig.add_trace(go.Scatter(x=self.t, y=self.path[:, 0], mode="lines", line=dict(width=2)))
+            for sim in range(self.n_simulations):
+                fig.add_trace(go.Scatter(x=self.t, y=self.path[sim,:, 0], mode="lines", line=dict(width=2)))
 
         elif self.dim == 2:
-            fig.add_trace(go.Scatter(x=self.path[:, 0], y=self.path[:, 1], mode="lines", line=dict(width=2)))
+            for sim in range(self.n_simulations):
+                fig.add_trace(go.Scatter(x=self.path[sim,:, 0], y=self.path[sim, :, 1], mode="lines", line=dict(width=2)))
 
         else:
-            fig.add_trace(
-                go.Scatter3d(x=self.path[:, 0], y=self.path[:, 1], z=self.path[:, 2], mode="lines", line=dict(width=2)))
+            for sim in range(self.n_simulations):
+                fig.add_trace(go.Scatter3d(x=self.path[sim,:, 0], y=self.path[sim,:, 1], z=self.path[sim,:, 2], mode="lines", line=dict(width=2)))
 
         fig.show()
