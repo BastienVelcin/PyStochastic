@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 from pystochastic.pyrandom import crandom
 
 class OrnsteinUhlenbeck:
-    def __init__(self,mean=0,sigma=1,theta=1,r_0=0,t_0=0, t_n=1, n_steps=1000,n_simulations=1):
+    def __init__(self,mean=0,sigma=1,theta=1,r_0=0,t_0=0, t_n=1, n_steps=1000):
         self.mean = np.atleast_1d(mean)
         self.sigma = np.atleast_2d(sigma)
         self.theta = np.atleast_2d(theta)
@@ -15,7 +15,7 @@ class OrnsteinUhlenbeck:
         self.t_0 = t_0
         self.t_n = t_n
         self.n_steps = n_steps
-        self.n_simulations = n_simulations
+        self.n_simulations = None
         self.dim = np.size(self.mean)
         self.t = np.linspace(t_0,t_n,n_steps+1)
         self.dt = (t_n-t_0)/n_steps
@@ -30,21 +30,22 @@ class OrnsteinUhlenbeck:
     def diffusion(self,x,t):
         return self.sigma
 
-    def simulate(self, method="euler-maruyama"):
+    def simulate(self, n_simulations=1, method="euler-maruyama"):
         if method == "euler-maruyama":
             from pystochastic.sde import EulerMaruyama
-            self.path = EulerMaruyama(self.drift,self.diffusion,self.r_0,self.t_0,self.t_n,self.n_steps,self.n_simulations).solve()
+            self.path = EulerMaruyama(self.drift,self.diffusion,self.r_0,self.t_0,self.t_n,self.n_steps,n_simulations).solve()
         elif method == "exact":
             if self.dim > 1:
                 raise ValueError("The exact method is only implemented for 1D processes.")
-            self.path = np.zeros((self.n_simulations,self.n_steps+1, 1))
+            self.path = np.zeros((n_simulations,self.n_steps+1, 1))
             self.path[:,0] = self.r_0
-            for sim in range(self.n_simulations):
+            for sim in range(n_simulations):
                 Z = crandom.normal(0, 1, self.n_steps)
                 for i in range(1,self.n_steps+1):
                     self.path[sim,i] = (self.mean+ (self.path[sim,i-1] - self.mean) * np.exp(-self.theta * self.dt) + self.sigma * np.sqrt((1 - np.exp(-2 * self.theta * self.dt)) / (2 * self.theta)) * Z[i-1])
         else:
             raise ValueError("The method must be either 'euler-maruyama' or 'exact'.")
+        self.n_simulations = n_simulations
         return self.path
 
     def plot(self):

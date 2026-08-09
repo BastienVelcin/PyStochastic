@@ -55,12 +55,7 @@ class Distribution(ABC):
 
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=x_axis, y=y_axis, mode="lines", name="PDF", line=dict(width=2)))
-        fig.update_layout(
-            title="Fonction de densité de probabilité",
-            xaxis_title="x",
-            yaxis_title="f(x)",
-            template="plotly_white",
-        )
+        fig.update_layout(title="Probability Density Function",xaxis_title="x",yaxis_title="f(x)")
         fig.show()
 
 

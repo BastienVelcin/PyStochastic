@@ -3,24 +3,26 @@ import plotly.graph_objects as go
 from pystochastic.pyrandom import crandom
 
 class Poisson:
-    def __init__(self,intensity=1,t_0=0, t_n=10, n_steps=1000, n_simulations=1):
+    def __init__(self,intensity=1,t_0=0, t_n=10, n_steps=1000):
         self.intensity = intensity
         self.t_0 = t_0
         self.t_n = t_n
         self.n_steps = n_steps
-        self.n_simulations = n_simulations
+        self.n_simulations = None
         self.t = np.linspace(t_0,t_n,n_steps+1)
         self.path = None
 
-    def simulate(self):
-        self.path = np.zeros((self.n_simulations,self.n_steps+1))
-        for sim in range(self.n_simulations):
+    def simulate(self,n_simulations=1):
+        self.path = np.zeros((n_simulations,self.n_steps+1))
+        for sim in range(n_simulations):
             T = [0]
             while T[-1] < self.t_n:
                 E = crandom.exponential(self.intensity).item()
                 T.append(T[-1] + E)
             for i in range(1,self.n_steps+1):
                 self.path[sim,i]= sum(T<= self.t[i])
+
+        self.n_simulations = n_simulations
         return self.path
 
     def plot(self):

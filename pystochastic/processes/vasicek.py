@@ -16,7 +16,7 @@ class Vasicek:
         self.t_0 = t_0
         self.t_n = t_n
         self.n_steps = n_steps
-        self.n_simulations = n_simulations
+        self.n_simulations = None
         self.dim = np.size(self.mean)
         self.t = np.linspace(t_0,t_n,n_steps+1)
         self.dt = (t_n-t_0)/n_steps
@@ -31,21 +31,22 @@ class Vasicek:
     def diffusion(self,x,t):
         return self.volatility
 
-    def simulate(self, method="euler-maruyama"):
+    def simulate(self, n_simulations=1, method="euler-maruyama"):
         if method == "euler-maruyama":
             from pystochastic.sde import EulerMaruyama
-            self.path = EulerMaruyama(self.drift,self.diffusion,self.r_0,self.t_0,self.t_n,self.n_steps,self.n_simulations).solve()
+            self.path = EulerMaruyama(self.drift,self.diffusion,self.r_0,self.t_0,self.t_n,self.n_steps,n_simulations).solve()
         elif method == "exact":
             if self.dim > 1:
                 raise ValueError("The exact method is only implemented for 1D processes.")
-            self.path = np.zeros((self.n_simulations, self.n_steps+1, 1))
+            self.path = np.zeros((n_simulations, self.n_steps+1, 1))
             self.path[:,0] = self.r_0
-            for sim in range(self.n_simulations):
+            for sim in range(n_simulations):
                 Z = crandom.normal(0, 1, self.n_steps)
                 for i in range(1,self.n_steps+1):
                     self.path[sim,i] = (self.mean+ (self.path[sim,i-1] - self.mean) * np.exp(-self.reversion_speed * self.dt) + self.volatility * np.sqrt((1 - np.exp(-2 * self.reversion_speed * self.dt)) / (2 * self.reversion_speed)) * Z[i-1])
         else:
             raise ValueError("The method must be either 'euler-maruyama' or 'exact'.")
+        self.n_simulations = n_simulations
         return self.path
 
     def plot(self):

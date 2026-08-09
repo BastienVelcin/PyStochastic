@@ -16,7 +16,7 @@ class GeometricBrownianMotion:
     - n_steps : number of time steps
     - n_simulations : number of simulations
     '''
-    def __init__(self, mu=1, sigma=1, S_0=1,t_0=0, t_n=1, n_steps=1000, n_simulations=1):
+    def __init__(self, mu=1, sigma=1, S_0=1,t_0=0, t_n=1, n_steps=1000):
 
         self.mu = np.atleast_1d(mu)
         self.sigma = np.atleast_2d(sigma)
@@ -24,7 +24,7 @@ class GeometricBrownianMotion:
         self.t_0 = t_0
         self.t_n = t_n
         self.n_steps = n_steps
-        self.n_simulations = n_simulations
+        self.n_simulations = None
         self.dim = np.size(S_0)
         self.t = np.linspace(t_0, t_n, n_steps+1)
         self.path = None
@@ -37,19 +37,20 @@ class GeometricBrownianMotion:
     def diffusion(self, x, t):
         return self.sigma
 
-    def simulate(self, method="exact"):
+    def simulate(self,n_simulations=1, method="exact"):
         if method == "euler-maruyama":
             from pystochastic.sde import EulerMaruyama
             self.path = EulerMaruyama(self.drift, self.diffusion, self.S_0, self.t_0, self.t_n, self.n_steps, self.n_simulations).solve()
         elif method == "exact":
-            self.path = np.zeros((self.n_simulations,self.n_steps+1, self.dim))
-            for sim in range(self.n_simulations):
+            self.path = np.zeros((n_simulations,self.n_steps+1, self.dim))
+            for sim in range(n_simulations):
                 W = Brownian(np.eye(self.dim), self.dim, self.t_0, self.t_n, self.n_steps)
                 for i in range(0, self.n_steps+1):
                     self.path[sim,i, :] = self.S_0 * np.exp(
                         (self.mu - np.sum(self.sigma ** 2, axis=1) / 2) * self.t[i] + self.sigma   @ W.path[i,:])
         else:
             raise ValueError("The method must be either 'euler-maruyama' or 'exact'.")
+        self.n_simulations = n_simulations
         return self.path
 
     def plot(self):
