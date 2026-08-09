@@ -1,8 +1,10 @@
-from abc import abstractmethod, ABC
-import matplotlib.pyplot as plt
-import scipy
-from pystochastic.pyrandom import crandom
 import numpy as np
+import scipy
+import plotly.graph_objects as go
+from abc import abstractmethod, ABC
+from pystochastic.pyrandom import crandom
+
+
 
 class Distribution(ABC):
 
@@ -39,21 +41,27 @@ class Distribution(ABC):
         pass
 
     def plot_pdf(self):
-        lo_bound = -2
-        up_bound = 2
         supp = self.support()
-        if supp[0] > -np.inf:
-            lo_bound = supp[0]
-        if supp[1] < np.inf:
-            lo_bound = supp[1]
-        supp_lenght = up_bound-lo_bound
+        mu = self.mean() if callable(self.mean) else 0
+        sd = np.sqrt(self.variance()) if callable(self.variance) else 1
 
-        x_axis = np.linspace(lo_bound-0.1*supp_lenght,up_bound+0.1*supp_lenght,int(1000*(supp_lenght)))
+        lo_bound = max(supp[0], mu - 8 * sd) if supp[0] > -np.inf else mu - 8 * sd
+        up_bound = min(supp[1], mu + 8 * sd) if supp[1] < np.inf else mu + 8 * sd
+
+        supp_length = up_bound - lo_bound
+
+        x_axis = np.linspace(lo_bound - 0.1 * supp_length, up_bound + 0.1 * supp_length, int(1000 * supp_length))
         y_axis = [self.pdf(x) for x in x_axis]
-        plt.plot(x_axis,y_axis, label="Probability Density Function (PDF)")
-        plt.legend()
-        plt.grid(True)
-        plt.show()
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=x_axis, y=y_axis, mode="lines", name="PDF", line=dict(width=2)))
+        fig.update_layout(
+            title="Fonction de densité de probabilité",
+            xaxis_title="x",
+            yaxis_title="f(x)",
+            template="plotly_white",
+        )
+        fig.show()
 
 
 
