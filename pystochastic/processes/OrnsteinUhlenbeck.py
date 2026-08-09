@@ -1,7 +1,6 @@
 import numpy as np
 import plotly.graph_objects as go
 from pystochastic.pyrandom import crandom
-from pystochastic.sde import EulerMaruyama
 
 class OrnsteinUhlenbeck:
     def __init__(self,mean=0,sigma=1,theta=1,r_0=0,t_0=0, t_n=1, n_steps=1000,n_simulations=1):
@@ -33,6 +32,7 @@ class OrnsteinUhlenbeck:
 
     def simulate(self, method="euler-maruyama"):
         if method == "euler-maruyama":
+            from pystochastic.sde import EulerMaruyama
             self.path = EulerMaruyama(self.drift,self.diffusion,self.r_0,self.t_0,self.t_n,self.n_steps,self.n_simulations).solve()
         elif method == "exact":
             if self.dim > 1:

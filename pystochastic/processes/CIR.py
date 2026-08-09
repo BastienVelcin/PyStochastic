@@ -1,7 +1,6 @@
 import numpy as np
 import plotly.graph_objects as go
 import scipy
-from pystochastic.sde import EulerMaruyama
 
 class CIR:
     def __init__(self, a=1, b=1, sigma=1, r_0=0, t_0=0, t_n=1, n_steps=1000,n_simulations=1):
@@ -33,6 +32,7 @@ class CIR:
 
     def simulate(self, method="exact"):
         if method == "euler-maruyama":
+            from pystochastic.sde import EulerMaruyama
             if (2 * self.a * self.b < self.sigma ** 2):
                 raise ValueError(
                     "The model parameters are inconsistent with the model. Please choose a, b and sigma such that 2*a*b >= sigma^2"

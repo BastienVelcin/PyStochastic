@@ -19,8 +19,7 @@ class Poisson:
             while T[-1] < self.t_n:
                 E = crandom.exponential(self.intensity).item()
                 T.append(T[-1] + E)
-            T = np.array(T)
-            for i in range(self.n_steps+1):
+            for i in range(1,self.n_steps+1):
                 self.path[sim,i]= sum(T<= self.t[i])
         return self.path
 

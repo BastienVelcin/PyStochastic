@@ -68,7 +68,7 @@ class Brownian:
         return (f"Brownian Motion\n------------------------\n "
                 f"Dimension : {self.dim}\n "
                 f"Time horizon: {self.t_n}\n "
-                f"Time step: {(self.t_0-self.t_n)/self.n_steps}\n "
+                f"Time step: {(self.t_n-self.t_0)/self.n_steps}\n "
                 f"Covariance matrix: \n"
                 f"{self.var}")
 

@@ -1,6 +1,5 @@
 import numpy as np
 import plotly.graph_objects as go
-from pystochastic.sde import EulerMaruyama
 from pystochastic.processes.brownian import Brownian
 
 class GeometricBrownianMotion:
@@ -40,6 +39,7 @@ class GeometricBrownianMotion:
 
     def simulate(self, method="exact"):
         if method == "euler-maruyama":
+            from pystochastic.sde import EulerMaruyama
             self.path = EulerMaruyama(self.drift, self.diffusion, self.S_0, self.t_0, self.t_n, self.n_steps, self.n_simulations).solve()
         elif method == "exact":
             self.path = np.zeros((self.n_simulations,self.n_steps+1, self.dim))

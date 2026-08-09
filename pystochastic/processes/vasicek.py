@@ -1,6 +1,5 @@
 import numpy as np
 import plotly.graph_objects as go
-from pystochastic.sde import EulerMaruyama
 from pystochastic.pyrandom import crandom
 
 class Vasicek:
@@ -34,6 +33,7 @@ class Vasicek:
 
     def simulate(self, method="euler-maruyama"):
         if method == "euler-maruyama":
+            from pystochastic.sde import EulerMaruyama
             self.path = EulerMaruyama(self.drift,self.diffusion,self.r_0,self.t_0,self.t_n,self.n_steps,self.n_simulations).solve()
         elif method == "exact":
             if self.dim > 1:
