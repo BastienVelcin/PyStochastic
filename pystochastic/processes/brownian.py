@@ -1,7 +1,7 @@
 import numpy as np
 import plotly.graph_objects as go
-from ..pyrandom import crandom
-from ..utils import is_pos_def
+from pystochastic.pyrandom import crandom
+from pystochastic.utils import is_pos_def
 
 
 class Brownian:
@@ -25,7 +25,7 @@ class Brownian:
         self.t = np.linspace(self.t_0,self.t_n,self.n_steps+1)
 
     def simulate(self):
-        self.sim = brownian_motion(self.var, self.dim, self.h, self.n)
+        self.sim = brownian_motion(self.var, self.dim, self.t_0,self.t_n,self.n_steps)
         self.path = self.sim[0]
         self.increments = self.sim[1]
         return self.path
@@ -68,7 +68,7 @@ class Brownian:
         return (f"Brownian Motion\n------------------------\n "
                 f"Dimension : {self.dim}\n "
                 f"Time horizon: {self.t_n}\n "
-                f"Time step: {(self.t_0-self.t_n)/self.n}\n "
+                f"Time step: {(self.t_0-self.t_n)/self.n_steps}\n "
                 f"Covariance matrix: \n"
                 f"{self.var}")
 
@@ -98,7 +98,7 @@ def brownian_motion(var=np.array(1),d=1, t_0 = 0, t_n = 1, n_steps = 1000):
     h = (t_n-t_0)/n_steps
     L = np.linalg.cholesky(var)
 
-    N = [crandom.normal(0,1,n_steps) for _ in range(d)]
+    N = [crandom.normal(0, 1, n_steps) for _ in range(d)]
     Z = np.stack(N,axis=0)
 
     W = np.zeros((n_steps+1,d))

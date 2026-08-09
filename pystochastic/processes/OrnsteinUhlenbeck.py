@@ -1,14 +1,15 @@
 import numpy as np
 import plotly.graph_objects as go
-from ..pyrandom import crandom
-from ..sde.eulermaruyama import EulerMaruyama
+from pystochastic.pyrandom import crandom
+from pystochastic.sde import EulerMaruyama
+
 class OrnsteinUhlenbeck:
     def __init__(self,mean=0,sigma=1,theta=1,r_0=0,t_0=0, t_n=1, n_steps=1000,n_simulations=1):
         self.mean = np.atleast_1d(mean)
         self.sigma = np.atleast_2d(sigma)
         self.theta = np.atleast_2d(theta)
 
-        if np.any(self.sigma < 0) or np.any(self.theta < 0):
+        if np.any(self.sigma < 0) or np.any(self.theta <=0):
             raise ValueError("The sigma and theta parameters should be greater than 0.")
 
         self.r_0 = np.atleast_1d(r_0)

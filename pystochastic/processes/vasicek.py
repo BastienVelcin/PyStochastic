@@ -1,7 +1,7 @@
 import numpy as np
 import plotly.graph_objects as go
-from ..sde.eulermaruyama import EulerMaruyama
-from ..pyrandom import crandom
+from pystochastic.sde import EulerMaruyama
+from pystochastic.pyrandom import crandom
 
 class Vasicek:
     def __init__(self,reversion_speed=1,mean=1,volatility=1,r_0=0,t_0=0, t_n=1, n_steps=1000, n_simulations=1):

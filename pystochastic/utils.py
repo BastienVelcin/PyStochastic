@@ -8,10 +8,12 @@ def is_pos_def(x):
     return np.all(np.linalg.eigvals(x) > 0)
 
 def default_drift(x, t):
-    return 1
+    x = np.atleast_1d(x)
+    return np.eye(len(x))
 
-def default_diffusion(x, t):
-    return 1
+def default_diffusion(x, t,d=1):
+    x = np.atleast_1d(x)
+    return np.eye(len(x))
 
 # Press the green button in the gutter to run the script.
 

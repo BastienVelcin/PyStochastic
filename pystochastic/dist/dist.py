@@ -1,7 +1,7 @@
 from abc import abstractmethod, ABC
 import matplotlib.pyplot as plt
 import scipy
-from ..pyrandom import crandom
+from pystochastic.pyrandom import crandom
 import numpy as np
 
 class Distribution(ABC):
@@ -92,7 +92,7 @@ class Uniform(Distribution):
                 return 1
 
     def sample(self,n=1):
-        return crandom.uniform(self.lobound,self.upbound,n)
+        return crandom.uniform(self.lobound, self.upbound, n)
 
     def mean(self):
         return (self.lobound + self.upbound)/2
@@ -145,7 +145,7 @@ class Exponential(Distribution):
                 return 1- np.exp(-self.alpha*x)
 
     def sample(self,n=1):
-        return crandom.exponential(self.alpha,n)
+        return crandom.exponential(self.alpha, n)
 
     def mean(self):
         return 1/self.alpha
@@ -189,7 +189,7 @@ class Normal(Distribution):
             return (1+scipy.special.erf((x-self.mu)/(self.sd*np.sqrt(2))))/2
 
     def sample(self,n=1):
-        return crandom.normal(self.mu, self.sd,n)
+        return crandom.normal(self.mu, self.sd, n)
 
     def mean(self):
         return self.mu

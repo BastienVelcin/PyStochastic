@@ -1,7 +1,7 @@
 import numpy as np
 import plotly.graph_objects as go
-from ..processes import brownian
-from ..utils import default_drift, default_diffusion
+from pystochastic.processes import brownian
+from pystochastic.utils import default_drift, default_diffusion
 
 class EulerMaruyama:
     '''

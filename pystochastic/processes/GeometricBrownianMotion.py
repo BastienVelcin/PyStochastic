@@ -1,7 +1,7 @@
 import numpy as np
 import plotly.graph_objects as go
-from ..sde.eulermaruyama import EulerMaruyama
-from .brownian import Brownian
+from pystochastic.sde import EulerMaruyama
+from pystochastic.processes.brownian import Brownian
 
 class GeometricBrownianMotion:
     '''

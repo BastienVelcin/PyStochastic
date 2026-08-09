@@ -1,6 +1,6 @@
 import numpy as np
 import plotly.graph_objects as go
-from ..pyrandom import crandom
+from pystochastic.pyrandom import crandom
 
 class Poisson:
     def __init__(self,intensity=1,t_0=0, t_n=10, n_steps=1000, n_simulations=1):
