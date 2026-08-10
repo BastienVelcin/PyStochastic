@@ -23,10 +23,6 @@ The crandom module allows to generate samples of differents discrete probability
 #### Poisson Process Module - Poisson (`pystochastic/processes/poisson.py`)
 #### Vasicek Model Module - Vasicek (`pystochastic/processes/vasicek.py`)
 #### Cox-Ingersoll-Ross Model Module - CIR (`pystochastic/processes/cir.py`)
-#### Cox-Ross-Rubinstein Model Module - CRR (`pystochastic/processes/crr.py`)
-#### Visualization Module - ProcessDisp (`pystochastic/processes/processdisp.py`)
-
-
 
 ### Monte Carlo Simulation
 
