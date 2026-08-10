@@ -246,23 +246,23 @@ def fisher(d1=1,d2=1,n=1):
     V = gamma(d2 / 2, 0.5, n)
     return (U*d2)/(V*d1)
 
-def pareto(a=1,b=1,n=1):
+def pareto(x_m=1,k=1,n=1):
 
     '''
-    :param a: position parameter
+    :param x_m: position parameter
     :param b: shape parameter
     :param n: number of samples
 
     The pareto function returns n samples of a Pareto distribution of parameters (a,b).
     '''
 
-    if a <= 0:
+    if x_m <= 0:
         raise ValueError("The position parameter should be greater than 0.")
-    if b <= 0:
+    if k <= 0:
         raise ValueError("The shape parameter should be greater than 0.")
 
     U = uniform(0,1,n)
-    return b/(U**(1/a))
+    return x_m * (U)**(-1/k)
 
 def rayleigh(s=1,n=1):
 

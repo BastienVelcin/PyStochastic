@@ -55,9 +55,9 @@ class MonteCarloEstimator:
             x=np.concatenate([n_axis, n_axis[::-1]]),
             y=np.concatenate([cum_mean + half_width, (cum_mean - half_width)[::-1]]),
             fill="toself", fillcolor="rgba(100,149,237,0.2)",
-            line=dict(width=0), name=f"IC {int(confidence * 100)}%", showlegend=True,
+            line=dict(width=0), name=f"CI {int(confidence * 100)}%", showlegend=True,
         ))
-        fig.add_trace(go.Scatter(x=n_axis, y=cum_mean, mode="lines", name="Estimateur cumulatif"))
+        fig.add_trace(go.Scatter(x=n_axis, y=cum_mean, mode="lines", name="Cumulative estimator"))
         fig.show()
 
 class MonteCarloProcess:

@@ -16,7 +16,8 @@ authors = [
 dependencies = [
     "numpy",
     "scipy",
-    "plotly"
+    "plotly",
+    "sympy"
 ]
 
 [tool.setuptools.packages.find]
