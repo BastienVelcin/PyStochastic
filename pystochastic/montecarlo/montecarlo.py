@@ -2,21 +2,77 @@ import numpy as np
 import plotly.graph_objects as go
 import pystochastic.processes as processes
 from pystochastic.processes import *
+from scipy.stats import norm
+from functools import partial
 
-class MonteCarlo:
+
+class MonteCarloEstimator:
+    def __init__(self,sampler,n_simulations=10000):
+
+        if n_simulations <= 1:
+            raise ValueError("The number of simulations should be greater than 1 to use Monte Carlo methods.")
+        self.sampler = sampler
+        self.samples = np.asarray(sampler).flatten()
+        self.n_simulations = n_simulations
+
+    def simulate(self,n_simulations=None):
+        if n_simulations is None:
+            n_simulations = self.n_simulations
+        self.samples = np.asarray(self.sampler.simulate(n_simulations)).flatten()
+        self.n_simulations = n_simulations
+
+
+    def estimate(self, n=None, function = lambda x: x):
+        if n is None:
+            n = self.n_simulations
+        return np.mean(function(self.samples[:n]), axis=0)
+
+    def mean_estimator(self, n= None, confidence = 0.95):
+        if n is None:
+            n = self.n_simulations
+        mean_est = self.estimate(n)
+        sd_estimate = np.std(self.samples[:n], axis=0)
+        z = norm.ppf(0.5 + confidence / 2)
+        half_width = z * sd_estimate / np.sqrt(n)
+        return mean_est, half_width
+
+    def confidence_interval(self, n = None,confidence = 0.95):
+        if n is None:
+            n = self.n_simulations
+        mean_est, half_width = self.mean_estimator(n,confidence)
+        return mean_est - half_width, mean_est + half_width
+
+    def confidence_curve(self,n=None,confidence = 0.95):
+        if n is None:
+            n = self.n_simulations
+        n_axis = np.arange(1, n + 1)
+        cum_mean = np.cumsum(self.samples[:n])/n_axis
+        cum_var = np.cumsum((self.samples-cum_mean)**2)/n_axis
+
+        z = norm.ppf(0.5 + confidence / 2)
+        half_width = z * np.sqrt(cum_var) / np.sqrt(n_axis)
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=np.concatenate([n_axis, n_axis[::-1]]),
+            y=np.concatenate([cum_mean + half_width, (cum_mean - half_width)[::-1]]),
+            fill="toself", fillcolor="rgba(100,149,237,0.2)",
+            line=dict(width=0), name=f"IC {int(confidence * 100)}%", showlegend=True,
+        ))
+        fig.add_trace(go.Scatter(x=n_axis, y=cum_mean, mode="lines", name="Estimateur cumulatif"))
+        fig.show()
+
+class MonteCarloProcess:
     def __init__(self,process,n_simulations=10000):
         self.process = process
         self.n_simulations = n_simulations
         self.t = self.process.t
-        self.ech = None
+        self.ech = self.process.simulate(self.n_simulations)
 
     def simulate(self):
         self.ech = self.process.simulate(self.n_simulations)
         return self.ech
 
     def estimate(self, t_0=None, function = lambda x: x):
-        if self.ech is None:
-            self.simulate()
         if t_0 is None:
             t_0 = self.process.t_n
         if t_0 not in self.t:
@@ -27,9 +83,6 @@ class MonteCarlo:
 
 
     def mean_path(self, plot_sim=True):
-        if self.ech is None:
-            self.simulate()
-
         meanpath = np.mean(self.ech,axis=0)
         fig = go.Figure()
 
@@ -53,3 +106,14 @@ class MonteCarlo:
         fig.show()
 
         return meanpath
+
+    def values_at(self, t_0=None, function=lambda x: x):
+        if t_0 is None:
+            t_0 = self.process.t_n
+        if t_0 not in self.t:
+            t_index = np.argmin(np.abs(t_0 - self.t))
+        else:
+            t_index = np.where(self.t == t_0)[0][0]
+        if self.ech is None:
+            self.simulate()
+        return function(self.ech[:,t_index])
