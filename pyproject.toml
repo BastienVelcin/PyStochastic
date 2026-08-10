@@ -17,8 +17,7 @@ dependencies = [
     "numpy",
     "scipy",
     "plotly",
-    "sympy",
-    "math"
+    "sympy"
 ]
 
 [tool.setuptools.packages.find]

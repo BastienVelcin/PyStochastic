@@ -94,12 +94,12 @@ class Uniform(Distribution):
 
         if x is None:
             print("Probability density function :")
-            print(f"| {(self.upbound-self.lobound)/2} for {self.lobound} <= x <= {self.upbound}" )
+            print(f"| {(1/{self.upbound-self.lobound})} for {self.lobound} <= x <= {self.upbound}" )
             print(f"| 0 else")
 
         else:
             if (self.lobound <= x <= self.upbound):
-                return (self.upbound-self.lobound)/2
+                return (1/{self.upbound-self.lobound})
             else:
                 return 0
 
@@ -374,7 +374,7 @@ class Frechet(Distribution):
         else:
             if x < self.m:
                 return 0
-            return (self.a/self.s)*((x-self.m)/(self.s))^(-1-self.a) * np.exp(-((x-self.m)/(self.s))^(-self.a))
+            return (self.a/self.s)*((x-self.m)/(self.s))**(-1-self.a) * np.exp(-((x-self.m)/(self.s))**(-self.a))
 
     def cdf(self, x=None):
         if x is None:
@@ -383,7 +383,7 @@ class Frechet(Distribution):
         else:
             if x <=self.m:
                 return 0
-            return  np.exp(-((x-self.m)/(self.s))^(-self.a))
+            return  np.exp(-((x-self.m)/(self.s))**(-self.a))
 
     def sample(self, n=1):
         return crandom.frechet(self.a, self.s, self.m, n)
@@ -504,7 +504,7 @@ class Kumaraswamy(Distribution):
         else:
             if not 0 <=x <= 1:
                 return 0
-            return (self.a*self.b)*(x**(self.a-1)) * (1-x^self.a)**(self.b-1)
+            return (self.a*self.b)*(x**(self.a-1)) * (1-x**self.a)**(self.b-1)
 
     def cdf(self, x=None):
         if x is None:
@@ -555,7 +555,7 @@ class Fisher(Distribution):
         else:
             if x <= 0:
                 return 0
-            return np.sqrt[(((self.d1*x)**self.d1)*self.d2^self.d2)/((self.d1*x+self.d2)^(self.d1+self.d2))]/(x*scipy.special.beta({self.d1/2}, {self.d2/2}))
+            return np.sqrt[(((self.d1*x)**self.d1)*self.d2**self.d2)/((self.d1*x+self.d2)**(self.d1+self.d2))]/(x*scipy.special.beta({self.d1/2}, {self.d2/2}))
 
     def cdf(self, x=None):
         if x is None:

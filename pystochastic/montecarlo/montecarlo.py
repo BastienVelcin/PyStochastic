@@ -11,11 +11,11 @@ class MonteCarloEstimator:
         if n_simulations is None:
             n_simulations = len(samples)
         if n_simulations <= 1:
-            raise ValueError(...)
+            raise ValueError("n_simulations cannot be less than or equal to 1.")
         if n_simulations > len(samples):
-            raise ValueError("n_simulations ne peut pas depasser le nombre d'echantillons fournis.")
+            raise ValueError("n_simulations cannot be greater than the number of samples provided.")
         self.samples = np.asarray(samples).flatten()
-        self.n_simulations = len(samples)
+        self.n_simulations = n_simulations
 
 
     def estimate(self, n=None, function = lambda x: x):
