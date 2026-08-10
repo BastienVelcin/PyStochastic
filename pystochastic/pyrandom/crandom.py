@@ -31,7 +31,8 @@ def uniform(a=0,b=1,n=1):
 
     The uniform function returns n samples of a uniform distribution on (a,b).
     '''
-
+    if n < 1 or type(n) != int:
+        raise ValueError("The number of samples should be a strictly positive integer.")
     if a > b:
         raise ValueError("The lower bound should be inferior or equal to the upper bound.")
 
@@ -44,7 +45,8 @@ def exponential(alpha=1,n=1):
 
     The exponential function returns n samples of an alpha-exponential distribution, with the generalized inverse density function.
     '''
-
+    if n < 1 or type(n) != int:
+        raise ValueError("The number of samples should be a strictly positive integer.")
     if alpha <= 0:
         raise ValueError("The parameter should be greater than 0.")
 
@@ -59,7 +61,8 @@ def normal(mean=0, sd=1,n=1):
 
     The normal function returns n samples of a normal distribution of parameters (mean, sd^2) with the Box-Muller method
     '''
-
+    if n < 1 or type(n) != int:
+        raise ValueError("The number of samples should be a strictly positive integer.")
     if sd <= 0:
         raise ValueError("The standard deviation should be greater than 0.")
 
@@ -104,7 +107,8 @@ def gamma(p=1, theta=1, n=1):
 
     The gamma function returns n samples of a gamma distribution of parameters (p,theta),
     '''
-
+    if n < 1 or type(n) != int:
+        raise ValueError("The number of samples should be a strictly positive integer.")
     if p <= 0:
         raise ValueError("The shape parameter should be greater than 0.")
     if theta <= 0:
@@ -130,7 +134,8 @@ def beta(a=1,b=1,n=1):
     The beta function returns n samples of a beta distribution of parameters (a,b), according to the following result :
     X ~ Gamma(a,1), Y ~ Gamma(b,1) ==> X/(X+Y) ~ Beta(a,b)
     '''
-
+    if n < 1 or type(n) != int:
+        raise ValueError("The number of samples should be a strictly positive integer.")
     if a <= 0:
         raise ValueError("The first shape parameter should be greater than 0.")
     if b <= 0:
@@ -149,7 +154,8 @@ def weibull(k=1, l=1, n=1):
 
     The weibull function returns n samples of a Weibull distribution of parameters (k,l).
     '''
-
+    if n < 1 or type(n) != int:
+        raise ValueError("The number of samples should be a strictly positive integer.")
     if k <= 0:
         raise ValueError("The shape parameter should be greater than 0.")
     if l <= 0:
@@ -168,7 +174,8 @@ def frechet(a=1,s=1,m=0,n=1):
 
     The frechet function returns n samples of a Fréchet distribution of parameters (a,s,m).
     '''
-
+    if n < 1 or type(n) != int:
+        raise ValueError("The number of samples should be a strictly positive integer.")
     if a <= 0:
         raise ValueError("The shape parameter should be greater than 0.")
     if s <= 0:
@@ -186,7 +193,8 @@ def cauchy(x=0,a=1,n=1):
 
     The cauchy function returns n samples of a Cauchy distribution of parameters (x,a).
     '''
-
+    if n < 1 or type(n) != int:
+        raise ValueError("The number of samples should be a strictly positive integer.")
     if a <= 0:
         raise ValueError("The scale parameter should be greater than 0.")
 
@@ -202,7 +210,8 @@ def gumbel(mu=0,beta=1,n=1):
 
     The gumbel function returns n samples of a Gumbel distribution of parameters (mu, beta).
     '''
-
+    if n < 1 or type(n) != int:
+        raise ValueError("The number of samples should be a strictly positive integer.")
     if beta <= 0:
         raise ValueError("The scale parameter should be greater than 0.")
 
@@ -218,7 +227,8 @@ def kumaraswamy(a=1,b=1,n=1):
 
     The kumaraswamy function returns n samples of a Kumaraswamy distribution of parameters (a,b).
     '''
-
+    if n < 1 or type(n) != int:
+        raise ValueError("The number of samples should be a strictly positive integer.")
     if a <= 0:
         raise ValueError("The first shape parameter should be greater than 0.")
     if b <= 0:
@@ -236,7 +246,8 @@ def fisher(d1=1,d2=1,n=1):
 
     The fisher function returns n samples of a Fisher distribution of parameters (d1,d2).
     '''
-
+    if n < 1 or type(n) != int:
+        raise ValueError("The number of samples should be a strictly positive integer.")
     if d1 <= 0:
         raise ValueError("The first degree of freedom should be greater than 0.")
     if d2 <= 0:
@@ -255,7 +266,8 @@ def pareto(x_m=1,k=1,n=1):
 
     The pareto function returns n samples of a Pareto distribution of parameters (a,b).
     '''
-
+    if n < 1 or type(n) != int:
+        raise ValueError("The number of samples should be a strictly positive integer.")
     if x_m <= 0:
         raise ValueError("The position parameter should be greater than 0.")
     if k <= 0:
@@ -272,7 +284,8 @@ def rayleigh(s=1,n=1):
 
     The rayleigh function returns n samples of a Rayleigh distribution of parameter s.
     '''
-
+    if n < 1 or type(n) != int:
+        raise ValueError("The number of samples should be a strictly positive integer.")
     if s <= 0:
         raise ValueError("The scale parameter should be greater than 0.")
 

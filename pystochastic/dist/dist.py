@@ -1,12 +1,54 @@
-from encodings import search_function
+"""
+============================================================
+Module DIST
+============================================================
+
+Description
+-----------
+This module provides a set of classes to work with probability distributions.
+
+This module provides a general class "Distribution", which yields to general methods :
+    - .pdf() : Probability density function, which can be evaluated at any point with an optional argument
+    - .cdf() : Cumulative distribution function, which can be evaluated at any point with an optional argument
+    - .sample() : Sample from the distribution
+    - .mean() : Mean of the distribution
+    - .variance() : Variance of the distribution
+    - .entropy() : Entropy of the distribution
+    - .support() : Support of the distribution
+    - .infos() : Recap of all information about the current distribution (pdf, cdf, mean, variance, entropy, support)
+
+From this general class, we introduce various subclasses for each implemented probability distribution.
+The available distributions are :
+    - Continuous-Time Uniform
+    - Exponential
+    - Normal
+    - Gamma
+    - Beta
+    - Weibull
+    - Frechet
+    - Cauchy
+    - Gumbel
+    - Kumaraswamy
+    - Fisher
+    - Pareto
+    - Rayleigh
+
+Example
+--------
+>> N = Normal(0,1,10) #Normal distribution with mean 0 and standard deviation 1
+>>
+>> N.sample(10) #Sample 10 random numbers from the distribution
+>>
+>> N.plot_pdf() #Plot the probability density function of the distribution
+
+"""
 
 import numpy as np
 import scipy
 import plotly.graph_objects as go
-import sympy
 from abc import abstractmethod, ABC
 from pystochastic.pyrandom import crandom
-
+from sympy import harmonic
 
 
 class Distribution(ABC):
@@ -23,23 +65,19 @@ class Distribution(ABC):
     def sample(self,n=1):
         pass
 
-    @property
+    @abstractmethod
     def mean(self):
         pass
 
-    @property
+    @abstractmethod
     def variance(self):
         pass
 
-    @property
+    @abstractmethod
     def entropy(self):
         pass
 
-    @property
-    def infos(self):
-        pass
-
-    @property
+    @abstractmethod
     def support(self):
         pass
 
@@ -70,13 +108,13 @@ class Distribution(ABC):
         up_bound = supp[1] if supp[1] < np.inf else mu + 8 * sd
 
         supp_length = up_bound - lo_bound
-
-        x_axis = np.linspace(lo_bound, up_bound, int(1000 * supp_length))
+        n_points = 1000
+        x_axis = np.linspace(lo_bound, up_bound, n_points)
         y_axis = [self.cdf(x) for x in x_axis]
 
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=x_axis, y=y_axis, mode="lines", name="CDF", line=dict(width=2)))
-        fig.update_layout(title="Probability Density Function",xaxis_title="x",yaxis_title="f(x)")
+        fig.update_layout(title="Cumulative Distribution Function",xaxis_title="x",yaxis_title="f(x)")
         fig.show()
 
     def infos(self):
@@ -86,7 +124,41 @@ class Distribution(ABC):
         print(f"| Entropy : {self.entropy()}")
 
 class Uniform(Distribution):
+
+    """
+    Continuous-Time Uniform probability distribution.
+
+    The Continuous-Time Uniform distribution is parameterized by two bounds parameterss ``a`` and ``b``.
+
+    Parameters
+    ----------
+    a : float
+        Lower bound. Must be strictly less than ``b``.
+    b : float
+        Upper bound. Must be strictly greater than ``a``.
+
+    Attributes
+    ----------
+    lobound : float
+        Lower bound.
+    upbound : float
+        Upper bound.
+
+    Examples
+    --------
+    >> U = Uniform(a=0, b=1)
+    >> U.sample(10)
+
+    Notes
+    -----
+    If a > b, the constructor automatically swaps the bounds.
+    """
+
     def __init__(self,a=0,b=1):
+
+        if a == b:
+            raise ValueError("The lower and upper bound should be different.")
+
         self.lobound = min(a,b)
         self.upbound = max(a,b)
 
@@ -135,6 +207,28 @@ class Uniform(Distribution):
         return (self.lobound, self.upbound)
 
 class Exponential(Distribution):
+
+    """
+    Exponential probability distribution.
+
+    The Exponential distribution is parameterized by an intensity parameter ''alpha''.
+
+    Parameters
+    ----------
+    alpha : float
+        Intensity parameter, or scale parameter inverse. Must be strictly positive.
+
+    Attributes
+    ----------
+    alpha : float
+        Intensity parameter, or scale parameter inverse.
+
+    Examples
+    --------
+    >> E = Exponential(alpha=2)
+    >> E.sample(10)
+    """
+
     def __init__(self,alpha=1):
         if alpha <=0:
             raise ValueError("The parameter should be greater than 0.")
@@ -181,11 +275,40 @@ class Exponential(Distribution):
         return (0, np.inf)
 
 class Normal(Distribution):
+
+    """
+    Normal probability distribution.
+
+    The Normal distribution is parameterized by a mean parameter ``mu`` and a standard deviation parameter ``sd``.
+
+    Parameters
+    ----------
+    mean : float
+        Mean parameter.
+
+    sd : float
+        Standard deviation parameter. Must be strictly positive.
+
+    Attributes
+    ----------
+    mean : float
+        Mean parameter.
+
+    sd : float
+        Standard deviation parameter. Must be strictly positive.
+
+    Examples
+    --------
+    >> N = Normal(mu=0,sd=1)
+    >> N.sample(10)
+    """
+
     def __init__(self,mu=0,sd=1):
-        self.mu = mu
-        self.sd = sd
         if sd <=0:
             raise ValueError("The standard deviation should be greater than 0.")
+        self.mu = mu
+        self.sd = sd
+
 
     def pdf(self, x=None):
 
@@ -218,6 +341,33 @@ class Normal(Distribution):
         return (-np.inf ,np.inf)
 
 class Gamma(Distribution):
+
+    """
+    Gamma probability distribution.
+
+    The Gamma distribution is parameterized by a shape parameter
+    ``k`` and a rate parameter ``theta``.
+
+    Parameters
+    ----------
+    k : float
+        Shape parameter. Must be strictly positive.
+    theta : float
+        Rate parameter. Must be strictly positive.
+
+    Attributes
+    ----------
+    k : float
+        Shape parameter.
+    theta : float
+        Rate parameter.
+
+    Examples
+    --------
+    >> G = Gamma(k=2, theta=1)
+    >> G.sample(10)
+    """
+
     def __init__(self,k=1,theta=1):
         if k <=0:
             raise ValueError("The form parameter should be greater than 0.")
@@ -263,6 +413,33 @@ class Gamma(Distribution):
         return (0,np.inf)
 
 class Beta(Distribution):
+
+    """
+    Beta probability distribution.
+
+    The Beta distribution is parameterized by two shape parameters
+    ``a`` and ''b''.
+
+    Parameters
+    ----------
+    a : float
+        First shape parameter. Must be strictly positive.
+    b : float
+        Second shape parameter. Must be strictly positive.
+
+    Attributes
+    ----------
+    a : float
+        First shape parameter.
+    b : float
+        Second shape parameter.
+
+    Examples
+    --------
+    >> B = Beta(a=2, b=3/2)
+    >> B.sample(10)
+    """
+
     def __init__(self,a=1,b=1):
         if a <= 0:
             raise ValueError("The first shape parameter should be greater than 0.")
@@ -294,7 +471,7 @@ class Beta(Distribution):
             elif x > 1:
                 return 1
             else:
-                return scipy.special.betainc(self.a,self.b,x)/scipy.special.beta(self.a,self.b)
+                return scipy.special.betainc(self.a, self.b, x)
 
     def sample(self,n=1):
         return crandom.beta(self.a, self.b, n)
@@ -312,6 +489,33 @@ class Beta(Distribution):
         return (0,1)
 
 class Weibull(Distribution):
+
+    """
+    Weibull probability distribution.
+
+    The Weibull distribution is parameterized by a shape parameter
+    ``k`` and a scale parameter ''l''.
+
+    Parameters
+    ----------
+    k : float
+        Shape parameter. Must be strictly positive.
+    l : float
+        Scale parameter. Must be strictly positive.
+
+    Attributes
+    ----------
+    k : float
+        Shape parameter.
+    l : float
+        Scale parameter.
+
+    Examples
+    --------
+    >> W = Weibull(k=2, l=3/2)
+    >> W.sample(10)
+    """
+
     def __init__(self,k=1,l=1):
         if k <=0:
             raise ValueError("The shape parameter should be greater than 0.")
@@ -329,7 +533,7 @@ class Weibull(Distribution):
         else:
             if x < 0:
                 return 0
-            return (self.k/self.l)*((x/self.l)**{self.k-1})*np.exp(-(x/self.l)**self.k)
+            return (self.k/self.l)*((x/self.l)**(self.k-1))*np.exp(-(x/self.l)**self.k)
 
     def cdf(self, x=None):
         if x is None:
@@ -355,6 +559,37 @@ class Weibull(Distribution):
         return (0, np.inf)
 
 class Frechet(Distribution):
+
+    """
+    Fréchet probability distribution.
+
+    The Fréchet distribution is parameterized by a shape parameter
+    ``a``, a scale parameter ''s'' and a position parameter ``m``.
+
+    Parameters
+    ----------
+    a : float
+        Shape parameter. Must be strictly positive.
+    s : float
+        Scale parameter. Must be strictly positive.
+    m : float
+        Position parameter.
+
+    Attributes
+    ----------
+    a : float
+        Shape parameter.
+    s : float
+        Scale parameter.
+    m : float
+        Position parameter.
+
+    Examples
+    --------
+    >> F = Frechet(a=2, s=3/2,m=-3)
+    >> F.sample(10)
+    """
+
     def __init__(self,a=1,s=1,m=0):
 
         if a <= 0:
@@ -372,7 +607,7 @@ class Frechet(Distribution):
             print(f"| 0 for x < {self.m}")
             print(f"| {self.a/self.s}*((x-{self.m})/{self.s})^{-1-self.a} * exp(-((x-{self.m})/{self.s})^{-self.a}) for x >= {self.m}")
         else:
-            if x < self.m:
+            if x <= self.m:
                 return 0
             return (self.a/self.s)*((x-self.m)/(self.s))**(-1-self.a) * np.exp(-((x-self.m)/(self.s))**(-self.a))
 
@@ -407,6 +642,31 @@ class Frechet(Distribution):
 
 class Cauchy(Distribution):
 
+    """
+    Cauchy probability distribution.
+
+    The Cauchy distribution is parameterized by a position parameter
+    ``x`` and a scale parameter ''a''.
+
+    Parameters
+    ----------
+    x : float
+        Position parameter.
+    a : float
+        Scale parameter. Must be strictly positive.
+
+    Attributes
+    ----------
+    x : float
+        Position parameter.
+    a : float
+        Scale parameter.
+
+    Examples
+    --------
+    >> C = Cauchy(x=0,a=1)
+    >> C.sample(10)
+    """
     def __init__(self,x=0,a=1):
 
         if a <= 0:
@@ -445,6 +705,32 @@ class Cauchy(Distribution):
         return (-np.inf, np.inf)
 
 class Gumbel(Distribution):
+
+    """
+    Gumbel probability distribution.
+
+    The Gumbel distribution is parameterized by a position parameter
+    ``mu`` and a scale parameter ''beta''.
+
+    Parameters
+    ----------
+    mu : float
+        Position parameter.
+    beta : float
+        Scale parameter. Must be strictly positive.
+
+    Attributes
+    ----------
+    mu : float
+        Position parameter.
+    beta : float
+        Scale parameter.
+
+    Examples
+    --------
+    >> G = Gumbel(mu=-1/2,beta=2)
+    >> G.sample(10)
+    """
 
     def __init__(self,mu=0,beta=1):
 
@@ -485,6 +771,32 @@ class Gumbel(Distribution):
 
 
 class Kumaraswamy(Distribution):
+
+    """
+    Kumaraswamy probability distribution.
+
+    The Kumaraswamy distribution is parameterized by a two shape parameters
+    ``a`` and ''b''.
+
+    Parameters
+    ----------
+    a : float
+        First shape parameter. Must be strictly positive.
+    b : float
+        Second shape parameter. Must be strictly positive.
+
+    Attributes
+    ----------
+    a : float
+        First shape parameter.
+    b : float
+        Second shape parameter.
+
+    Examples
+    --------
+    >> K = Kumaraswamy(a=3/2, b=5)
+    >> K.sample(10)
+    """
 
     def __init__(self,a=1,b=1):
 
@@ -530,12 +842,38 @@ class Kumaraswamy(Distribution):
         return self.b * scipy.special.beta(1+2/self.a, self.b) - self.mean()**2
 
     def entropy(self):
-        return (1-1/self.b)+(self.a-1)*sympy.harmonic(self.b) - np.log(self.a*self.b)
+        return (1-1/self.b)+(self.a-1)*harmonic(self.b) - np.log(self.a*self.b)
 
     def support(self):
         return (0,1)
 
 class Fisher(Distribution):
+
+    """
+    Fisher probability distribution.
+
+    The Fisher distribution is parameterized by a two degree of freedom parameters
+    ``d1`` and ''d2''.
+
+    Parameters
+    ----------
+    d1 : float
+        First degree of freedom. Must be strictly positive.
+    d1 : float
+        Second degree of freedom. Must be strictly positive.
+
+    Attributes
+    ----------
+    d1 : float
+        First degree of freedom.
+    d1 : float
+        Second degree of freedom.
+
+    Examples
+    --------
+    >> F = Fisher(d1=2, d2=5)
+    >> F.sample(10)
+    """
 
     def __init__(self,d1=1,d2=1):
 
@@ -555,7 +893,7 @@ class Fisher(Distribution):
         else:
             if x <= 0:
                 return 0
-            return np.sqrt[(((self.d1*x)**self.d1)*self.d2**self.d2)/((self.d1*x+self.d2)**(self.d1+self.d2))]/(x*scipy.special.beta({self.d1/2}, {self.d2/2}))
+            return np.sqrt((((self.d1*x)**self.d1)*self.d2**self.d2)/((self.d1*x+self.d2)**(self.d1+self.d2)))/(x*scipy.special.beta(self.d1/2, self.d2/2))
 
     def cdf(self, x=None):
         if x is None:
@@ -579,12 +917,39 @@ class Fisher(Distribution):
             return (2*self.d2**2)*(self.d1+self.d2-2)/(self.d1*((self.d2-2)**2)*(self.d2-4))
         return None
     def entropy(self):
-       return np.log(scipy.special.gamma(self.d1/2))+np.log(scipy.special.gamma(self.d2/2)) - np.log(scipy.special.gamma((self.d1+self.d2)/2)) + (1-{self.d1}/2)*scipy.special.digamma(1+self.d1/2) - (1+{self.d2}/2)*scipy.special.digamma(1+self.d2/2) + ((self.d1+self.d2)/2)*scipy.special.digamma((self.d1+self.d2)/2) + np.log(self.d2/self.d1)
+       return np.log(scipy.special.gamma(self.d1/2))+np.log(scipy.special.gamma(self.d2/2)) - np.log(scipy.special.gamma((self.d1+self.d2)/2)) + (1-self.d1/2)*scipy.special.digamma(1+self.d1/2) - (1+self.d2/2)*scipy.special.digamma(1+self.d2/2) + ((self.d1+self.d2)/2)*scipy.special.digamma((self.d1+self.d2)/2) + np.log(self.d2/self.d1)
 
     def support(self):
         return (0,np.inf)
 
 class Pareto(Distribution):
+
+    """
+    Pareto probability distribution.
+
+    The Pareto distribution is parameterized by a position parameter ''x_m'' and
+    a shape parameter ''k''.
+
+    Parameters
+    ----------
+    x_m : float
+        Position parameter. Must be strictly positive.
+    k : float
+        Shape parameter. Must be strictly positive.
+
+    Attributes
+    ----------
+    x_m : float
+        Position parameter. Must be strictly positive.
+    k : float
+        Shape parameter. Must be strictly positive.
+
+    Examples
+    --------
+    >> P = Pareto(x_m=2, k=1/2)
+    >> P.sample(10)
+    """
+
     def __init__(self,x_m=1,k=1):
 
         if x_m <= 0:
@@ -603,7 +968,7 @@ class Pareto(Distribution):
         else:
             if x < self.x_m:
                 return 0
-            return (self.k*(self.x_m)**(self.k))/(x**self.k+1)
+            return (self.k*(self.x_m)**(self.k))/(x**(self.k+1))
 
     def cdf(self, x=None):
         if x is None:
@@ -634,6 +999,28 @@ class Pareto(Distribution):
         return (self.x_m, np.inf)
 
 class Rayleigh(Distribution):
+
+    """
+    Rayleigh probability distribution.
+
+    The Rayleigh distribution is parameterized by a scale parameter ''s''.
+
+    Parameters
+    ----------
+    s : float
+        Scale parameter. Must be strictly positive.
+
+    Attributes
+    ----------
+    s : float
+        Scale parameter.
+
+    Examples
+    --------
+    >> R = Rayleigh(s=4)
+    >> R.sample(10)
+    """
+
     def __init__(self,s=1):
 
         if s <= 0:
@@ -662,7 +1049,7 @@ class Rayleigh(Distribution):
             return  1 - np.exp(-(x**2)/(2*self.s**2))
 
     def sample(self, n=1):
-        return crandom.pareto(self.s, n)
+        return crandom.rayleigh(self.s, n)
 
     def mean(self):
         return self.s*np.sqrt(np.pi/2)
@@ -670,7 +1057,7 @@ class Rayleigh(Distribution):
     def variance(self):
         return (self.s**2)*(4-np.pi)/2
     def entropy(self):
-        1 + np.log(self.s/np.sqrt(2))+np.euler_gamma/2
+        return 1 + np.log(self.s/np.sqrt(2))+np.euler_gamma/2
 
     def support(self):
         return (0, np.inf)
