@@ -7,13 +7,15 @@ from functools import partial
 
 
 class MonteCarloEstimator:
-    def __init__(self,sampler,n_simulations=10000):
-
+    def __init__(self,samples,n_simulations=None):
+        if n_simulations is None:
+            n_simulations = len(samples)
         if n_simulations <= 1:
-            raise ValueError("The number of simulations should be greater than 1 to use Monte Carlo methods.")
-        self.sampler = sampler
-        self.samples = np.asarray(sampler).flatten()
-        self.n_simulations = n_simulations
+            raise ValueError(...)
+        if n_simulations > len(samples):
+            raise ValueError("n_simulations ne peut pas depasser le nombre d'echantillons fournis.")
+        self.samples = np.asarray(samples).flatten()
+        self.n_simulations = len(samples)
 
 
     def estimate(self, n=None, function = lambda x: x):
@@ -45,7 +47,7 @@ class MonteCarloEstimator:
         cum_mean = S1 / n_axis
         with np.errstate(invalid="ignore", divide="ignore"):
             cum_var = (S2 - S1 ** 2 / n_axis) / (n_axis - 1)
-
+        cum_var = np.nan_to_num(cum_var, nan=0.0)
         z = norm.ppf(0.5 + confidence / 2)
         half_width = z * np.sqrt(cum_var) / np.sqrt(n_axis)
         fig = go.Figure()
@@ -76,7 +78,7 @@ class MonteCarloProcess:
             t_index = np.argmin(np.abs(t_0 - self.t))
         else:
             t_index = np.where(self.t == t_0)[0][0]
-        return np.mean(function(self.ech[:,t_index], axis=0))
+        return np.mean(function(self.ech[:,t_index]), axis=0)
 
 
     def mean_path(self, plot_sim=True):
