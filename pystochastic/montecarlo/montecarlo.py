@@ -15,12 +15,6 @@ class MonteCarloEstimator:
         self.samples = np.asarray(sampler).flatten()
         self.n_simulations = n_simulations
 
-    def simulate(self,n_simulations=None):
-        if n_simulations is None:
-            n_simulations = self.n_simulations
-        self.samples = np.asarray(self.sampler.simulate(n_simulations)).flatten()
-        self.n_simulations = n_simulations
-
 
     def estimate(self, n=None, function = lambda x: x):
         if n is None:
@@ -46,8 +40,11 @@ class MonteCarloEstimator:
         if n is None:
             n = self.n_simulations
         n_axis = np.arange(1, n + 1)
-        cum_mean = np.cumsum(self.samples[:n])/n_axis
-        cum_var = np.cumsum((self.samples-cum_mean)**2)/n_axis
+        S1 = np.cumsum(self.samples[:n])
+        S2 = np.cumsum(self.samples[:n] ** 2)
+        cum_mean = S1 / n_axis
+        with np.errstate(invalid="ignore", divide="ignore"):
+            cum_var = (S2 - S1 ** 2 / n_axis) / (n_axis - 1)
 
         z = norm.ppf(0.5 + confidence / 2)
         half_width = z * np.sqrt(cum_var) / np.sqrt(n_axis)
@@ -72,14 +69,14 @@ class MonteCarloProcess:
         self.ech = self.process.simulate(self.n_simulations)
         return self.ech
 
-    def estimate(self, t_0=None, function = lambda x: x):
+    def estimate(self, t_0=None, function = lambda x: x[:,0]):
         if t_0 is None:
             t_0 = self.process.t_n
         if t_0 not in self.t:
             t_index = np.argmin(np.abs(t_0 - self.t))
         else:
             t_index = np.where(self.t == t_0)[0][0]
-        return np.mean(self.ech[:,t_index], axis=0)
+        return np.mean(function(self.ech[:,t_index], axis=0))
 
 
     def mean_path(self, plot_sim=True):
@@ -107,7 +104,7 @@ class MonteCarloProcess:
 
         return meanpath
 
-    def values_at(self, t_0=None, function=lambda x: x):
+    def values_at(self, t_0=None, function=lambda x: x[:,0]):
         if t_0 is None:
             t_0 = self.process.t_n
         if t_0 not in self.t:
