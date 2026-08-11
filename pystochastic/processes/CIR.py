@@ -19,7 +19,7 @@ class CIR:
         self.t = np.linspace(t_0, t_n, n_steps + 1)
         self.dt = (t_n - t_0) / n_steps
         self.path = None
-
+        self.dim = 1
         self.nu = (4*self.a*self.b)/(self.sigma**2)
         self.factor = (4*self.a*np.exp(-self.a * self.dt))/((self.sigma**2)*(1-np.exp(-self.a * self.dt)))
         self.c = ((self.sigma**2)*(1-np.exp(-self.a * self.dt)))/(4*self.a)
@@ -51,6 +51,13 @@ class CIR:
         return self.path
 
     def plot(self):
+
+        """
+        Plot method.
+
+        Plot the simulated path of the CIR process.
+        """
+
         if self.path is None:
             raise ValueError("The path has not been simulated yet. Please run the simulate method first.")
         fig = go.Figure()

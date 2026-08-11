@@ -33,14 +33,13 @@ The available distributions are :
     - Pareto
     - Rayleigh
 
-Example
+Examples
 --------
 >> N = Normal(0,1,10) #Normal distribution with mean 0 and standard deviation 1
 >>
 >> N.sample(10) #Sample 10 random numbers from the distribution
 >>
 >> N.plot_pdf() #Plot the probability density function of the distribution
-
 """
 
 import numpy as np
@@ -55,33 +54,141 @@ class Distribution(ABC):
 
     @abstractmethod
     def pdf(self, x=None):
+
+        """
+        Probability Density Function method.
+
+        Print or evaluate the probability density function at a point x.
+
+        Parameters
+        ----------
+        x : float
+            Point at which to evaluate the the probability density function.
+
+        Returns
+        -------
+        float
+            Image of x by the probability density function.
+        """
+
         pass
 
     @abstractmethod
     def cdf(self, x=None):
+
+        """
+        Cumulative Distribution function method.
+
+        Print or evaluate the cumulative distribution function at a point x.
+        The cumulative distribution function is defined by
+                            F(x) = P(X <= x).
+
+        Parameters
+        ----------
+        x : float
+            Point at which to evaluate the cumulative distribution function.
+
+        Returns
+        -------
+        float
+            Image of x by the cumulative distribution function.
+        """
+
         pass
 
     @abstractmethod
     def sample(self,n=1):
+
+        """
+        Sampling method.
+
+        Sample n points from the effective distribution.
+
+        Parameters
+        ----------
+        n : int
+            Number of samples. Must be a strictly positive integer.
+
+        Returns
+        -------
+        np.ndarray
+            n samples of the effective distribution.
+        """
+
         pass
 
     @abstractmethod
     def mean(self):
+
+        """
+        Mean method.
+
+        Return the mean of the effective distribution.
+
+        Returns
+        -------
+        float
+            Mean of the effective distribution.
+        """
+
         pass
 
     @abstractmethod
     def variance(self):
+
+        """
+        Variance method.
+
+        Return the variance of the effective distribution.
+
+        Returns
+        -------
+        float
+            Variance of the effective distribution.
+        """
+
         pass
 
     @abstractmethod
     def entropy(self):
+
+        """
+        Entropy method.
+
+        Return the Shannon Entropy of the effective distribution.
+
+        Returns
+        -------
+        float
+            Shannon Entropy of the effective distribution.
+        """
+
         pass
 
     @abstractmethod
     def support(self):
+        """
+        Support method.
+
+        Return the support of the effective distribution.
+        The support of a distribution is the set of real numbers where the probability density function is nonzero.
+
+        Returns
+        -------
+        tuple
+            (lower bound, upper bound) of the support.
+        """
+
         pass
 
     def plot_pdf(self):
+
+        """
+        Plot PDF method.
+
+        Plot the graph of the probability density function.
+        """
+
         supp = self.support()
         mu = self.mean() if callable(self.mean) else 0
         sd = np.sqrt(self.variance()) if callable(self.variance) else 1
@@ -100,6 +207,13 @@ class Distribution(ABC):
         fig.show()
 
     def plot_cdf(self):
+
+        """
+        Plot CDF method.
+
+        Plot the graph of the cumulative distribution function.
+        """
+
         supp = self.support()
         mu = self.mean() if callable(self.mean) else 0
         sd = np.sqrt(self.variance()) if callable(self.variance) else 1
@@ -117,7 +231,16 @@ class Distribution(ABC):
         fig.update_layout(title="Cumulative Distribution Function",xaxis_title="x",yaxis_title="f(x)")
         fig.show()
 
-    def infos(self):
+    def info(self):
+        """
+        Info method.
+
+        Print a recap of the effective distribution.
+        """
+        print(f"| Distribution : {self.__class__.__name__}")
+        print(f"| Parameters : {self.__dict__}")
+        print(f"| Probability Density Function : {self.pdf()}")
+        print(f"| Cumulative Distribution Function : {self.cdf()}")
         print(f"| Support : {self.support()}")
         print(f"| mean : {self.mean()}")
         print(f"| Variance : {self.variance()}")
@@ -146,7 +269,7 @@ class Uniform(Distribution):
 
     Examples
     --------
-    >> U = Uniform(a=0, b=1)
+    >> U = Uniform(a=0,b=1)
     >> U.sample(10)
 
     Notes
@@ -157,13 +280,14 @@ class Uniform(Distribution):
     def __init__(self,a=0,b=1):
 
         if a == b:
-            raise ValueError("The lower and upper bound should be different.")
+            raise ValueError(
+                "The lower and upper bound should be different."
+            )
 
         self.lobound = min(a,b)
         self.upbound = max(a,b)
 
     def pdf(self, x=None):
-
         if x is None:
             print("Probability density function :")
             print(f"| {(1/{self.upbound-self.lobound})} for {self.lobound} <= x <= {self.upbound}" )
@@ -230,8 +354,12 @@ class Exponential(Distribution):
     """
 
     def __init__(self,alpha=1):
+
         if alpha <=0:
-            raise ValueError("The parameter should be greater than 0.")
+            raise ValueError(
+                "The parameter should be greater than 0."
+            )
+
         self.alpha = alpha
 
     def pdf(self, x=None):
@@ -285,7 +413,6 @@ class Normal(Distribution):
     ----------
     mean : float
         Mean parameter.
-
     sd : float
         Standard deviation parameter. Must be strictly positive.
 
@@ -303,27 +430,30 @@ class Normal(Distribution):
     >> N.sample(10)
     """
 
-    def __init__(self,mu=0,sd=1):
-        if sd <=0:
-            raise ValueError("The standard deviation should be greater than 0.")
-        self.mu = mu
-        self.sd = sd
+    def __init__(self,mean=0,sd=1):
 
+        if sd <=0:
+            raise ValueError(
+                "The standard deviation should be greater than 0."
+            )
+
+        self.mean = mean
+        self.sd = sd
 
     def pdf(self, x=None):
 
         if x is None:
             print("Probability density function :")
-            print(f"| (1/{self.sd}*sqrt(2*pi)) * exp(-(x-{self.mu})^2 / 2*{self.sd}^2)")
+            print(f"| (1/{self.sd}*sqrt(2*pi)) * exp(-(x-{self.mean})^2 / 2*{self.sd}^2)")
         else:
-            return (1/(self.sd*np.sqrt(2*np.pi)))*np.exp(-(x - self.mu)**2 / (2*self.sd**2))
+            return (1/(self.sd*np.sqrt(2*np.pi)))*np.exp(-(x - self.mean)**2 / (2*self.sd**2))
 
     def cdf(self, x=None):
         if x is None:
             print("Cumulative distribution function :")
-            print(f"| (1+erf((x-{self.mu})/({self.sd}*sqrt(2))))/2")
+            print(f"| (1+erf((x-{self.mean})/({self.sd}*sqrt(2))))/2")
         else:
-            return (1+scipy.special.erf((x-self.mu)/(self.sd*np.sqrt(2))))/2
+            return (1+scipy.special.erf((x-self.mean)/(self.sd*np.sqrt(2))))/2
 
     def sample(self,n=1):
         return crandom.normal(self.mu, self.sd, n)
@@ -364,15 +494,21 @@ class Gamma(Distribution):
 
     Examples
     --------
-    >> G = Gamma(k=2, theta=1)
+    >> G = Gamma(k=2,theta=1)
     >> G.sample(10)
     """
 
     def __init__(self,k=1,theta=1):
+
         if k <=0:
-            raise ValueError("The form parameter should be greater than 0.")
+            raise ValueError(
+                "The form parameter should be greater than 0."
+            )
+
         if theta <=0:
-            raise ValueError("The rate parameter should be greater than 0.")
+            raise ValueError(
+                "The rate parameter should be greater than 0."
+            )
 
         self.k = k
         self.theta = theta
@@ -436,15 +572,20 @@ class Beta(Distribution):
 
     Examples
     --------
-    >> B = Beta(a=2, b=3/2)
+    >> B = Beta(a=2,b=3/2)
     >> B.sample(10)
     """
 
     def __init__(self,a=1,b=1):
+
         if a <= 0:
-            raise ValueError("The first shape parameter should be greater than 0.")
+            raise ValueError(
+                "The first shape parameter should be greater than 0."
+            )
         if b <= 0:
-            raise ValueError("The second shape parameter should be greater than 0.")
+            raise ValueError(
+                "The second shape parameter should be greater than 0."
+            )
 
         self.a = a
         self.b = b
@@ -512,15 +653,21 @@ class Weibull(Distribution):
 
     Examples
     --------
-    >> W = Weibull(k=2, l=3/2)
+    >> W = Weibull(k=2,l=3/2)
     >> W.sample(10)
     """
 
     def __init__(self,k=1,l=1):
+
         if k <=0:
-            raise ValueError("The shape parameter should be greater than 0.")
+            raise ValueError(
+                "The shape parameter should be greater than 0."
+            )
+
         if l <=0:
-            raise ValueError("The scale parameter should be greater than 0.")
+            raise ValueError(
+                "The scale parameter should be greater than 0."
+            )
 
         self.k = k
         self.l = l
@@ -586,16 +733,21 @@ class Frechet(Distribution):
 
     Examples
     --------
-    >> F = Frechet(a=2, s=3/2,m=-3)
+    >> F = Frechet(a=2,s=3/2,m=-3)
     >> F.sample(10)
     """
 
     def __init__(self,a=1,s=1,m=0):
 
         if a <= 0:
-            raise ValueError("The shape parameter should be greater than 0.")
+            raise ValueError(
+                "The shape parameter should be greater than 0."
+            )
+
         if s <= 0:
-            raise ValueError("The scale parameter should be greater than 0.")
+            raise ValueError(
+                "The scale parameter should be greater than 0."
+            )
 
         self.a = a
         self.s = s
@@ -667,10 +819,13 @@ class Cauchy(Distribution):
     >> C = Cauchy(x=0,a=1)
     >> C.sample(10)
     """
+
     def __init__(self,x=0,a=1):
 
         if a <= 0:
-            raise ValueError("The scale parameter should be greater than 0.")
+            raise ValueError(
+                "The scale parameter should be greater than 0."
+            )
 
         self.x = x
         self.a = a
@@ -735,7 +890,9 @@ class Gumbel(Distribution):
     def __init__(self,mu=0,beta=1):
 
         if beta <= 0:
-            raise ValueError("The scale parameter should be greater than 0.")
+            raise ValueError(
+                "The scale parameter should be greater than 0."
+            )
 
         self.mu = mu
         self.beta = beta
@@ -794,16 +951,21 @@ class Kumaraswamy(Distribution):
 
     Examples
     --------
-    >> K = Kumaraswamy(a=3/2, b=5)
+    >> K = Kumaraswamy(a=3/2,b=5)
     >> K.sample(10)
     """
 
     def __init__(self,a=1,b=1):
 
         if a <= 0:
-            raise ValueError("The first shape parameter should be greater than 0.")
+            raise ValueError(
+                "The first shape parameter should be greater than 0."
+            )
+
         if b <= 0:
-            raise ValueError("The second shape parameter should be greater than 0.")
+            raise ValueError(
+                "The second shape parameter should be greater than 0."
+            )
 
         self.a = a
         self.b = b
@@ -871,16 +1033,21 @@ class Fisher(Distribution):
 
     Examples
     --------
-    >> F = Fisher(d1=2, d2=5)
+    >> F = Fisher(d1=2,d2=5)
     >> F.sample(10)
     """
 
     def __init__(self,d1=1,d2=1):
 
         if d1 <= 0:
-            raise ValueError("The first degree of freedom should be greater than 0.")
+            raise ValueError(
+                "The first degree of freedom should be greater than 0."
+            )
+
         if d2 <= 0:
-            raise ValueError("The second degree of freedom should be greater than 0.")
+            raise ValueError(
+                "The second degree of freedom should be greater than 0."
+            )
 
         self.d1 = d1
         self.d2 = d2
@@ -946,16 +1113,21 @@ class Pareto(Distribution):
 
     Examples
     --------
-    >> P = Pareto(x_m=2, k=1/2)
+    >> P = Pareto(x_m=2,k=1/2)
     >> P.sample(10)
     """
 
     def __init__(self,x_m=1,k=1):
 
         if x_m <= 0:
-            raise ValueError("The position parameter should be greater than 0.")
+            raise ValueError(
+                "The position parameter should be greater than 0."
+            )
+
         if k <= 0:
-            raise ValueError("The shape parameter should be greater than 0.")
+            raise ValueError(
+                "The shape parameter should be greater than 0."
+            )
 
         self.x_m = x_m
         self.k = k
@@ -1024,7 +1196,9 @@ class Rayleigh(Distribution):
     def __init__(self,s=1):
 
         if s <= 0:
-            raise ValueError("The scale parameter should be greater than 0.")
+            raise ValueError(
+                "The scale parameter should be greater than 0."
+            )
 
         self.s = s
 
@@ -1056,6 +1230,7 @@ class Rayleigh(Distribution):
 
     def variance(self):
         return (self.s**2)*(4-np.pi)/2
+
     def entropy(self):
         return 1 + np.log(self.s/np.sqrt(2))+np.euler_gamma/2
 

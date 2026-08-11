@@ -1,8 +1,8 @@
 import numpy as np
 import plotly.graph_objects as go
 from pystochastic.pyrandom import crandom
-
-class Vasicek:
+from abc import abstractmethod, ABC
+class Vasicek():
     def __init__(self,reversion_speed=1,mean=1,volatility=1,r_0=0,t_0=0, t_n=1, n_steps=1000, n_simulations=1):
         self.reversion_speed = np.atleast_2d(reversion_speed)
         self.mean = np.atleast_1d(mean)
@@ -50,6 +50,13 @@ class Vasicek:
         return self.path
 
     def plot(self):
+
+        """
+        Plot method.
+
+        Plot the simulated path of the Vasieck process. The path can be plotted only in 1D, 2D or 3D.
+        """
+
         if self.dim > 3:
             raise ValueError("The path can be plotted only for 1D, 2D and 3D.")
         if self.path is None:

@@ -1,9 +1,7 @@
 import numpy as np
-import plotly.graph_objects as go
-import pystochastic.processes as processes
 from pystochastic.processes import *
 from scipy.stats import norm
-from functools import partial
+
 
 
 class MonteCarloEstimator:

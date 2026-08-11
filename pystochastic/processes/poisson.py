@@ -2,15 +2,17 @@ import numpy as np
 import plotly.graph_objects as go
 from pystochastic.pyrandom import crandom
 
-class Poisson:
+class Poisson():
     def __init__(self,intensity=1,t_0=0, t_n=10, n_steps=1000):
         self.intensity = intensity
         self.t_0 = t_0
         self.t_n = t_n
         self.n_steps = n_steps
         self.n_simulations = None
+        self.dim = 1
         self.t = np.linspace(t_0,t_n,n_steps+1)
         self.path = None
+
 
     def simulate(self,n_simulations=1):
         self.path = np.zeros((n_simulations,self.n_steps+1))
@@ -26,6 +28,13 @@ class Poisson:
         return self.path
 
     def plot(self):
+
+        """
+        Plot method.
+
+        Plot the simulated path of the Poisson process.
+        """
+
         if self.path is None:
             raise ValueError("The path has not been simulated yet. Please run the simulate method first.")
         fig = go.Figure()
