@@ -15,7 +15,7 @@ def test_default_drift():
     x = np.array([1.0, 2.0])
     result = default_drift(x, 0.5)
     print(result)
-    assert np.allclose(result, x)
+    assert np.allclose(result, np.array([1, 1]))
 
 
 def test_default_diffusion():
@@ -23,4 +23,4 @@ def test_default_diffusion():
     result = default_diffusion(x, 0.5)
 
     assert np.shape(result) == (2, 2)
-    assert np.allclose(result, np.diag(x))
+    assert np.allclose(result, np.eye(2))

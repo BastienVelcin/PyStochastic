@@ -106,12 +106,13 @@ class Poisson():
         self.path = np.zeros((n_simulations,self.n_steps+1))
 
         for sim in range(n_simulations):
-            T = [0]
-
+            T = []
+            current_time = 0
             # We simulate exponential random variables until the total sum of them exceeds the final time.
-            while T[-1] < self.t_n:
+            while current_time < self.t_n:
                 E = crandom.exponential(self.intensity).item()
-                T.append(T[-1] + E)
+                current_time += E
+                T.append(current_time)
 
             for i in range(1,self.n_steps+1):
                 # The Poisson process value is given by the number of exponential sums that are smaller than the current time.

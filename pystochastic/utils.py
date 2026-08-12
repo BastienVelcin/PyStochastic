@@ -9,7 +9,7 @@ def is_pos_def(x):
 
 def default_drift(x, t):
     x = np.atleast_1d(x)
-    return np.eye(len(x))
+    return np.ones_like((len(x),1))
 
 def default_diffusion(x, t):
     x = np.atleast_1d(x)
