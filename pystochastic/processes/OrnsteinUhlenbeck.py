@@ -143,11 +143,11 @@ class OrnsteinUhlenbeck:
             self.path[:,0] = self.r_0
 
             for sim in range(n_simulations):
-                # For every simulation, we compute a different normal samples
+                # For every simulation, we compute different normal samples
                 Z = crandom.normal(0, 1, self.n_steps)
 
                 for i in range(1,self.n_steps+1):
-                    # The induction formula is given by R_t = (mean + R_{t-1} - mu) * exp(-theta * dt) + sigma * sqrt(1 - exp(-2 * theta * dt)) / (2 * theta)) * Z[i-1])
+                    # The induction formula is given by R_t = (mean + R_{t-1} - mean) * exp(-theta * dt) + sigma * sqrt(1 - exp(-2 * theta * dt)) / (2 * theta)) * Z[i-1])
                     self.path[sim,i] = (self.mean+ (self.path[sim,i-1] - self.mean) * np.exp(-self.theta * self.dt) + self.sigma * np.sqrt((1 - np.exp(-2 * self.theta * self.dt)) / (2 * self.theta)) * Z[i-1])
 
         else:
