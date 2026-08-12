@@ -76,22 +76,20 @@ class Brownian:
 
     Examples
     --------
-    >> W = Brownian(var=np.eye(2),dim=2,t_0=0,t_n=1,n_steps=1000)
+    >> W = Brownian(var=np.eye(2),t_0=0,t_n=1,n_steps=1000)
     >> W.simulate()
     >> W.plot()
     """
 
     def __init__(self,
-                 var=None,
-                 dim=1,
+                 var=1,
                  t_0=0,
                  t_n=1,
                  n_steps=1000):
 
-        if var is None:
-            var = np.eye(dim)
+        self.var = np.atleast_2d(var)
 
-        if not is_pos_def(var):
+        if not is_pos_def(self.var):
             raise ValueError(
                 "The covariance matrix is not positive-definite."
             )
@@ -101,27 +99,23 @@ class Brownian:
                 "The final time must be strictly greater than the initial time."
             )
 
-        if var.shape != (dim, dim):
-            raise ValueError(
-                "The dimension of the covariance matrix must coincide with the specified dimension."
-            )
-
-        if not is_pos_def(var):
+        if not is_pos_def(self.var):
             raise ValueError(
                 "The covariance matrix is not positive-definite."
             )
 
-        self.var = np.array(var)
-        self.dim = dim
+        self.dim = np.shape(self.var)[0]
         self.t_0 = t_0
         self.t_n = t_n
         self.n_steps = n_steps
-        self.sim = brownian_motion(self.var, self.dim,self.t_0,self.t_n,self.n_steps)
-        self.path = self.sim[0]
-        self.increments =self.sim[1]
+        self.sim = None
+        self.n_simulations = None
+        self.path = None
+        self.increments =None
         self.t = np.linspace(self.t_0,self.t_n,self.n_steps+1)
 
-    def simulate(self):
+
+    def simulate(self,n_simulations=1):
 
         """
         Simulate method.
@@ -138,9 +132,11 @@ class Brownian:
         The function only returns the path and not the increments. The increments can be accessed through the 'increments' attribute.
         """
 
-        self.sim = brownian_motion(self.var, self.dim, self.t_0,self.t_n,self.n_steps)
+        self.sim = brownian_motion(self.var, self.t_0,self.t_n,self.n_steps, n_simulations)
         self.path = self.sim[0]
         self.increments = self.sim[1]
+
+        self.n_simulations = n_simulations
         return self.path
 
     def plot(self):
@@ -148,36 +144,50 @@ class Brownian:
         """
         Plot method.
 
-        Plot the simulated path of the brownian motion. The path can be plotted only in 1D, 2D or 3D.
+        Plot the simulated path of the Geometric Brownian Motion. The path can be plotted only in 1D, 2D or 3D.
         """
+
+        if self.sim == None:
+            raise ValueError(
+                "The path has not been simulated yet. Please run the simulate method first."
+            )
 
         if self.dim > 3:
             raise ValueError(
                 "The path can be plotted only for 1D, 2D and 3D."
             )
 
+        if self.path is None:
+            raise ValueError(
+                "The path has not been simulated yet. Please run the simulate method first."
+            )
+
         fig = go.Figure()
 
         if self.dim == 1:
-            fig.add_trace(go.Scatter(x=self.t,
-                                     y=self.path[:,0],
-                                     mode="lines",
-                                     line=dict(width=2)))
+            for sim in range(self.n_simulations):
+                fig.add_trace(go.Scatter(x=self.t,
+                                         y=self.path[sim,:, 0],
+                                         mode="lines",
+                                         line=dict(width=2)))
 
         elif self.dim == 2:
-            fig.add_trace(go.Scatter(x=self.path[:, 0],
-                                     y=self.path[:, 1],
-                                     mode="lines",
-                                     line=dict(width=2)))
+            for sim in range(self.n_simulations):
+                fig.add_trace(go.Scatter(x=self.path[sim,:, 0],
+                                         y=self.path[sim, :, 1],
+                                         mode="lines",
+                                         line=dict(width=2)))
 
         else:
-            fig.add_trace(go.Scatter3d(x=self.path[:, 0],
-                                       y=self.path[:, 1],
-                                       z=self.path[:, 2],
-                                       mode="lines",
-                                       line=dict(width=2)))
+            for sim in range(self.n_simulations):
+                fig.add_trace(go.Scatter3d(x=self.path[sim,:, 0],
+                                           y=self.path[sim,:, 1],
+                                           z=self.path[sim,:, 2],
+                                           mode="lines",
+                                           line=dict(width=2)))
 
         fig.show()
+
 
     def final_position(self):
 
@@ -190,8 +200,12 @@ class Brownian:
         -------
         float or np.ndarray
             State of the Brownian motion at the final time t_n.
-
         """
+
+        if self.sim == None:
+            raise ValueError(
+                "The path has not been simulated yet. Please run the simulate method first."
+            )
 
         return self.path[-1]
 
@@ -212,6 +226,11 @@ class Brownian:
         -----
         This method can only be used in 1D since the notion of maximum value is not defined in higher dimensions.
         """
+
+        if self.sim == None:
+            raise ValueError(
+                "The path has not been simulated yet. Please run the simulate method first."
+            )
 
         if self.dim != 1:
             raise ValueError(
@@ -241,6 +260,11 @@ class Brownian:
         This method can only be used in 1D since the notion of minimum value is not defined in higher dimensions.
         """
 
+        if self.sim == None:
+            raise ValueError(
+                "The path has not been simulated yet. Please run the simulate method first."
+            )
+
         if self.dim != 1:
             raise ValueError(
                 "The minimum value can only be computed in 1D."
@@ -269,6 +293,10 @@ class Brownian:
         The norm used in this function is the Euclidean norm.
         """
 
+        if self.sim == None:
+            raise ValueError(
+                "The path has not been simulated yet. Please run the simulate method first."
+            )
 
         norms = np.sum(self.path**2, axis=1)
         arg_max = np.argmax(norms)
@@ -287,6 +315,12 @@ class Brownian:
             Dimension, time horizon, time step, and covariance matrix of the brownian motion.
 
         """
+
+        if self.sim == None:
+            raise ValueError(
+                "The path has not been simulated yet. Please run the simulate method first."
+            )
+
         return (f"Brownian Motion\n------------------------\n "
                 f"Dimension : {self.dim}\n "
                 f"Time horizon: {self.t_n}\n "
@@ -294,7 +328,7 @@ class Brownian:
                 f"Covariance matrix: \n"
                 f"{self.var}")
 
-def brownian_motion(var=np.array(1),d=1, t_0 = 0, t_n = 1, n_steps = 1000):
+def brownian_motion(var=1, t_0 = 0, t_n = 1, n_steps = 1000,n_simulations=1):
 
     """
     Brownian motion function.
@@ -307,23 +341,28 @@ def brownian_motion(var=np.array(1),d=1, t_0 = 0, t_n = 1, n_steps = 1000):
         np.ndarray of the simulated brownian motion path and np.ndarray of the increments.
 
     """
+    var = np.atleast_2d(var)
+    d = np.shape(var)[0]
+
+    W = np.zeros((n_simulations,n_steps+1, 1))
+    dW = np.zeros((n_simulations, n_steps, 1))
 
     # Computation of the step length and Cholesky decomposition
-    h = (t_n-t_0)/n_steps
-    L = np.linalg.cholesky(var) # The Cholesky decomposition of the covariance matrix is analogous to the square root for matrices.
+    h = (t_n - t_0) / n_steps
+    L = np.linalg.cholesky(var)  # The Cholesky decomposition of the covariance matrix is analogous to the square root for matrices.
 
-    # Sampling of normal random variables
+    for sim in range(n_simulations):
 
-    N = [crandom.normal(0, 1, n_steps) for _ in range(d)]
-    Z = np.stack(N,axis=0)
+        # Sampling of normal random variables
 
-    W = np.zeros((n_steps+1,d))
+        N = [crandom.normal(0, 1, n_steps) for _ in range(d)]
+        Z = np.stack(N,axis=0)
 
-    # The increments are independent and normally distributed, with a variance of h*L*L^T
-    dW = np.sqrt(h) * L @ Z
+        # The increments are independent and normally distributed, with a variance of h*L*L^T
+        dW[sim,:] = np.transpose(np.sqrt(h) * L @ Z)
 
-    # Since W_0 = 0 and W_i = W_i - W_{i-1} + W_{i-1} - W_{i-2} + ... - W_0 = W_i - W_{i-1} + dW_{i-1} + ... + dW_0
-    for k in range(n_steps):
-        W[k + 1] = W[k] + dW[:, k]
+        # Since W_0 = 0 and W_i = W_i - W_{i-1} + W_{i-1} - W_{i-2} + ... - W_0 = W_i - W_{i-1} + dW_{i-1} + ... + dW_0
+        for k in range(n_steps):
+            W[sim,k + 1] = W[sim,k] + dW[sim,k]
 
-    return W,np.transpose(dW)
+    return W,dW
