@@ -295,7 +295,7 @@ class Uniform(Distribution):
 
         else:
             if (self.lobound <= x <= self.upbound):
-                return (1/{self.upbound-self.lobound})
+                return (1/(self.upbound-self.lobound))
             else:
                 return 0
 
@@ -411,14 +411,14 @@ class Normal(Distribution):
 
     Parameters
     ----------
-    mean : float
+    mu : float
         Mean parameter.
     sd : float
         Standard deviation parameter. Must be strictly positive.
 
     Attributes
     ----------
-    mean : float
+    mu : float
         Mean parameter.
 
     sd : float
@@ -430,30 +430,30 @@ class Normal(Distribution):
     >> N.sample(10)
     """
 
-    def __init__(self,mean=0,sd=1):
+    def __init__(self,mu=0,sd=1):
 
         if sd <=0:
             raise ValueError(
                 "The standard deviation should be greater than 0."
             )
 
-        self.mean = mean
+        self.mu = mu
         self.sd = sd
 
     def pdf(self, x=None):
 
         if x is None:
             print("Probability density function :")
-            print(f"| (1/{self.sd}*sqrt(2*pi)) * exp(-(x-{self.mean})^2 / 2*{self.sd}^2)")
+            print(f"| (1/{self.sd}*sqrt(2*pi)) * exp(-(x-{self.mu})^2 / 2*{self.sd}^2)")
         else:
-            return (1/(self.sd*np.sqrt(2*np.pi)))*np.exp(-(x - self.mean)**2 / (2*self.sd**2))
+            return (1/(self.sd*np.sqrt(2*np.pi)))*np.exp(-(x - self.mu)**2 / (2*self.sd**2))
 
     def cdf(self, x=None):
         if x is None:
             print("Cumulative distribution function :")
-            print(f"| (1+erf((x-{self.mean})/({self.sd}*sqrt(2))))/2")
+            print(f"| (1+erf((x-{self.mu})/({self.sd}*sqrt(2))))/2")
         else:
-            return (1+scipy.special.erf((x-self.mean)/(self.sd*np.sqrt(2))))/2
+            return (1+scipy.special.erf((x-self.mu)/(self.sd*np.sqrt(2))))/2
 
     def sample(self,n=1):
         return crandom.normal(self.mu, self.sd, n)

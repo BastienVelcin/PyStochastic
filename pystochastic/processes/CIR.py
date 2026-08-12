@@ -74,11 +74,11 @@ class CIR:
     dim : int
         Dimension of the process. Here, the dimension is 1.
     t : np.ndarray
-        Time interval on which we want to simulate the GBM.
+        Time interval on which we want to simulate the CIR.
     dt : float
         Time step length.
     path : np.ndarray
-        Path of the simulated GBM.
+        Path of the simulated CIR.
     nu : float
         First parameter of the Noncentral chi-squared distribution for the exact simulation equation
     factor : float
@@ -88,9 +88,9 @@ class CIR:
 
     Examples
     --------
-    >> R = CIR(a=2,b=3,sigma=1,r_0=0,t_0=0,t_n=1,n_steps=1000)
-    >> R.simulate()
-    >> R.plot()
+    >>> R = CIR(a=2,b=3,sigma=1,r_0=0,t_0=0,t_n=1,n_steps=1000)
+    >>> R.simulate()
+    >>> R.plot()
     """
 
     def __init__(self, a=1, b=1, sigma=1, r_0=0, t_0=0, t_n=1, n_steps=1000):
@@ -131,10 +131,17 @@ class CIR:
 
         Simulate a Cox-Ingersoll-Ross process path using both the Euler-Maruyama method and exact solution.
 
+        Parameters
+        ----------
+        n_simulations : int, default=1
+            Number of trajectories to simulate.
+        method : {"exact", "euler-maruyama"}, default="exact"
+            Simulation method to use.
+
         Returns
         -------
         np.ndarray
-            Path of the simulated Cox-Ingersoll-Ross process.
+            Path of the simulated Cox-Ingersoll-Ross process of the form ``(n_simulations, n_steps + 1, dim)``.
         """
 
         if method == "euler-maruyama":

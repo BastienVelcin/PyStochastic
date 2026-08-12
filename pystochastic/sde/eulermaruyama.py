@@ -21,7 +21,7 @@ Examples
 
 import numpy as np
 import plotly.graph_objects as go
-from pystochastic.processes import brownian
+from pystochastic.processes import *
 from pystochastic.utils import default_drift, default_diffusion
 
 class EulerMaruyama:
@@ -85,7 +85,7 @@ class EulerMaruyama:
     def __init__(self,
                  mu=default_drift,
                  sigma=default_diffusion,
-                 x_0=np.array(0),
+                 x_0=0,
                  t_0=0,
                  t_n=1,
                  n_steps=1000,
@@ -96,10 +96,9 @@ class EulerMaruyama:
                 "The final time must be strictly greater than the initial time."
             )
 
-        x_0 = np.atleast_1d(x_0)
         self.mu = mu
         self.sigma = sigma
-        self.x_0 = x_0
+        self.x_0 = np.atleast_1d(x_0)
         self.t_0 = t_0
         self.t_n = t_n
         self.n_steps = n_steps
@@ -108,7 +107,7 @@ class EulerMaruyama:
         self.t = np.linspace(t_0,t_n,n_steps+1)
         self.dt = (t_n-t_0)/n_steps
 
-    def solve(self, plot=False):
+    def solve(self, plot=True):
 
         """
         Solve method.
@@ -133,15 +132,14 @@ class EulerMaruyama:
         Y[:,0,:] = self.x_0
 
         fig = go.Figure()
-
+        W = Brownian(np.eye(self.dim), self.t_0, self.t_n, self.n_steps)
+        W.simulate(self.n_simulations)
+        dW = W.increments
         for sim in range(self.n_simulations):
             # For every simulation, we compute a different Brownian increment array.
-            dW = brownian.Brownian(np.eye(self.dim), self.dim, self.t_0, self.t_n, self.n_steps).increments
-
             for i in range(1,self.n_steps+1):
                 # Euler-Maruyama induction formula.
-                Y[sim,i,:] = Y[sim,i-1,:] + self.mu(Y[sim,i-1,:],self.t[i-1])*self.dt + self.sigma(Y[sim,i-1,:],self.t[i-1]) @ dW[i-1,:]
-
+                Y[sim,i,:] = Y[sim,i-1,:] + self.mu(Y[sim,i-1,:],self.t[i-1])*self.dt + self.sigma(Y[sim,i-1,:],self.t[i-1]) @ dW[sim,i-1,:]
         # Plotting is allowed only for 1D, 2D and 3D and if the user has specified the plot parameter to True.
 
         if plot == True and self.dim <= 3:

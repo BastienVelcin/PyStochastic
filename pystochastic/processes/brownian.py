@@ -207,7 +207,7 @@ class Brownian:
                 "The path has not been simulated yet. Please run the simulate method first."
             )
 
-        return self.path[-1]
+        return self.path[:,-1]
 
     def max(self):
 
@@ -237,10 +237,10 @@ class Brownian:
                 "The maximum value can only be computed in 1D. Please refer to the max_norm function."
             )
 
-        argmax = np.argmax(self.path)
+        argmax = np.argmax(self.path, axis=1)
 
         # RETURN FORM: (max_value, time_index, time)
-        return np.max(self.path),argmax, self.t[argmax]
+        return np.max(self.path, axis=1),argmax, self.t[argmax]
 
     def min(self):
 
@@ -270,10 +270,10 @@ class Brownian:
                 "The minimum value can only be computed in 1D."
             )
 
-        argmin = np.argmin(self.path)
+        argmin = np.argmin(self.path, axis=1)
 
         # RETURN FORM: (max_value, time_index, time)
-        return np.min(self.path), argmin, self.t[argmin]
+        return np.min(self.path, axis=1), argmin, self.t[argmin]
 
     def max_norm(self):
 
@@ -298,35 +298,11 @@ class Brownian:
                 "The path has not been simulated yet. Please run the simulate method first."
             )
 
-        norms = np.sum(self.path**2, axis=1)
-        arg_max = np.argmax(norms)
-        return self.path[arg_max,:], arg_max, self.t[arg_max]
+        norms = np.sum(self.path**2, axis=2)
+        arg_max = np.argmax(norms, axis=1)
+        values = (self.path[np.arange(0,self.n_simulations),arg_max,:])
+        return values, arg_max, self.t[arg_max]
 
-    def __repr__(self):
-
-        """
-        Representation method.
-
-        The max norm provides some information about the effective brownian motion.
-
-        Returns
-        -------
-        str
-            Dimension, time horizon, time step, and covariance matrix of the brownian motion.
-
-        """
-
-        if self.sim == None:
-            raise ValueError(
-                "The path has not been simulated yet. Please run the simulate method first."
-            )
-
-        return (f"Brownian Motion\n------------------------\n "
-                f"Dimension : {self.dim}\n "
-                f"Time horizon: {self.t_n}\n "
-                f"Time step: {(self.t_n-self.t_0)/self.n_steps}\n "
-                f"Covariance matrix: \n"
-                f"{self.var}")
 
 def brownian_motion(var=1, t_0 = 0, t_n = 1, n_steps = 1000,n_simulations=1):
 
@@ -344,22 +320,20 @@ def brownian_motion(var=1, t_0 = 0, t_n = 1, n_steps = 1000,n_simulations=1):
     var = np.atleast_2d(var)
     d = np.shape(var)[0]
 
-    W = np.zeros((n_simulations,n_steps+1, 1))
-    dW = np.zeros((n_simulations, n_steps, 1))
+    W = np.zeros((n_simulations,n_steps+1, d))
+    dW = np.zeros((n_simulations, n_steps, d))
 
     # Computation of the step length and Cholesky decomposition
     h = (t_n - t_0) / n_steps
     L = np.linalg.cholesky(var)  # The Cholesky decomposition of the covariance matrix is analogous to the square root for matrices.
-
     for sim in range(n_simulations):
 
         # Sampling of normal random variables
 
         N = [crandom.normal(0, 1, n_steps) for _ in range(d)]
         Z = np.stack(N,axis=0)
-
         # The increments are independent and normally distributed, with a variance of h*L*L^T
-        dW[sim,:] = np.transpose(np.sqrt(h) * L @ Z)
+        dW[sim] = np.transpose(np.sqrt(h) * L @ Z)
 
         # Since W_0 = 0 and W_i = W_i - W_{i-1} + W_{i-1} - W_{i-2} + ... - W_0 = W_i - W_{i-1} + dW_{i-1} + ... + dW_0
         for k in range(n_steps):

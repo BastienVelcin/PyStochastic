@@ -72,11 +72,11 @@ class OrnsteinUhlenbeck:
     dim : int
         Dimension of the process.
     t : np.ndarray
-        Time interval on which we want to simulate the GBM.
+        Time interval on which we want to simulate the process.
     dt : float
         Time step length.
     path : np.ndarray
-        Path of the simulated GBM.
+        Path of the simulated process.
 
     Examples
     --------
@@ -117,10 +117,17 @@ class OrnsteinUhlenbeck:
 
         Simulate an Ornstein Uhlenbeck process path using both the Euler-Maruyama method and the induction formula.
 
+        Parameters
+        ----------
+        n_simulations : int, default=1
+            Number of trajectories to simulate.
+        method : {"exact", "euler-maruyama"}, default="euler-maruyama"
+            Simulation method to use.
+
         Returns
         -------
         np.ndarray
-            Path of the simulated Ornstein Uhlenbeck process.
+            Path of the simulated Ornstein Uhlenbeck process of the form ``(n_simulations, n_steps + 1, dim)``.
         """
 
         if method == "euler-maruyama":

@@ -63,9 +63,9 @@ class Poisson():
     dim : int
         Dimension of the process. Here, the dimension is 1.
     t : np.ndarray
-        Time interval on which we want to simulate the GBM.
+        Time interval on which we want to simulate the process.
     path : np.ndarray
-        Path of the simulated GBM.
+        Path of the simulated process.
 
     Examples
     --------
@@ -92,10 +92,15 @@ class Poisson():
 
         Simulate a Poisson process path using exponential random variables.
 
+        Parameters
+        ----------
+        n_simulations : int, default=1
+            Number of trajectories to simulate.
+
         Returns
         -------
         np.ndarray
-            Path of the simulated Poisson process.
+            Path of the simulated Poisson process of the form ``(n_simulations, n_steps + 1)``.
         """
 
         self.path = np.zeros((n_simulations,self.n_steps+1))

@@ -104,10 +104,17 @@ class GeometricBrownianMotion:
 
         Simulate a Geometric Brownian Motion path using both the Euler-Maruyama method and the explicit solution.
 
+        Parameters
+        ----------
+        n_simulations : int, default=1
+            Number of trajectories to simulate.
+        method : {"exact", "euler-maruyama"}, default="exact"
+            Simulation method to use.
+
         Returns
         -------
         np.ndarray
-            Path of the simulated Geometric Brownian Motion.
+            Path of the simulated Geometric Brownian Motion of the form ``(n_simulations, n_steps + 1, dim)``.
         """
         if method == "euler-maruyama":
             from pystochastic.sde import EulerMaruyama
@@ -117,19 +124,20 @@ class GeometricBrownianMotion:
                                       self.t_0,
                                       self.t_n,
                                       self.n_steps,
-                                      self.n_simulations).solve()
+                                      n_simulations).solve()
 
         elif method == "exact":
             self.path = np.zeros((n_simulations,self.n_steps+1, self.dim))
+            W = Brownian(np.eye(self.dim), self.t_0, self.t_n, self.n_steps)
+            W.simulate(n_simulations=n_simulations)
 
             for sim in range(n_simulations):
                 # For every simulation, we compute a different Brownian increment array.
-                W = Brownian(np.eye(self.dim), self.dim, self.t_0, self.t_n, self.n_steps)
-
+                print(W.path)
                 for i in range(0, self.n_steps+1):
                     # The explicit solution is given by S_t = S_0 * exp((mu - 1/2 * sigma^2) * t + sigma * W_t)
                     self.path[sim,i, :] = self.S_0 * np.exp(
-                        (self.mu - np.sum(self.sigma ** 2, axis=1) / 2) * self.t[i] + self.sigma   @ W.path[i,:])
+                        (self.mu - np.sum(self.sigma ** 2, axis=1) / 2) * self.t[i] + self.sigma  @ W.path[sim,i,:])
         else:
             raise ValueError(
                 "The method must be either 'euler-maruyama' or 'exact'."

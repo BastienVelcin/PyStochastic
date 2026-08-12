@@ -11,7 +11,7 @@ def default_drift(x, t):
     x = np.atleast_1d(x)
     return np.eye(len(x))
 
-def default_diffusion(x, t,d=1):
+def default_diffusion(x, t):
     x = np.atleast_1d(x)
     return np.eye(len(x))
 
