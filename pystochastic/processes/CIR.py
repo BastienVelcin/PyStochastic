@@ -12,6 +12,8 @@ This module provides a general class "CIR", with the following built-in methods:
     - .diffusion() : Diffusion function of the CIR model.
     - .simulate() : Simulate a Cox-Ingersoll-Ross model path in 1D, with both exact and Euler-Maruyama methods.
     - .plot() : Plot the Cox-Ingersoll-Ross model path.
+    - .mean() : Mean of the CIR process at a given time.
+    - .variance() : Variance of the CIR process at a given time.
 
 Examples
 --------
@@ -202,3 +204,61 @@ class CIR:
                                      line=dict(width=2)))
         fig.show()
 
+    def mean(self,t):
+
+        """
+        Mean method.
+
+        Return the mean of the CIR path at a given time t.
+
+        Returns
+        -------
+        float
+            Mean of the CIR path at a time t
+
+        Parameters
+        ----------
+        t : float
+            Time at which the mean is evaluated. Must be between t_0 and t_n.
+
+        Notes
+        -----
+        The mean of the CIR path at every time t with a fixed r_0 is given by r_0 * exp(-a*t) + b*(1-exp(-a*t))
+        """
+
+        if not self.t_0 <= t <= self.t_n:
+            raise ValueError(
+                "The time must be between t_0 and t_n."
+            )
+
+        return self.r_0 * np.exp(-self.a * t) + self.b*(1-np.exp(-self.a * t))
+
+    def variance(self,t):
+
+        """
+        Variance method.
+
+        Return the variance of the CIR path at a given time t.
+
+        Parameters
+        ----------
+        t : float
+            Time at which the variance is evaluated. Must be between t_0 and t_n.
+
+        Returns
+        -------
+        float
+            Variance of the CIR path at a time t
+
+        Notes
+        -----
+        The variance of the CIR path at every time t with a fixed r_0 is given by
+        r_0 * sigma^2/a * (exp(-a*t)-exp(-2*a*t)) + (b*sigma^2)/(2*a) * (1-exp(-a*t))^2
+        """
+
+        if not self.t_0 <= t <= self.t_n:
+            raise ValueError(
+                "The time must be between t_0 and t_n."
+            )
+
+        return self.r_0 * (self.sigma**2 / self.a) * (np.exp(-self.a*t)-np.exp(-2 * self.a * t)) + (self.b * self.sigma**2)/(2*self.a) * (1-np.exp(-self.a*t))**2

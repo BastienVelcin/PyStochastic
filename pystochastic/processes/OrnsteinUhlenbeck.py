@@ -10,6 +10,10 @@ This module provides a way to simulate an Ornstein-Uhlenbeck process with a give
 This module provides a general class "OrnsteinUhlenbeck", with the following built-in methods:
     - .simulate() : Simulate an Ornstein-Uhlenbeck process path, with both exact (only in 1D) and Euler-Maruyama methods.
     - .plot() : Plot the Ornstein-Uhlenbeck process path.
+    - .mean() : Mean of the Ornstein-Uhlenbeck process at a given time.
+    - .covariance_matrix() : Covariance matrix of the Ornstein-Uhlenbeck process at a given time.
+    - .covariance() : Covariance between two coordinates of the Ornstein-Uhlenbeck process at a given time.
+    - .variance() : Variance of the Ornstein-Uhlenbeck process at a given time.
 
 Examples
 --------
@@ -21,6 +25,7 @@ Examples
 """
 
 import numpy as np
+import scipy
 import plotly.graph_objects as go
 from pystochastic.pyrandom import crandom
 
@@ -36,7 +41,7 @@ class OrnsteinUhlenbeck:
 
     Parameters
     ----------
-    mean : float, or list, or np.ndarray
+    mu : float, or list, or np.ndarray
         Long term mean vector of the model.
     sigma : float, or np.ndarray
         Constant matrix diffusion of the model. The dimension of the matrix must coincide with the dimension of the starting point and the vector drift.
@@ -53,7 +58,7 @@ class OrnsteinUhlenbeck:
 
     Attributes
     ----------
-    mean : float, or list, or np.ndarray
+    mu : float, or list, or np.ndarray
         Long term mean vector of the model.
     sigma : float, or np.ndarray
         Constant matrix diffusion of the model.
@@ -85,8 +90,8 @@ class OrnsteinUhlenbeck:
     >> R.plot()
     """
 
-    def __init__(self,mean=0,sigma=1,theta=1,r_0=0,t_0=0, t_n=1, n_steps=1000):
-        self.mean = np.atleast_1d(mean)
+    def __init__(self,mu=0,sigma=1,theta=1,r_0=0,t_0=0, t_n=1, n_steps=1000):
+        self.mu = np.atleast_1d(mu)
         self.sigma = np.atleast_2d(sigma)
         self.theta = np.atleast_2d(theta)
 
@@ -100,7 +105,7 @@ class OrnsteinUhlenbeck:
         self.t_n = t_n
         self.n_steps = n_steps
         self.n_simulations = None
-        self.dim = np.size(self.mean)
+        self.dim = np.size(self.mu)
         self.t = np.linspace(t_0,t_n,n_steps+1)
         self.dt = (t_n-t_0)/n_steps
         self.path = None
@@ -132,7 +137,7 @@ class OrnsteinUhlenbeck:
 
         if method == "euler-maruyama":
             from pystochastic.sde import EulerMaruyama
-            self.path = EulerMaruyama(lambda x,t : self.theta @ (self.mean-x),
+            self.path = EulerMaruyama(lambda x,t : self.theta @ (self.mu-x),
                                       lambda x,t : self.sigma,
                                       self.r_0,
                                       self.t_0,
@@ -155,7 +160,7 @@ class OrnsteinUhlenbeck:
 
                 for i in range(1,self.n_steps+1):
                     # The induction formula is given by R_t = (mean + R_{t-1} - mean) * exp(-theta * dt) + sigma * sqrt(1 - exp(-2 * theta * dt)) / (2 * theta)) * Z[i-1])
-                    self.path[sim,i] = (self.mean+ (self.path[sim,i-1] - self.mean) * np.exp(-self.theta * self.dt) + self.sigma * np.sqrt((1 - np.exp(-2 * self.theta * self.dt)) / (2 * self.theta)) * Z[i-1])
+                    self.path[sim,i] = (self.mu+ (self.path[sim,i-1] - self.mu) * np.exp(-self.theta * self.dt) + self.sigma * np.sqrt((1 - np.exp(-2 * self.theta * self.dt)) / (2 * self.theta)) * Z[i-1])
 
         else:
             raise ValueError(
@@ -208,3 +213,145 @@ class OrnsteinUhlenbeck:
                                            mode="lines",
                                            line=dict(width=2)))
         fig.show()
+
+    def mean(self,t):
+
+        """
+        Mean method.
+
+        Return the mean of the Ornstein-Uhlenbeck process at a given time t.
+
+        Parameters
+        ----------
+        t : float
+            Time at which the mean is evaluated. Must be between t_0 and t_n.
+
+        Returns
+        -------
+        float
+            Mean of the Ornstein-Uhlenbeck process at a time t
+
+        Notes
+        -----
+        The mean of the Ornstein-Uhlenbeck process  at every time t with a fixed R_0 is given by
+                            R_0 * exp(-theta*t) + mean * (Id - exp(-theta*t))
+        """
+
+        if not self.t_0 <= t <= self.t_n:
+            raise ValueError(
+                "The time must be between t_0 and t_n."
+            )
+
+        return self.r_0 @ scipy.linalg.expm(- self.theta * t) + self.mu @ (np.eye(self.dim) - scipy.linalg.expm(- self.theta * t))
+
+    def covariance_matrix(self, t):
+
+        """
+        Covariance Matrix method.
+
+        Return the covariance of the Ornstein-Uhlenbeck process at a given time t.
+        The covariance matrix satisfies the following Lyapunov equation :
+            P'(t) = -theta*P(t) - P(t)*theta^T + (Sigma*Sigma^T)
+
+        Parameters
+        ----------
+        t : float
+            Time at which the covariance is evaluated.
+
+        Returns
+        -------
+        np.ndarray
+            Covariance matrix of the Ornstein-Uhlenbeck process at a time t.
+        """
+
+        if not self.t_0 <= t <= self.t_n:
+            raise ValueError(
+                "The time must be between t_0 and t_n."
+            )
+
+        Q = self.sigma @ self.sigma.T
+
+        # We define the Lyapunov equation, where s is the time at which we want to evaluate the solution of the
+        # Lyapunov equation, and p is the state of the process at time t (as a vector).
+        def ode(s, p):
+
+            #Because p was flatten (inputted as a vector), we need to reshape it as a matrix like the covariance one.
+            P = p.reshape(self.dim, self.dim)
+
+            # We define the right-hand side of the Lyapunov equation
+            dP = -self.theta @ P- P @ self.theta.T + Q
+
+            # We return the flattened version of the right-hand side of the Lyapunov equation. We use the method ravel
+            # to flatten the array column by column instead of row by row.
+            return dP.ravel()
+
+        # We solve the Lyapunov equation using the scipy.integrate.solve_ivp function, with the initial condition p=0, since
+        # R_0, the initial condition of the process, is a deterministic vector.
+
+        solution = scipy.integrate.solve_ivp(ode, (0, t),np.zeros(self.dim ** 2))
+
+        # solution.y is a 2D array, with the first dimension corresponding to the time, and the second dimension to the state.
+        # Because we want the solution at the time t, we need to select the last column of the array, and to reshape it as a matrix,
+        # instead of a vector.
+
+        return solution.y[: , -1].reshape(self.dim, self.dim)
+
+    def covariance(self, t,i,j):
+
+        """
+        Covariance Matrix method.
+
+        Return the covariance between the i-th and j-th coordinates
+        of the Ornstein-Uhlenbeck process at a given time t.
+
+
+        Parameters
+        ----------
+        t : float
+            Time at which the covariance is evaluated.
+        i : int
+            Index of the first coordinate. It must verify 0 <= i < dim.
+        j : int
+            Index of the second coordinate. It must verify 0 <= j < dim.
+
+        Returns
+        -------
+        np.ndarray
+            Covariance between the i-th and j-th coordinates.
+
+        Notes
+        -----
+        This method is using the covariance matrix method, which solves the Lyapunov equation.
+        """
+
+        if not self.t_0 <= t <= self.t_n:
+            raise ValueError(
+                "The time must be between t_0 and t_n."
+            )
+
+        return self.covariance_matrix(t)[i,j]
+
+    def variance(self,t):
+
+        """
+        Variance method.
+
+        Return the variance of the Ornstein-Uhlenbeck process at a given time t.
+
+
+        Parameters
+        ----------
+        t : float
+            Time at which the covariance is evaluated.
+
+        Returns
+        -------
+        np.ndarray
+            Variance of the Ornstein-Uhlenbeck process at the time t.
+
+        Notes
+        -----
+        This method is using the covariance matrix method, which solves the Lyapunov equation.
+        """
+
+        return np.diag(self.covariance_matrix(t))

@@ -23,6 +23,8 @@ import numpy as np
 import plotly.graph_objects as go
 from pystochastic.processes import *
 from pystochastic.utils import default_drift, default_diffusion
+import multiprocessing
+from multiprocessing import Pool
 
 class EulerMaruyama:
 

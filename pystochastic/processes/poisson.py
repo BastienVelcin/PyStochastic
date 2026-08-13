@@ -10,6 +10,8 @@ This module provides a way to simulate a Poisson process with a given intensity 
 This module provides a general class "CIR", with the following built-in methods:
     - .simulate() : Simulate a Poisson process path in 1D.
     - .plot() : Plot the Poisson process path.
+    - .mean() : Mean of the Poisson process at a given time.
+    - .variance() : Variance of the Poisson process at a given time.
 
 Examples
 --------
@@ -144,3 +146,53 @@ class Poisson():
                                      mode="lines",
                                      line=dict(width=2,shape="hv")))
         fig.show()
+
+    def mean(self,t):
+
+        """
+        Mean method.
+
+        Return the mean of the Poisson process at a given time t.
+
+        Parameters
+        ----------
+        t : float
+            Time at which the mean is evaluated. Must be between t_0 and t_n.
+
+        Returns
+        -------
+        float
+            Mean of the Poisson process at a time t
+
+        Notes
+        -----
+        The mean of the Poisson process at every time t is equal to the intensity times t, since the Poisson process at a time t
+        follows a Poisson distribution of parameter intensity times t.
+        """
+
+        return self.intensity*t
+
+    def variance(self,t):
+
+        """
+        Variance method.
+
+        Return the variance of the Poisson process at a given time t.
+
+        Parameters
+        ----------
+        t : float
+            Time at which the variance is evaluated. Must be between t_0 and t_n.
+
+        Returns
+        -------
+        float
+            Variance of the Poisson process at a time t
+
+        Notes
+        -----
+        The variance of the Poisson process at every time t is equal to the intensity times t, since the Poisson process at a time t
+        follows a Poisson distribution of parameter intensity times t.
+        """
+
+        return self.intensity * t

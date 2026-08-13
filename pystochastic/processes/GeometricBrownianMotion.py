@@ -9,7 +9,11 @@ This module provides a way to simulate a Geometric Brownian Motion (GBM) with a 
 
 This module provides a general class "GeometricBrownianMotion", with the following built-in methods:
     - .simulate() : Simulate a Geometric Brownian Motion path, with both exact and Euler-Maruyama methods.
-    - .plot() : Plot the Geometric Brownian Motion motion path.
+    - .plot() : Plot the Geometric Brownian Motion path.
+    - .mean() : Mean of the Geometric Brownian Motion process at a given time.
+    - .covariance() : Covariance between two coordinates of the Geometric Brownian Motion process at a given time.
+    - .covariance_matrix() : Covariance matrix of the Geometric Brownian Motion process at a given time.
+    - .variance() : Variance of the Geometric Brownian Motion process at a given time.
 
 Examples
 --------
@@ -189,3 +193,132 @@ class GeometricBrownianMotion:
                                            line=dict(width=2)))
 
         fig.show()
+
+    def mean(self, t):
+
+        """
+        Mean method.
+
+        Return the mean of the GBM path at a given time t.
+
+        Parameters
+        ----------
+        t : float
+            Time at which the mean is evaluated. Must be between t_0 and t_n.
+
+        Returns
+        -------
+        float
+            Mean of the GBM path at a time t
+
+        Notes
+        -----
+        The mean of the GBM path at every time t with a fixed S_0 is given by S_0 * exp(mu*t)
+        """
+
+        if not self.t_0 <= t <= self.t_n:
+            raise ValueError(
+                "The time must be between t_0 and t_n."
+            )
+
+        return self.S_0 * np.exp(self.mu * t)
+
+    def covariance(self,t, i,j):
+
+        """
+        Covariance method.
+
+        Return the covariance between the i-th and j-th coordinates
+        of the GBM at a given time t.
+
+        Parameters
+        ----------
+        t : float
+            Time at which the covariance is evaluated. Must be between t_0 and t_n.
+        i : int
+            Index of the first coordinate. It must verify 0 <= i < dim.
+        j : int
+            Index of the second coordinate. It must verify 0 <= j < dim.
+
+        Returns
+        -------
+        float
+            Covariance between the i-th and j-th coordinates.
+
+        Notes
+        -----
+        The covariance of the i-th and j-th coordinate of the GBM path at a time t is given by
+            S_{0,i} * S_{0,j} * exp((mu_{i} + mu_{j})*t) * (exp((sigma*sigma^T)_{ij}*t) - 1).
+        """
+
+        if not self.t_0 <= t <= self.t_n:
+            raise ValueError(
+                "The time must be between t_0 and t_n."
+            )
+
+        if not 0 <= i < self.dim:
+            raise ValueError(
+                "The first coordinate must be between 0 and the dimension (excluded)."
+            )
+
+        if not 0 <= j < self.dim:
+            raise ValueError(
+                "The second coordinate must be between 0 and the dimension (excluded)."
+            )
+        return self.S_0[i]*self.S_0[j]*np.exp((self.mu[i]+self.mu[j])*t)*(np.exp((self.sigma*self.sigma.T)[i,j] * t)-1)
+
+    def covariance_matrix(self,t):
+
+        """
+        Covariance Matrix method.
+
+        Return the covariance of the GBM at a given time t.
+
+        Parameters
+        ----------
+        t : float
+            Time at which the covariance is evaluated.
+
+        Returns
+        -------
+        np.ndarray
+            Covariance matrix of the GBM at a time t.
+        """
+
+        if not self.t_0 <= t <= self.t_n:
+            raise ValueError(
+                "The time must be between t_0 and t_n."
+            )
+
+        covar = np.zeros((self.dim,self.dim))
+
+        for i in range(self.dim):
+            for j in range(i,self.dim):
+                covar[i,j] = self.covariance(t,i,j)
+                covar[j,i] = covar[i,j]
+        return covar
+
+    def variance(self, t):
+
+        """
+        Variance method.
+
+        Return the variance of the GBM coordinates at a given time t.
+
+        Parameters
+        ----------
+        t : float
+            Time at which the variance is evaluated.
+
+        Returns
+        -------
+        np.ndarray
+            Variance of the GBM path coordinates at a given time t.
+        """
+
+        if not self.t_0 <= t <= self.t_n:
+            raise ValueError(
+                "The time must be between t_0 and t_n."
+            )
+
+        return np.array([self.covariance(t,i,i) for i in range(self.dim)])
