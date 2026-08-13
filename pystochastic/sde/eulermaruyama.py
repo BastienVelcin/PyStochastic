@@ -81,7 +81,6 @@ class EulerMaruyama:
     --------
     >> solver = EulerMaruyama(mu=lambda x,t : x, sigma=lambda x,t : 0.1*x, x_0=0, t_0=0, t_n=1, n_steps=1000, n_simulations=10)
     >> solver.solve(plot=True)
-
     """
 
     def __init__(self,
@@ -134,9 +133,11 @@ class EulerMaruyama:
         Y[:,0,:] = self.x_0
 
         fig = go.Figure()
+
         W = Brownian(np.eye(self.dim), self.t_0, self.t_n, self.n_steps)
         W.simulate(self.n_simulations)
         dW = W.increments
+
         for sim in range(self.n_simulations):
             # For every simulation, we compute a different Brownian increment array.
             for i in range(1,self.n_steps+1):

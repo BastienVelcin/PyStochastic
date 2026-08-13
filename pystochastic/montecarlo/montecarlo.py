@@ -225,7 +225,7 @@ class MonteCarloProcess:
     >> mc.mean_path()
     """
 
-    def __init__(self,process,n_simulations=10000):
+    def __init__(self,process,n_simulations=100):
 
         self.process = process
         self.n_simulations = n_simulations
@@ -248,7 +248,7 @@ class MonteCarloProcess:
         self.ech = self.process.simulate(self.n_simulations)
         return self.ech
 
-    def estimate(self, t_0=None, function = lambda x: x[:,0]):
+    def estimate(self, t_0=None, function = lambda x: x[:,0],n=None):
 
         """
         Estimate method.
@@ -262,6 +262,17 @@ class MonteCarloProcess:
             Estimation of the mean.
         """
 
+        if n is None:
+            n = self.n_simulations
+            
+        if n <= 0:
+            raise ValueError("n must be strictly positive.")
+
+        if n > self.n_simulations:
+            raise ValueError(
+                "n cannot be greater than the number of simulations."
+            )
+
         if t_0 is None:
             t_0 = self.process.t_n
 
@@ -270,7 +281,7 @@ class MonteCarloProcess:
             t_index = np.argmin(np.abs(t_0 - self.t))
         else:
             t_index = np.where(self.t == t_0)[0][0]
-        return np.mean(function(self.ech[:,t_index]), axis=0)
+        return np.mean(function(self.ech[:n,t_index]), axis=0)
 
 
     def mean_path(self, plot_sim=True):
@@ -362,3 +373,24 @@ class MonteCarloProcess:
             self.simulate()
 
         return function(self.ech[:,t_index])
+
+    def mean_error(self,t,error_type="absolute",plot=True):
+        n_axis = np.arange(1, self.n_simulations + 1)
+        mean_approx = np.array([self.estimate(t_0=t,n=i) for i in n_axis])
+        if error_type == "absolute":
+            error =  abs(mean_approx-self.process.mean(t))
+        elif error_type == "relative":
+            if self.process.mean(t) == 0:
+                raise ValueError("Cannot compute the relative error when the mean of the process is 0.")
+            error =  (mean_approx - self.process.mean(t))/self.process.mean(t)
+        elif error_type == "quadratic":
+            error = (mean_approx - self.process.mean(t))**2
+
+        fig = go.Figure()
+        for sim in range(self.n_simulations):
+            fig.add_trace(go.Scatter(x=n_axis,
+                                     y=error,
+                                     mode="lines",
+                                     line=dict(width=2)))
+
+        fig.show()

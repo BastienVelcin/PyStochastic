@@ -449,17 +449,10 @@ def brownian_motion(var=1, t_0 = 0, t_n = 1, n_steps = 1000,n_simulations=1):
     # Computation of the step length and Cholesky decomposition
     h = (t_n - t_0) / n_steps
     L = np.linalg.cholesky(var)  # The Cholesky decomposition of the covariance matrix is analogous to the square root for matrices.
-    for sim in range(n_simulations):
 
-        # Sampling of normal random variables
+    N = crandom.normal(0,1,n_simulations*n_steps*d)
+    Z = np.reshape(N,(n_simulations,n_steps,d))
+    dW[:,:] = Z @ L.T * np.sqrt(h)
 
-        N = [crandom.normal(0, 1, n_steps) for _ in range(d)]
-        Z = np.stack(N,axis=0)
-        # The increments are independent and normally distributed, with a variance of h*L*L^T
-        dW[sim] = np.transpose(np.sqrt(h) * L @ Z)
-
-        # Since W_0 = 0 and W_i = W_i - W_{i-1} + W_{i-1} - W_{i-2} + ... - W_0 = W_i - W_{i-1} + dW_{i-1} + ... + dW_0
-        for k in range(n_steps):
-            W[sim,k + 1] = W[sim,k] + dW[sim,k]
-
+    W[:, 1:, :] = np.cumsum(dW, axis=1)
     return W,dW
