@@ -186,7 +186,6 @@ from pystochastic.processes import Brownian
 
 brownian = Brownian(
     var=1,
-    dim=1,
     t_0=0,
     t_n=1,
     n_steps=1000
