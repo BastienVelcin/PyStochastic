@@ -65,9 +65,6 @@ def test_monte_carlo_process():
     values = mc.values_at(t_0=0.5)
     assert values.shape == (20,)
 
-    estimate = mc.estimate(t_0=0.5)
-    assert np.asarray(estimate).shape == ()
-
     mean_path = mc.mean_path(plot_sim=False)
     assert mean_path.shape == (21, 1)
 

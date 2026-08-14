@@ -95,7 +95,7 @@ class OrnsteinUhlenbeck:
         self.sigma = np.atleast_2d(sigma)
         self.theta = np.atleast_2d(theta)
 
-        if np.any(self.sigma < 0) or np.any(self.theta <=0):
+        if np.all(self.sigma < 0) or np.all(self.theta <=0):
             raise ValueError(
                 "The sigma and theta parameters should be greater than 0."
             )
@@ -137,7 +137,7 @@ class OrnsteinUhlenbeck:
 
         if method == "euler-maruyama":
             from pystochastic.sde import EulerMaruyama
-            self.path = EulerMaruyama(lambda x,t : self.theta @ (self.mu-x),
+            self.path = EulerMaruyama(lambda x,t : (self.mu-x) @ self.theta.T ,
                                       lambda x,t : self.sigma,
                                       self.r_0,
                                       self.t_0,

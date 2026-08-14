@@ -265,11 +265,11 @@ class TestOrnsteinUhlenbeck:
 
     def test_initialization(self):
         R = OrnsteinUhlenbeck(
-            mean=1, sigma=0.5, theta=2, r_0=0, t_n=1, n_steps=50
+            mu=1, sigma=0.5, theta=2, r_0=0, t_n=1, n_steps=50
         )
 
         assert R.dim == 1
-        assert R.mean.shape == (1,)
+        assert R.mu.shape == (1,)
         assert R.sigma.shape == (1, 1)
         assert R.theta.shape == (1, 1)
         assert R.r_0.shape == (1,)
@@ -278,7 +278,7 @@ class TestOrnsteinUhlenbeck:
     def test_invalid_dimensions(self):
         with pytest.raises(ValueError):
             OrnsteinUhlenbeck(
-                mean=[1, 2],
+                mu=[1, 2],
                 sigma=np.eye(2),
                 theta=np.eye(2),
                 r_0=[0],
@@ -286,7 +286,7 @@ class TestOrnsteinUhlenbeck:
 
     def test_euler_maruyama_shape(self):
         R = OrnsteinUhlenbeck(
-            mean=1, sigma=0.5, theta=2, r_0=0, t_n=1, n_steps=50
+            mu=1, sigma=0.5, theta=2, r_0=0, t_n=1, n_steps=50
         )
         path = R.simulate(n_simulations=10, method="euler-maruyama")
 
@@ -294,7 +294,7 @@ class TestOrnsteinUhlenbeck:
 
     def test_exact_shape(self):
         R = OrnsteinUhlenbeck(
-            mean=1, sigma=0.5, theta=2, r_0=0, t_n=1, n_steps=50
+            mu=1, sigma=0.5, theta=2, r_0=0, t_n=1, n_steps=50
         )
         path = R.simulate(n_simulations=10, method="exact")
 
@@ -302,7 +302,7 @@ class TestOrnsteinUhlenbeck:
 
     def test_exact_method_is_only_available_in_one_dimension(self):
         R = OrnsteinUhlenbeck(
-            mean=[1, 2],
+            mu=[1, 2],
             sigma=np.ones((2, 2)),
             theta=np.ones((2, 2)),
             r_0=[0, 0],
@@ -330,7 +330,7 @@ class TestVasicek:
     def test_initialization(self):
         R = Vasicek(
             reversion_speed=1,
-            mean=0.05,
+            mu=0.05,
             volatility=0.1,
             r_0=0.03,
             t_n=1,
@@ -343,7 +343,7 @@ class TestVasicek:
     def test_simulation_shape(self):
         R = Vasicek(
             reversion_speed=1,
-            mean=0.05,
+            mu=0.05,
             volatility=0.1,
             r_0=0.03,
             t_n=1,

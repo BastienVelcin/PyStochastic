@@ -105,8 +105,7 @@ def test_milstein_deterministic_equation():
 
     paths = solver.solve(plot=False)
 
-    # The current implementation stores n_steps points rather than n_steps + 1.
-    assert paths.shape == (2, 10, 1)
+    assert paths.shape == (2, 11, 1)
     assert np.allclose(paths[:, 0, 0], 0)
 
 

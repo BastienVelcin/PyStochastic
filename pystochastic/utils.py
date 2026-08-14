@@ -7,11 +7,11 @@ import numpy as np
 def is_pos_def(x):
     return np.all(np.linalg.eigvals(x) > 0)
 
-def default_drift(x, t):
+def default_drift(x, t=None):
     x = np.atleast_1d(x)
     return np.ones(len(x))
 
-def default_diffusion(x, t):
+def default_diffusion(x, t=None):
     x = np.atleast_1d(x)
     return np.eye(len(x))
 

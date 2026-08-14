@@ -17,14 +17,94 @@ Examples
 >> solver = EulerMaruyama(mu=lambda x,t : x, sigma=lambda x,t : 0.1*x, x_0=0, t_0=0, t_n=1, n_steps=1000, n_simulations=10) #Euler-Maruyama SDE with drift x(t) = x and diffusion 0.1*x(t)
 >>
 >> solver.solve(plot=True) #Plot the evolution of the SDE
+
+Notes
+-----
+On the euler-maruyama method, the first argument of the drift and diffusion functions is a matrix, which contains a certain point at each simulation.
+Then
+    - drift(x,t) --> shape (d,) #Vector of length d, where d is the dimension of the SDE
+    - diffusion(x,t) --> shape (d,d)  #Matrix of size d*d, where d is the dimension of the SDE
+
+where x.shape = (n_simulations,dim)
+
 """
 
 import numpy as np
 import plotly.graph_objects as go
 from pystochastic.processes import *
 from pystochastic.utils import default_drift, default_diffusion
-import multiprocessing
-from multiprocessing import Pool
+
+
+def batchify(fct, x, t, output_dim):
+
+    """
+    Batchify function.
+
+    Returns a version of ``fct`` that accepts a batch of states. The function to bash takes two arguments :
+
+    Parameters
+    ----------
+    x : np.ndarray
+        Two-dimensional array of shape (n_simulations, dim), which contains the list of all
+        points to apply the function to.
+    t : float
+        Time at which the function is evaluated.
+    output_dim : int
+        Dimension of the output of the function.
+
+    Returns
+    -------
+        Batched function
+    ""
+
+
+    """
+
+    # Check if the output of a function has a meaning
+    if output_dim < 1:
+        raise ValueError("The state dimension must be positive.")
+
+
+    x = np.asarray(x)
+
+    if x.ndim != 1 or x.size != output_dim:
+        raise ValueError("x must be a one-dimensional state of output_dim elements.")
+
+
+    # Use three rows: using two rows can hide functions that accidentally
+    # index the two batch rows as if they were state coordinates.
+    x_batch = np.stack([x, x, x])
+
+    try:
+        result = np.asarray(fct(x_batch, t))
+    except (ValueError, TypeError, IndexError):
+        result = None
+
+    if result is not None:
+
+        # Drift: one state vector per batch element.
+        if result.shape == (x_batch.shape[0], output_dim):
+            return fct
+
+        # Diffusion: one (state_dimension, noise_dimension) matrix per
+        # batch element.  The noise dimension need not equal state_dim.
+        if (result.ndim == 3 and result.shape[0] == x_batch.shape[0]
+                and result.shape[1] == output_dim):
+            return fct
+
+    # The function is single-state.  Probe one state to distinguish a drift
+    # vector from a diffusion matrix when the batched call was rejected.
+    try:
+        single_result = np.asarray(fct(x, t))
+    except (ValueError, TypeError, IndexError):
+        single_result = None
+
+    # np.vectorize applies the single-state function independently to each
+    # simulation while retaining its vector/matrix output shape.
+    if (single_result is not None and single_result.ndim == 2
+            and single_result.shape[0] == output_dim):
+        return np.vectorize(fct, signature='(d),()->(d,m)')
+    return np.vectorize(fct, signature='(d),()->(d)')
 
 class EulerMaruyama:
 
@@ -108,7 +188,10 @@ class EulerMaruyama:
         self.t = np.linspace(t_0,t_n,n_steps+1)
         self.dt = (t_n-t_0)/n_steps
 
-    def solve(self, plot=True):
+        self._mu = batchify(mu, self.x_0, self.t, self.dim)
+        self._sigma = batchify(sigma, self.x_0, self.t, self.dim)
+
+    def solve(self, plot=True, parallel=False , n_threads=None):
 
         """
         Solve method.
@@ -136,15 +219,20 @@ class EulerMaruyama:
 
         W = Brownian(np.eye(self.dim), self.t_0, self.t_n, self.n_steps)
         W.simulate(self.n_simulations)
+
         dW = W.increments
 
-        for sim in range(self.n_simulations):
-            # For every simulation, we compute a different Brownian increment array.
-            for i in range(1,self.n_steps+1):
-                # Euler-Maruyama induction formula.
-                Y[sim,i,:] = Y[sim,i-1,:] + self.mu(Y[sim,i-1,:],self.t[i-1])*self.dt + self.sigma(Y[sim,i-1,:],self.t[i-1]) @ dW[sim,i-1,:]
-        # Plotting is allowed only for 1D, 2D and 3D and if the user has specified the plot parameter to True.
+        for i in range(1,self.n_steps+1):
 
+            y_prev = Y[:, i - 1, :]
+            t_prev = self.t[i - 1]
+
+            drift = self._mu(y_prev, t_prev) * self.dt
+            diffusion = (self._sigma(y_prev, t_prev) @ dW[:, i - 1, :, None]).squeeze(-1)
+
+            Y[:, i, :] = y_prev + drift + diffusion
+
+        # Plotting is allowed only for 1D, 2D and 3D and if the user has specified the plot parameter to True.
         if plot == True and self.dim <= 3:
             for sim in range(self.n_simulations):
                 if self.dim == 1:
@@ -173,3 +261,4 @@ class EulerMaruyama:
                 )
 
         return Y
+

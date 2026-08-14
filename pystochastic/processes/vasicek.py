@@ -130,7 +130,7 @@ class Vasicek():
             Drift of the Vasicek process evaluated at a time t and a point x.
         """
 
-        return self.reversion_speed @ (self.mu-x)
+        return (self.mu-x) @ self.reversion_speed.T
 
     def diffusion(self,x,t):
 

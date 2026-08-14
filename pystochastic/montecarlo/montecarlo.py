@@ -267,7 +267,7 @@ class MonteCarloProcess:
         if n is None:
             n = self.n_simulations
 
-        n = np.asarray(n)
+        n = np.atleast_1d(n)
 
         if n.any() <= 0:
             raise ValueError("n must be strictly positive.")

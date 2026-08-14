@@ -25,6 +25,73 @@ import plotly.graph_objects as go
 from pystochastic.processes import Brownian
 from pystochastic.utils import default_drift, default_diffusion
 
+def batchify(fct, x, output_dim):
+
+    """
+    Batchify function.
+
+    Returns a version of ``fct`` that accepts a batch of states. The function to bash takes two arguments :
+
+    Parameters
+    ----------
+    x : np.ndarray
+        Two-dimensional array of shape (n_simulations, dim), which contains the list of all
+        points to apply the function to.
+    output_dim : int
+        Dimension of the output of the function.
+
+    Returns
+    -------
+        Batched function
+    ""
+
+
+    """
+
+    # Check if the output of a function has a meaning
+    if output_dim < 1:
+        raise ValueError("The state dimension must be positive.")
+
+    x = np.asarray(x)
+
+    if x.ndim != 1 or x.size != output_dim:
+        raise ValueError("x must be a one-dimensional state of output_dim elements.")
+
+
+    # Use three rows: using two rows can hide functions that accidentally
+    # index the two batch rows as if they were state coordinates.
+    x_batch = np.stack([x, x, x])
+
+    try:
+        result = np.asarray(fct(x_batch))
+    except (ValueError, TypeError, IndexError):
+        result = None
+
+    if result is not None:
+
+        # Drift: one state vector per batch element.
+        if result.shape == (x_batch.shape[0], output_dim):
+            return fct
+
+        # Diffusion: one (state_dimension, noise_dimension) matrix per
+        # batch element.  The noise dimension need not equal state_dim.
+        if (result.ndim == 3 and result.shape[0] == x_batch.shape[0]
+                and result.shape[1] == output_dim):
+            return fct
+
+    # The function is single-state.  Probe one state to distinguish a drift
+    # vector from a diffusion matrix when the batched call was rejected.
+    try:
+        single_result = np.asarray(fct(x))
+    except (ValueError, TypeError, IndexError):
+        single_result = None
+
+    # np.vectorize applies the single-state function independently to each
+    # simulation while retaining its vector/matrix output shape.
+    if (single_result is not None and single_result.ndim == 2
+            and single_result.shape[0] == output_dim):
+        return np.vectorize(fct, signature='(d)->(d,m)')
+    return np.vectorize(fct, signature='(d)->(d)')
 
 class Milstein:
 
@@ -109,6 +176,23 @@ class Milstein:
         self.n_simulations = n_simulations
         self.t = np.linspace(t_0,t_n,n_steps+1)
         self.dt = (t_n-t_0)/n_steps
+        self.dim = np.size(x_0)
+
+        # Milstein is currently one-dimensional. Normalize both scalar and
+        # 1x1-array coefficient functions to a vector of shape ``(1,)``.
+        def as_one_dimensional(coefficient):
+            def normalized(x):
+                value = np.asarray(coefficient(x))
+                if value.size != 1:
+                    raise ValueError(
+                        "Milstein coefficients must return one value in 1D."
+                    )
+                return value.reshape(1)
+
+            return np.vectorize(normalized, signature='(d)->(d)')
+
+        self._mu = as_one_dimensional(mu)
+        self._sigma = as_one_dimensional(sigma)
 
     def approx_derivative_diffusion(self,x, eps=1e-6):
 
@@ -130,7 +214,10 @@ class Milstein:
         """
 
         # Rate of change of the diffusion function at x, with a small gap eps.
-        return (self.sigma(x + eps)- self.sigma(x - eps)) / (2 * eps)
+        x = np.asarray(x)
+        return (
+            self._sigma(x + eps) - self._sigma(x - eps)
+        ) / (2 * eps)
 
     def solve(self, plot=True):
 
@@ -151,7 +238,7 @@ class Milstein:
         """
 
         # Initialization of the 'n_simulations' simulations.
-        Y = np.zeros((self.n_simulations,self.n_steps,1))
+        Y = np.zeros((self.n_simulations,self.n_steps+1,1))
 
         # Fixing the initial condition on every simulation.
         Y[:,0,:] = self.x_0
@@ -161,16 +248,23 @@ class Milstein:
         W = Brownian(1, self.t_0, self.t_n, self.n_steps)
         W.simulate(self.n_simulations)
         dW = W.increments
-        for sim in range(self.n_simulations):
-            # For every simulation, we compute a different Brownian increment array.
 
+        for i in range(1,self.n_steps+1):
+            y_prev = Y[:, i - 1, :]
+            dW_prev = dW[:, i - 1, :]
 
-            for i in range(1,self.n_steps):
-                # Milstein induction formula.
-                Y[sim,i,:] = Y[sim,i-1,:] + self.mu(Y[sim,i-1,:])*self.dt + self.sigma(Y[sim,i-1,:]) * dW[sim,i-1,:] + (1/2)*self.sigma(Y[sim,i-1,:])*self.approx_derivative_diffusion(Y[sim,i-1,:])*(dW[sim,i-1,:]**2-self.dt)
+            sigma = self._sigma(y_prev)
+            sigma_derivative = self.approx_derivative_diffusion(y_prev)
+
+            drift = self._mu(y_prev) * self.dt
+            diffusion = sigma * dW_prev
+            correction = 0.5 * sigma * sigma_derivative * (
+                dW_prev ** 2 - self.dt
+            )
+
+            Y[:, i, :] = y_prev + drift + diffusion + correction
 
         # Plotting is allowed only if the user has specified the plot parameter to True.
-
         if plot == True:
             for sim in range(self.n_simulations):
                 fig.add_trace(go.Scatter(x=self.t,

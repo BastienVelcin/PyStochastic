@@ -122,8 +122,8 @@ class GeometricBrownianMotion:
         """
         if method == "euler-maruyama":
             from pystochastic.sde import EulerMaruyama
-            self.path = EulerMaruyama(lambda x,t : self.mu*x,
-                                      lambda x,t : self.sigma*x,
+            self.path = EulerMaruyama(lambda x, t: self.mu * x,
+                                      lambda x, t: x[..., :, None] * self.sigma,
                                       self.S_0,
                                       self.t_0,
                                       self.t_n,
