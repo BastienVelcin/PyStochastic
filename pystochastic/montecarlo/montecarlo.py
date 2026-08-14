@@ -262,13 +262,18 @@ class MonteCarloProcess:
             Estimation of the mean.
         """
 
+
+
         if n is None:
             n = self.n_simulations
-            
-        if n <= 0:
+
+        n = np.asarray(n)
+
+        if n.any() <= 0:
             raise ValueError("n must be strictly positive.")
 
-        if n > self.n_simulations:
+        if n.any() > self.n_simulations:
+
             raise ValueError(
                 "n cannot be greater than the number of simulations."
             )
@@ -281,7 +286,11 @@ class MonteCarloProcess:
             t_index = np.argmin(np.abs(t_0 - self.t))
         else:
             t_index = np.where(self.t == t_0)[0][0]
-        return np.mean(function(self.ech[:n,t_index]), axis=0)
+
+        means = np.zeros(np.size(n))
+        for i in range(np.size(n)):
+            means[i] = np.mean(function(self.ech[:n[i],t_index]), axis=0)
+        return means
 
 
     def mean_path(self, plot_sim=True):
@@ -374,23 +383,106 @@ class MonteCarloProcess:
 
         return function(self.ech[:,t_index])
 
-    def mean_error(self,t,error_type="absolute",plot=True):
-        n_axis = np.arange(1, self.n_simulations + 1)
-        mean_approx = np.array([self.estimate(t_0=t,n=i) for i in n_axis])
+    def mean_error(self,t,N=[10, 100, 1000],error_type="absolute",plot=True, plottype=None):
+
+        N = np.asarray(N)
+
+        number_of_samples = len(N)
+        dim = self.process.dim
+
+        mean_approximation = np.zeros((number_of_samples, dim))
+
+        for i, n in enumerate(N):
+            mean_approximation[i, :] = self.estimate(t_0=t,n=n)
+
+        true_mean = self.process.mean(t)
+
         if error_type == "absolute":
-            error =  abs(mean_approx-self.process.mean(t))
+            error = np.abs(mean_approximation - true_mean)
+
         elif error_type == "relative":
-            if self.process.mean(t) == 0:
-                raise ValueError("Cannot compute the relative error when the mean of the process is 0.")
-            error =  (mean_approx - self.process.mean(t))/self.process.mean(t)
+
+            if np.any(true_mean == 0):
+                raise ValueError(
+                    "The relative error is not defined when the process mean is zero."
+                )
+
+            error = np.abs((mean_approximation - true_mean) / true_mean)
+
         elif error_type == "quadratic":
-            error = (mean_approx - self.process.mean(t))**2
+            error = np.sqrt((1/N)*(mean_approximation - true_mean) ** 2)
 
-        fig = go.Figure()
-        for sim in range(self.n_simulations):
-            fig.add_trace(go.Scatter(x=n_axis,
-                                     y=error,
-                                     mode="lines",
-                                     line=dict(width=2)))
+        else:
+            raise ValueError(
+                "error_type must be 'absolute', 'relative' or 'quadratic'."
+            )
 
+        if plot==True:
+            fig = go.Figure()
+            for d in range(dim):
+                fig.add_trace(
+                    go.Scatter(
+                        x=N,
+                        y=error[:, d],
+                        mode="lines+markers",
+                        name=f"Dimension {d + 1}"
+                    )
+                )
+
+        if plottype == "log":
+            fig.update_xaxes(type="log")
+            fig.update_yaxes(type="log")
+        fig.show()
+
+        return error
+
+    def mean_error2(self,t,N=(10, 100, 1000),error_type="absolute",n_experiments=1,plot=True,plottype=None):
+
+        N = np.asarray(N)
+        N_len = np.size(N)
+        dim = self.process.dim
+
+        mean_approximation = np.zeros((n_experiments,N_len,dim))
+
+        for i in range(n_experiments):
+            self.ech = self.process.simulate(self.n_simulations)
+            mean_approximation[i, :] = self.estimate(t_0=t, n=N).reshape(N_len, dim)
+
+        true_mean = self.process.mean(t)
+
+        if error_type == "absolute":
+            error = np.abs(mean_approximation - true_mean)
+
+        elif error_type == "relative":
+
+            if np.any(true_mean == 0):
+                raise ValueError(
+                    "The relative error is not defined when the process mean is zero."
+                )
+
+            error = np.abs((mean_approximation - true_mean) / true_mean)
+
+        elif error_type == "mse":
+            error = np.mean((mean_approximation - true_mean) ** 2, axis=0)
+
+        else:
+            raise ValueError(
+                "error_type must be 'absolute', 'relative' or 'mse'."
+            )
+
+        if plot == True:
+            fig = go.Figure()
+            for d in range(dim):
+                fig.add_trace(
+                    go.Scatter(
+                        x=N,
+                        y=error[:, d],
+                        mode="lines+markers",
+                        name=f"Dimension {d + 1}"
+                    )
+                )
+
+        if plottype == "log":
+            fig.update_xaxes(type="log")
+            fig.update_yaxes(type="log")
         fig.show()
