@@ -169,5 +169,4 @@ class EulerMaruyama:
                     fig.add_trace(go.Scatter3d(x=Y[sim, :, 0], y=Y[sim, :, 1], z=Y[sim, :, 2],
                                                 mode="lines", line=dict(width=2)))
             fig.show()
-
         return Y
