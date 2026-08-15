@@ -97,7 +97,7 @@ class Vasicek():
         self.mu = np.atleast_1d(mu)
         self.volatility = np.atleast_2d(volatility)
 
-        if np.any(self.reversion_speed <= 0) or np.any(self.volatility < 0):
+        if np.all(self.reversion_speed <= 0) or np.all(self.volatility < 0):
             raise ValueError(
                 "The sigma and theta parameters should be greater than 0."
             )
@@ -107,7 +107,7 @@ class Vasicek():
         self.t_n = t_n
         self.n_steps = n_steps
         self.n_simulations = None
-        self.dim = np.size(self.mu)
+        self.dim = self.mu.size
         self.t = np.linspace(t_0,t_n,n_steps+1)
         self.dt = (t_n-t_0)/n_steps
         self.path = None
