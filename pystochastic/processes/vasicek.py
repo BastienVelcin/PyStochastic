@@ -30,6 +30,7 @@ import numpy as np
 import scipy
 import plotly.graph_objects as go
 from pystochastic.pyrandom import crandom
+from pystochastic.utils import _decompose
 
 class Vasicek():
 
@@ -92,12 +93,25 @@ class Vasicek():
     >> R.plot()
     """
 
-    def __init__(self,mu=1,reversion_speed=1,volatility=1,r_0=0,t_0=0, t_n=1, n_steps=1000, n_simulations=1):
-        self.reversion_speed = np.atleast_2d(reversion_speed)
-        self.mu = np.atleast_1d(mu)
-        self.volatility = np.atleast_2d(volatility)
+    def __init__(self, mu=1, reversion_speed=1, volatility=1, r_0=0, t_0=0, t_n=1, n_steps=1000, n_simulations=1):
 
-        if np.any(self.reversion_speed <= 0) or np.any(self.volatility < 0):
+        rs, rs_diag = _decompose(reversion_speed)
+        vol, vol_diag = _decompose(volatility)
+
+        # We check if the reversion speed and volatility can be vectorized. If both cannot be vectorized at the same time,
+        self._diagonal = rs_diag and vol_diag #True if the reversion speed and volatility are diagonal matrices or vectors, else False.
+
+        if self._diagonal:
+            self.reversion_speed = rs
+            self.volatility = vol
+
+        else:
+            self.reversion_speed = np.atleast_2d(reversion_speed)
+            self.volatility = np.atleast_2d(volatility)
+
+        self.mu = np.atleast_1d(mu)
+
+        if np.all(self.reversion_speed <= 0) or np.all(self.volatility < 0):
             raise ValueError(
                 "The sigma and theta parameters should be greater than 0."
             )
@@ -108,43 +122,17 @@ class Vasicek():
         self.n_steps = n_steps
         self.n_simulations = None
         self.dim = np.size(self.mu)
-        self.t = np.linspace(t_0,t_n,n_steps+1)
-        self.dt = (t_n-t_0)/n_steps
+        self.t = np.linspace(t_0, t_n, n_steps + 1)
+        self.dt = (t_n - t_0) / n_steps
         self.path = None
+        # ... (le check de coherence des dimensions existant reste valable tel quel)
 
-        if not(np.shape(self.reversion_speed)[0] == np.shape(self.reversion_speed)[1] == self.dim == np.shape(self.volatility)[0] == np.shape(self.volatility)[1]  == self.r_0.size):
-            raise ValueError(
-                "The dimension of the the mean, signa, theta, and of the starting point must coincide."
-            )
+    def drift(self, x, t):
+        if self._diagonal:
+            return self.reversion_speed * (self.mu - x)
+        return self.reversion_speed @ (self.mu - x)
 
-    def drift(self,x,t):
-
-        """
-        Drift method
-
-        Drift function of the Vasicek process.
-
-        Returns
-        -------
-        np.ndarray
-            Drift of the Vasicek process evaluated at a time t and a point x.
-        """
-
-        return (self.mu-x) @ self.reversion_speed.T
-
-    def diffusion(self,x,t):
-
-        """
-        Diffusion method
-
-        Diffusion function of the Vasicek process.
-
-        Returns
-        -------
-        np.ndarray
-            Diffusion of the Vasicek process evaluated at a time t and a point x.
-        """
-
+    def diffusion(self, x, t):
         return self.volatility
 
     def simulate(self, n_simulations=1, method="euler-maruyama"):

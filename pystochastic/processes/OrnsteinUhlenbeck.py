@@ -91,9 +91,23 @@ class OrnsteinUhlenbeck:
     """
 
     def __init__(self,mu=0,sigma=1,theta=1,r_0=0,t_0=0, t_n=1, n_steps=1000):
+
+        sgm, sgm_diag = _decompose(reversion_speed)
+        sgm, tht_diag = _decompose(volatility)
+
+        # We check if the reversion speed and volatility can be vectorized. If both cannot be vectorized at the same time,
+        self._diagonal = sgm_diag and tht_diag #True if the reversion speed and volatility are diagonal matrices or vectors, else False.
+
+        if self._diagonal:
+            self.sigma = sgm
+            self.theta = tht
+
+        else:
+            self.sigma = np.atleast_2d(sigma)
+            self.theta = np.atleast_2d(theta)
+
         self.mu = np.atleast_1d(mu)
-        self.sigma = np.atleast_2d(sigma)
-        self.theta = np.atleast_2d(theta)
+
 
         if np.all(self.sigma < 0) or np.all(self.theta <=0):
             raise ValueError(
@@ -114,6 +128,14 @@ class OrnsteinUhlenbeck:
             raise ValueError(
                 "The dimension of the mean, sigma, theta, and of the starting point must coincide."
             )
+
+    def drift(self, x, t):
+        if self._diagonal:
+            return (self.mu-x) * self.theta.T
+        return (self.mu-x) @ self.theta.T
+
+    def diffusion(self, x, t):
+        return self.sigma
 
     def simulate(self, n_simulations=1, method="euler-maruyama"):
 
@@ -137,7 +159,7 @@ class OrnsteinUhlenbeck:
 
         if method == "euler-maruyama":
             from pystochastic.sde import EulerMaruyama
-            self.path = EulerMaruyama(lambda x,t : (self.mu-x) @ self.theta.T ,
+            self.path = EulerMaruyama(lambda x,t :  ,
                                       lambda x,t : self.sigma,
                                       self.r_0,
                                       self.t_0,
