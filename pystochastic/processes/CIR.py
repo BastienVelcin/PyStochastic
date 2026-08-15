@@ -10,7 +10,7 @@ This module provides a way to simulate a Cox-Ingersoll-Ross process with a given
 This module provides a general class "CIR", with the following built-in methods:
     - .drift() : Drift function of the CIR model.
     - .diffusion() : Diffusion function of the CIR model.
-    - .simulate() : Simulate a Cox-Ingersoll-Ross model path in 1D, with both exact and Euler-Maruyama methods.
+    - .simulate() : Simulate a Cox-Ingersoll-Ross model path in 1D, with both exact, Milstein and Euler-Maruyama methods.
     - .plot() : Plot the Cox-Ingersoll-Ross model path.
     - .mean() : Mean of the CIR process at a given time.
     - .variance() : Variance of the CIR process at a given time.
@@ -120,10 +120,10 @@ class CIR:
         self.factor = (4*self.a*np.exp(-self.a * self.dt))/((self.sigma**2)*(1-np.exp(-self.a * self.dt)))
         self.c = ((self.sigma**2)*(1-np.exp(-self.a * self.dt)))/(4*self.a)
 
-    def drift(self,x,t):
+    def drift(self,x,t=None):
         return self.a * (self.b-x)
 
-    def diffusion(self,x,t):
+    def diffusion(self,x,t=None):
         return self.sigma * np.sqrt(np.maximum(x,0))
 
     def simulate(self, n_simulations=1,method="exact"):
@@ -137,7 +137,7 @@ class CIR:
         ----------
         n_simulations : int, default=1
             Number of trajectories to simulate.
-        method : {"exact", "euler-maruyama"}, default="exact"
+        method : {"exact", "euler-maruyama", "milstein"}, default="exact"
             Simulation method to use.
 
         Returns
@@ -160,9 +160,21 @@ class CIR:
                                       self.t_n,
                                       self.n_steps,
                                       n_simulations).solve()
+        if method == "milstein":
+            from pystochastic.sde import Milstein
+            if (2 * self.a * self.b < self.sigma ** 2):
+                raise ValueError(
+                    "The model parameters are inconsistent with the model. Please choose a, b and sigma such that 2*a*b >= sigma^2"
+                )
 
+            self.path = Milstein(self.drift,
+                                      self.diffusion,
+                                      self.r_0,
+                                      self.t_0,
+                                      self.t_n,
+                                      self.n_steps,
+                                      n_simulations).solve()
         elif method == "exact":
-
             self.path = np.zeros((n_simulations,self.n_steps+1, 1))
             self.path[:,0] = self.r_0
             for sim in range(n_simulations):
@@ -174,7 +186,7 @@ class CIR:
 
         else:
             raise ValueError(
-                "The method must be either 'euler-maruyama' or 'exact'."
+                "The method must be either 'euler-maruyama', 'milstein' or 'exact'."
             )
 
         # When the first simulation is launched, we define the global number of simulations

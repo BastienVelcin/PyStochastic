@@ -25,7 +25,6 @@ import plotly.graph_objects as go
 from pystochastic.processes import Brownian
 from pystochastic.utils import default_drift, default_diffusion
 
-
 class Milstein:
 
     """
@@ -88,7 +87,7 @@ class Milstein:
                  t_0=0,
                  t_n=1,
                  n_steps=1000,
-                 n_simulations=1):
+                 n_simulations=100):
 
         if np.size(x_0) != 1:
             raise NotImplementedError(
@@ -161,13 +160,10 @@ class Milstein:
         W = Brownian(1, self.t_0, self.t_n, self.n_steps)
         W.simulate(self.n_simulations)
         dW = W.increments
-        for sim in range(self.n_simulations):
-            # For every simulation, we compute a different Brownian increment array.
 
-
-            for i in range(1,self.n_steps):
-                # Milstein induction formula.
-                Y[sim,i,:] = Y[sim,i-1,:] + self.mu(Y[sim,i-1,:])*self.dt + self.sigma(Y[sim,i-1,:]) * dW[sim,i-1,:] + (1/2)*self.sigma(Y[sim,i-1,:])*self.approx_derivative_diffusion(Y[sim,i-1,:])*(dW[sim,i-1,:]**2-self.dt)
+        for i in range(1,self.n_steps):
+            # Milstein induction formula.
+            Y[:,i,:] = Y[:,i-1,:] + self.mu(Y[:,i-1,:])*self.dt + self.sigma(Y[:,i-1,:]) * dW[:,i-1,:] + (1/2)*self.sigma(Y[:,i-1,:])*self.approx_derivative_diffusion(Y[:,i-1,:])*(dW[:,i-1,:]**2-self.dt)
 
         # Plotting is allowed only if the user has specified the plot parameter to True.
 
