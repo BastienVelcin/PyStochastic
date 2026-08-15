@@ -27,6 +27,7 @@ Examples
 import numpy as np
 import plotly.graph_objects as go
 from pystochastic.processes.brownian import Brownian
+from pystochastic.utils import _decompose
 
 class GeometricBrownianMotion:
 
@@ -85,6 +86,17 @@ class GeometricBrownianMotion:
 
     def __init__(self, mu=1, sigma=1, S_0=1,t_0=0, t_n=1, n_steps=1000):
 
+        sgm, sgm_diag = _decompose(sigma)
+
+        self._diagonal = sgm_diag
+        if self._diagonal:
+            self.sigma = sgm
+        else:
+            self.sigma = np.atleast_2d(sigma)
+
+        self.mu = np.atleast_1d(mu)
+
+
         self.mu = np.atleast_1d(mu)
         self.sigma = np.atleast_2d(sigma)
         self.S_0 = np.atleast_1d(S_0)
@@ -101,7 +113,15 @@ class GeometricBrownianMotion:
                 "The dimension of the volatility matrix, of the drift and of the starting point must coincide."
             )
 
-    def simulate(self,n_simulations=1, method="exact"):
+    def drift(self, x, t):
+        return self.mu * x
+
+    def diffusion(self, x, t):
+        if self._diagonal:
+            return self.sigma * x
+        return self.sigma @ x
+
+    def simulate(self,n_simulations=1, method="exact",parallel=False):
 
         """
         Simulate method.
@@ -122,13 +142,13 @@ class GeometricBrownianMotion:
         """
         if method == "euler-maruyama":
             from pystochastic.sde import EulerMaruyama
-            self.path = EulerMaruyama(lambda x,t : self.mu*x,
-                                      lambda x,t : self.sigma*x,
+            self.path = EulerMaruyama(self.drift,
+                                      self.diffusion,
                                       self.S_0,
                                       self.t_0,
                                       self.t_n,
                                       self.n_steps,
-                                      n_simulations).solve()
+                                      n_simulations).solve(parallel=parallel)
 
         elif method == "exact":
             self.path = np.zeros((n_simulations,self.n_steps+1, self.dim))

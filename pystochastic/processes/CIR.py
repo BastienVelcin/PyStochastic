@@ -90,9 +90,9 @@ class CIR:
 
     Examples
     --------
-    >>> R = CIR(a=2,b=3,sigma=1,r_0=0,t_0=0,t_n=1,n_steps=1000)
-    >>> R.simulate()
-    >>> R.plot()
+    >> R = CIR(a=2,b=3,sigma=1,r_0=0,t_0=0,t_n=1,n_steps=1000)
+    >> R.simulate()
+    >> R.plot()
     """
 
     def __init__(self, a=1, b=1, sigma=1, r_0=0, t_0=0, t_n=1, n_steps=1000):

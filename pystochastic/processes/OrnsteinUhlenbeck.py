@@ -136,7 +136,7 @@ class OrnsteinUhlenbeck:
     def diffusion(self, x, t):
         return self.sigma
 
-    def simulate(self, n_simulations=1, method="euler-maruyama"):
+    def simulate(self, n_simulations=1, method="euler-maruyama",parallel=False):
 
         """
         Simulate method.
@@ -158,13 +158,13 @@ class OrnsteinUhlenbeck:
 
         if method == "euler-maruyama":
             from pystochastic.sde import EulerMaruyama
-            self.path = EulerMaruyama(lambda x,t : self.theta @ (self.mu-x),
-                                      lambda x,t : self.sigma,
+            self.path = EulerMaruyama(self.drift,
+                                      self.diffusion,
                                       self.r_0,
                                       self.t_0,
                                       self.t_n,
                                       self.n_steps,
-                                      n_simulations).solve()
+                                      n_simulations, parallel=parallel).solve()
 
         elif method == "exact":
             if self.dim > 1:

@@ -93,9 +93,21 @@ class Vasicek():
     """
 
     def __init__(self,mu=1,reversion_speed=1,volatility=1,r_0=0,t_0=0, t_n=1, n_steps=1000, n_simulations=1):
-        self.reversion_speed = np.atleast_2d(reversion_speed)
+        rs, rs_diag = _decompose(reversion_speed)
+        vol, vol_diag = _decompose(volatility)
+
+        # Coherence : si l'un des deux a une vraie correlation, on force les DEUX
+        # en forme matricielle (sinon EulerMaruyama pourrait choisir le chemin
+        # vectorise sur la seule base de diffusion, alors que drift utiliserait '@').
+        self._diagonal = rs_diag and vol_diag
+        if self._diagonal:
+            self.reversion_speed = rs
+            self.volatility = vol
+        else:
+            self.reversion_speed = np.atleast_2d(reversion_speed)
+            self.volatility = np.atleast_2d(volatility)
+
         self.mu = np.atleast_1d(mu)
-        self.volatility = np.atleast_2d(volatility)
 
         if np.all(self.reversion_speed <= 0) or np.all(self.volatility < 0):
             raise ValueError(
@@ -130,7 +142,9 @@ class Vasicek():
             Drift of the Vasicek process evaluated at a time t and a point x.
         """
 
-        return self.reversion_speed @ (self.mu-x)
+        if self._diagonal:
+            return self.reversion_speed * (self.mu - x)
+        return self.reversion_speed @ (self.mu - x)
 
     def diffusion(self,x,t):
 
