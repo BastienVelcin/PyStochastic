@@ -150,7 +150,7 @@ class Milstein:
         """
 
         # Initialization of the 'n_simulations' simulations.
-        Y = np.zeros((self.n_simulations,self.n_steps,1))
+        Y = np.zeros((self.n_simulations,self.n_steps+1,1))
 
         # Fixing the initial condition on every simulation.
         Y[:,0,:] = self.x_0

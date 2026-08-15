@@ -116,8 +116,8 @@ class OrnsteinUhlenbeck:
         # If sigma and theta are a scalar, a vector or a diagonal matrix, we force it to be vector to use vectorization
         # Otherwise, we assign them their matrix form, and we will use the sequential method.
         if self._diagonal:
-            self.theta = _theta_diag
-            self.sigma = _sigma_diag
+            self.theta = _theta
+            self.sigma = _sigma
 
         if np.all(self.sigma < 0) or np.all(self.theta <=0):
             raise ValueError(

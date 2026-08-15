@@ -326,7 +326,7 @@ class Vasicek():
                 "The time must be between t_0 and t_n."
             )
 
-        return self.volatility + scipy.linalg.expm(-self.reversion_speed*(t-self.t_0)) @ (self.r_0 - self.volatility)
+        return self.mu + scipy.linalg.expm(-self.reversion_speed * (t - self.t_0)) @ (self.r_0 - self.mu)
 
     def covariance_matrix(self, t):
 

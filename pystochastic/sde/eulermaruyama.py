@@ -33,7 +33,7 @@ from pystochastic.processes import Brownian
 from pystochastic.utils import default_drift, default_diffusion, _decompose
 
 
-def _is_diagonal_form(f, x_0, t_0):
+def _is_vectorizable_diffusion(f, x_0, t_0):
 
     """
     Is Diagonal Form function
@@ -303,7 +303,7 @@ class EulerMaruyama:
         args = (self.mu, self.sigma, self.x_0, self.t, self.dt, self.n_steps, self.dim, dW)
 
         #If the diffusion is diagonal, we use the vectorized method. Otherwise, we use the sequential method.
-        if _is_diagonal_form(self.sigma, self.x_0, self.t_0):
+        if _is_vectorizable_diffusion(self.sigma, self.x_0, self.t_0):
             Y = _simulate_vectorized(*args)
 
         # SEQUENTIAL METHOD :
