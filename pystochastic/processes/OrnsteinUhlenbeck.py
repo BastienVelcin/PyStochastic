@@ -28,6 +28,7 @@ import numpy as np
 import scipy
 import plotly.graph_objects as go
 from pystochastic.pyrandom import crandom
+from pystochastic.utils import _decompose
 
 class OrnsteinUhlenbeck:
 
@@ -85,15 +86,27 @@ class OrnsteinUhlenbeck:
 
     Examples
     --------
-    >> R = OrnsteinUhlenbeck(mean=[2,1],sigma=np.ones((2,2)),theta=np.ones((2,2)),r_0=[1,1],t_0=0,t_n=1,n_steps=1000)
+    >> R = OrnsteinUhlenbeck(mean=[2,2],sigma=np.ones((2,2)),theta=np.ones((2,2)),r_0=[1,1],t_0=0,t_n=1,n_steps=1000)
     >> R.simulate()
     >> R.plot()
     """
 
     def __init__(self,mu=0,sigma=1,theta=1,r_0=0,t_0=0, t_n=1, n_steps=1000):
+        rs, rs_diag = _decompose(sigma)
+        vol, vol_diag = _decompose(theta)
+
+        # Coherence : si l'un des deux a une vraie correlation, on force les DEUX
+        # en forme matricielle (sinon EulerMaruyama pourrait choisir le chemin
+        # vectorise sur la seule base de diffusion, alors que drift utiliserait '@').
+        self._diagonal = rs_diag and vol_diag
+        if self._diagonal:
+            self.theta = rs
+            self.sigma = vol
+        else:
+            self.theta = np.atleast_2d(theta)
+            self.sigma = np.atleast_2d(sigma)
+
         self.mu = np.atleast_1d(mu)
-        self.sigma = np.atleast_2d(sigma)
-        self.theta = np.atleast_2d(theta)
 
         if np.any(self.sigma < 0) or np.any(self.theta <=0):
             raise ValueError(
@@ -114,6 +127,14 @@ class OrnsteinUhlenbeck:
             raise ValueError(
                 "The dimension of the mean, sigma, theta, and of the starting point must coincide."
             )
+
+    def drift(self, x, t):
+        if self._diagonal:
+            return self.theta * (self.mu - x)
+        return self.theta @ (self.mu - x)
+
+    def diffusion(self, x, t):
+        return self.sigma
 
     def simulate(self, n_simulations=1, method="euler-maruyama"):
 
