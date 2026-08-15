@@ -13,7 +13,7 @@ from pystochastic.utils import default_drift, default_diffusion
 
 def _is_diagonal_form(sigma, x_0, t_0):
     """
-    Teste si sigma(x_0,t_0) renvoie un scalaire/vecteur (diffusion diagonale,
+    Test si sigma(x_0,t_0) renvoie un scalaire/vecteur (diffusion diagonale,
     vectorisable sur toutes les simulations d'un coup) ou une vraie matrice 2D
     (diffusion pleine/correlee, qui necessite un traitement par simulation).
     """

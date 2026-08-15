@@ -21,7 +21,7 @@ def _decompose(value):
     Decompose function
 
     For processes that use Euler-Maruyama method for simulation, we indentify the nature of the drift and diffusion
-    to accelerate the simulation depending on the nature of the functions.
+    to improve the simulation depending on the nature of the functions.
 
     If drift and diffusion are batch compatible, the simulation is vectorized.
     If not, we use multiprocessing with an explicit for loop on every simulations.

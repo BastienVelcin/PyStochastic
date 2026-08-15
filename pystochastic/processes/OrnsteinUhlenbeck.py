@@ -159,8 +159,8 @@ class OrnsteinUhlenbeck:
 
         if method == "euler-maruyama":
             from pystochastic.sde import EulerMaruyama
-            self.path = EulerMaruyama(lambda x,t :  ,
-                                      lambda x,t : self.sigma,
+            self.path = EulerMaruyama(self.drift,
+                                      self.diffusion,
                                       self.r_0,
                                       self.t_0,
                                       self.t_n,

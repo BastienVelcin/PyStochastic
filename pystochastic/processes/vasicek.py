@@ -88,7 +88,7 @@ class Vasicek():
 
     Examples
     --------
-    >> R = Vasieck(reversion_speed=2,mean=3,volatility=1,r_0=0,t_0=0,t_n=1,n_steps=1000)
+    >> R = Vasieck(reversion_speed=1,mean=3,volatility=1,r_0=0,t_0=0,t_n=1,n_steps=1000)
     >> R.simulate()
     >> R.plot()
     """
