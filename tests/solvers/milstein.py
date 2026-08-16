@@ -29,9 +29,9 @@ def difference():
     for process in processes:
 
         seed(n_seed)
-        solverEM = process.simulate(
+        solverM = process.simulate(
             n_simulations=n_simulations,
-            method="euler-maruyama"
+            method="milstein"
         )
 
         seed(n_seed)
@@ -41,11 +41,11 @@ def difference():
         )
 
         mean_diff = np.mean(
-            solverEM - solverExact,
+            solverM - solverExact,
             axis=0
         )
         print(type(process).__name__)
-        print("EM:", solverEM.shape)
+        print("M:", solverM.shape)
         print("Exact:", solverExact.shape)
         print("t:", process.t.shape)
         print("diff:", mean_diff.shape)
@@ -56,12 +56,12 @@ def difference():
                 x=process.t,
                 y=mean_diff[:,0],
                 mode="lines",
-                name="EM - Exact"
+                name="M - Exact"
             )
         )
 
         fig.update_layout(
-            title=f"{type(process).__name__} — Euler-Maruyama vs Exact",
+            title=f"{type(process).__name__} — Milstein vs Exact",
             xaxis_title="t",
             yaxis_title="Mean difference"
         )
@@ -84,9 +84,9 @@ def rmse(process):
         )
 
         seed(n_seed)
-        solverEM = process.simulate(
+        solverM = process.simulate(
             n_simulations=n_simulations,
-            method="euler-maruyama"
+            method="milstein"
         )
 
         seed(n_seed)
@@ -97,7 +97,7 @@ def rmse(process):
 
         rmse_vect[i] = np.sqrt(
             np.mean(
-                (solverEM[:, -1] - solverExact[:, -1]) ** 2
+                (solverM[:, -1] - solverExact[:, -1]) ** 2
             )
         )
         print(f"RMSE for {steps} steps")
@@ -105,7 +105,7 @@ def rmse(process):
             f"N={steps}, "
             f"n_steps={process.n_steps}, "
             f"len(t)={len(process.t)}, "
-            f"EM shape={solverEM.shape}, "
+            f"M shape={solverM.shape}, "
             f"Exact shape={solverExact.shape}, "
         )
 

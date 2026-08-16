@@ -161,7 +161,7 @@ class Milstein:
         W.simulate(self.n_simulations)
         dW = W.increments
 
-        for i in range(1,self.n_steps):
+        for i in range(1,self.n_steps+1):
             # Milstein induction formula.
             Y[:,i,:] = Y[:,i-1,:] + self.mu(Y[:,i-1,:])*self.dt + self.sigma(Y[:,i-1,:]) * dW[:,i-1,:] + (1/2)*self.sigma(Y[:,i-1,:])*self.approx_derivative_diffusion(Y[:,i-1,:])*(dW[:,i-1,:]**2-self.dt)
 
