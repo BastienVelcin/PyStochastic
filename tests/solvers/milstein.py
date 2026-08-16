@@ -4,13 +4,11 @@ import plotly.graph_objects as go
 from pystochastic.processes import *
 from pystochastic.pyrandom.setseed import seed
 
-
 OU = OrnsteinUhlenbeck()
 G = GeometricBrownianMotion()
 V = Vasicek()
-C = CIR()
 
-processes = [OU, G, V, C]
+processes = [OU, G, V]
 
 n_simulations = 1000
 n_seed = 42
@@ -76,12 +74,13 @@ def rmse(process):
         steps = int(steps)
         process.n_steps = steps
 
-        # Important : mettre à jour la grille temporelle
+        # We need to update the time grid at every different value of "n_steps"
         process.t = np.linspace(
             process.t_0,
             process.t_n,
             steps + 1
         )
+        process.dt = (process.t[-1] - process.t[1]) / steps
 
         seed(n_seed)
         solverM = process.simulate(
@@ -100,15 +99,6 @@ def rmse(process):
                 (solverM[:, -1] - solverExact[:, -1]) ** 2
             )
         )
-        print(f"RMSE for {steps} steps")
-        print(
-            f"N={steps}, "
-            f"n_steps={process.n_steps}, "
-            f"len(t)={len(process.t)}, "
-            f"M shape={solverM.shape}, "
-            f"Exact shape={solverExact.shape}, "
-        )
-
 
     fig = go.Figure()
 
@@ -128,13 +118,60 @@ def rmse(process):
     )
 
     fig.show()
+
+    fig.show()
     p = np.polyfit(
-            np.log(n_steps),
-            np.log(rmse_vect),
-            1
-        )[0]
-    print(f"Estimated order for: {-p}")
+        np.log(n_steps),
+        np.log(rmse_vect),
+        1
+    )[0]
+    print(f"Estimated strong convergence order with the process {process}: {-p}")
+    return -p
+
 
 def rmse_all():
+    all_p = []
     for process in processes:
-        rmse(process)
+        all_p.append(rmse(process))
+    return all_p
+
+
+def strong_convergence_order():
+    print(f"Strong convergence order: {np.mean(rmse_all())}")
+
+
+n_steps = 1000
+n_sim = 100
+
+def approx_mean_diff(process):
+
+    diff = np.zeros(n_steps)
+    for i in range(n_sim):
+
+        process.n_steps = n_steps
+
+        process.t = np.linspace(
+            process.t_0,
+            process.t_n,
+            n_steps + 1
+        )
+
+        process.dt = (process.t[-1] - process.t[1]) / n_steps
+        seed(n_seed)
+
+        solverM = process.simulate(
+            n_simulations=n_simulations,
+            method="milstein"
+        )
+
+        seed(n_seed)
+        solverExact = process.simulate(
+            n_simulations=n_simulations,
+            method="exact"
+        )
+
+        diff[i] = np.mean(
+            solverM - solverExact
+        )
+
+    return np.mean(diff)

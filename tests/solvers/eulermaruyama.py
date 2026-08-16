@@ -5,12 +5,15 @@ from pystochastic.processes import *
 from pystochastic.pyrandom.setseed import seed
 
 
+# Since the exact solution of the CIR don't depend of a Brownian motion,
+# but depend of a Non-central Khi Squared law, it don't make sense to
+# compute the strong convergence order with it.
+
 OU = OrnsteinUhlenbeck()
 G = GeometricBrownianMotion()
 V = Vasicek()
-C = CIR()
 
-processes = [OU, G, V, C]
+processes = [OU, G, V]
 
 n_simulations = 1000
 n_seed = 42
@@ -76,12 +79,13 @@ def rmse(process):
         steps = int(steps)
         process.n_steps = steps
 
-        # Important : mettre à jour la grille temporelle
+        # We need to update the time grid at every different value of "n_steps"
         process.t = np.linspace(
             process.t_0,
             process.t_n,
             steps + 1
         )
+        process.dt = (process.t[-1]-process.t[1])/steps
 
         seed(n_seed)
         solverEM = process.simulate(
@@ -100,15 +104,6 @@ def rmse(process):
                 (solverEM[:, -1] - solverExact[:, -1]) ** 2
             )
         )
-        print(f"RMSE for {steps} steps")
-        print(
-            f"N={steps}, "
-            f"n_steps={process.n_steps}, "
-            f"len(t)={len(process.t)}, "
-            f"EM shape={solverEM.shape}, "
-            f"Exact shape={solverExact.shape}, "
-        )
-
 
     fig = go.Figure()
 
@@ -133,8 +128,14 @@ def rmse(process):
             np.log(rmse_vect),
             1
         )[0]
-    print(f"Estimated order for: {-p}")
+    print(f"Estimated strong convergence order with the process {process}: {-p}")
+    return -p
 
 def rmse_all():
+    all_p = []
     for process in processes:
-        rmse(process)
+        all_p.append(rmse(process))
+    return all_p
+
+def strong_convergence_order():
+    print(f"Strong convergence order: {np.mean(rmse_all())}")

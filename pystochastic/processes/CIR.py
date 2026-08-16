@@ -26,7 +26,7 @@ Examples
 
 import numpy as np
 import plotly.graph_objects as go
-
+from pystochastic.pyrandom.setseed import *
 class CIR:
 
     """
@@ -187,9 +187,9 @@ class CIR:
             self.path = np.zeros((n_simulations,self.n_steps+1, 1))
             self.path[:,0] = self.r_0
             for i in range(1,self.n_steps+1):
-
+                rng = get_rng()
                 # The induction formula is given by R_{t+1} = c*Z, where Z ~ NCX2(df=nu, nc=R_t * factor)
-                Y = np.random.noncentral_chisquare(df=self.nu, nonc=self.path[:,i-1] * self.factor)
+                Y = rng.noncentral_chisquare(df=self.nu, nonc=self.path[:,i-1] * self.factor)
                 self.path[:,i] = self.c*Y
 
         else:
