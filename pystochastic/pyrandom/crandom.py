@@ -37,6 +37,7 @@ array([0.50638435, 2.45166231, 0.07610754, 6.88851094, 4.02989885,
 
 import numpy as np
 import sys
+from pystochastic.pyrandom.setseed import get_rng, seed
 
 def uniform(a=0,b=1,n=1):
 
@@ -63,7 +64,7 @@ def uniform(a=0,b=1,n=1):
     If a > b, the function automatically swaps the bounds.
     """
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -73,7 +74,9 @@ def uniform(a=0,b=1,n=1):
             "The lower bound must be inferior or equal to the upper bound."
         )
 
-    return np.random.uniform(0, 1, size=n)*(b-a)+a
+    rng = get_rng()
+
+    return rng.uniform(0, 1, size=n)*(b-a)+a
 
 def exponential(alpha=1,n=1):
 
@@ -94,7 +97,7 @@ def exponential(alpha=1,n=1):
     >> exponential(alpha=2,n=10)
     """
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -127,7 +130,7 @@ def normal(mean=0, sd=1,n=1):
     >> normal(mean=1,sd=3/2,n=5)
     """
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -191,7 +194,7 @@ def gamma(p=1, theta=1, n=1):
     >> gamma(k=2,theta=1,n=12)
     """
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -238,7 +241,7 @@ def beta(a=1,b=1,n=1):
     >> beta(a=2,b=3/2,n=6)
     """
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -280,7 +283,7 @@ def weibull(k=1, l=1, n=1):
     >> weibull(k=2,l=3/2,n=3)
     """
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -322,7 +325,7 @@ def frechet(a=1,s=1,m=0,n=1):
     >> frechet(a=2,s=3/2,m=-3,n=7)
     """
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -362,7 +365,7 @@ def cauchy(x=0,a=1,n=1):
     >> cauchy(x=0,a=1,n=5)
     """
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -397,7 +400,7 @@ def gumbel(mu=0,beta=1,n=1):
     >> gumbel(mu=-1/2,beta=2,n=4)
     """
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -432,7 +435,7 @@ def kumaraswamy(a=1,b=1,n=1):
     >> kumaraswamy(a=3/2,b=5,n=10)
     """
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -472,7 +475,7 @@ def fisher(d1=1,d2=1,n=1):
     >> fisher(d1=2,d2=5,n=15)
     """
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -513,7 +516,7 @@ def pareto(x_m=1,k=1,n=1):
     >> pareto(x_m=2,k=1/2,n=12)
     """
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -550,7 +553,7 @@ def rayleigh(s=1,n=1):
     >> rayleigh(s=4,n=10)
     """
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )

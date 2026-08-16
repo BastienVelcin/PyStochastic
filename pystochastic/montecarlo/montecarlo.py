@@ -7,7 +7,7 @@ Description
 -----------
 This module provides some Monte Carlo methods, for both random variables and processes.
 This modules provides two classes, with the following methods:
-    - MonteCarloEstimator : Monte Carlo methods for samples from a given random variable.
+    - MonteCarlo : Monte Carlo methods for samples from a given random variable.
         - .estimate() : Estimates the mean of a function of a given random variable.
         - .mean_estimator() : Estimates the mean and the half-width of the confidence interval.
         - .confidence_interval() : Estimates the confidence interval of the mean.
@@ -35,10 +35,10 @@ import plotly.graph_objects as go
 from pystochastic.processes import *
 from scipy.stats import norm
 
-class MonteCarloEstimator:
+class MonteCarlo:
 
     """
-    MonteCarloEstimator class
+    MonteCarlo class
 
     A Monte Carlo class for independent samples that comes from a same distribution.
     It provides the main methods for estimating the mean of a function of a given random variable, and the
@@ -60,7 +60,7 @@ class MonteCarloEstimator:
 
     Examples
     --------
-    >> mc = MonteCarloEstimator(crandom.normal(mu=0,sigma=1,n=1000),n_simulations=100))
+    >> mc = MonteCarlo(crandom.normal(mu=0,sigma=1,n=1000),n_simulations=100))
     >> mc.estimate(lambda x: x**2)
     >> mc.confidence_curve(confidence=0.90)
     """
@@ -383,60 +383,7 @@ class MonteCarloProcess:
 
         return function(self.ech[:,t_index])
 
-    def mean_error(self,t,N=[10, 100, 1000],error_type="absolute",plot=True, plottype=None):
-
-        N = np.asarray(N)
-
-        number_of_samples = len(N)
-        dim = self.process.dim
-
-        mean_approximation = np.zeros((number_of_samples, dim))
-
-        for i, n in enumerate(N):
-            mean_approximation[i, :] = self.estimate(t_0=t,n=n)
-
-        true_mean = self.process.mean(t)
-
-        if error_type == "absolute":
-            error = np.abs(mean_approximation - true_mean)
-
-        elif error_type == "relative":
-
-            if np.any(true_mean == 0):
-                raise ValueError(
-                    "The relative error is not defined when the process mean is zero."
-                )
-
-            error = np.abs((mean_approximation - true_mean) / true_mean)
-
-        elif error_type == "quadratic":
-            error = np.sqrt((1/N)*(mean_approximation - true_mean) ** 2)
-
-        else:
-            raise ValueError(
-                "error_type must be 'absolute', 'relative' or 'quadratic'."
-            )
-
-        if plot==True:
-            fig = go.Figure()
-            for d in range(dim):
-                fig.add_trace(
-                    go.Scatter(
-                        x=N,
-                        y=error[:, d],
-                        mode="lines+markers",
-                        name=f"Dimension {d + 1}"
-                    )
-                )
-
-        if plottype == "log":
-            fig.update_xaxes(type="log")
-            fig.update_yaxes(type="log")
-        fig.show()
-
-        return error
-
-    def mean_error2(self,t,N=(10, 100, 1000),error_type="absolute",n_experiments=1,plot=True,plottype=None):
+    def mean_error(self,t,N=(10, 100, 1000),error_type="absolute",n_experiments=1,plot=True,plottype=None):
 
         N = np.asarray(N)
         N_len = np.size(N)
@@ -481,8 +428,7 @@ class MonteCarloProcess:
                         name=f"Dimension {d + 1}"
                     )
                 )
-
-        if plottype == "log":
-            fig.update_xaxes(type="log")
-            fig.update_yaxes(type="log")
-        fig.show()
+            if plottype == "log":
+                fig.update_xaxes(type="log")
+                fig.update_yaxes(type="log")
+            fig.show()

@@ -242,7 +242,6 @@ class GeometricBrownianMotion:
             self.path = np.zeros((n_simulations,self.n_steps+1, self.dim))
             W = Brownian(np.eye(self.dim), self.t_0, self.t_n, self.n_steps)
             W.simulate(n_simulations=n_simulations)
-
             #If the volatility is a scalar, a vector or a diagonal matrix, then sigma is reshaped as a vector,
             # so we need to sum on the only available axis. Otherwise, sigma is a matrix, and we need to sum on the axis 1.
             if self._diagonal:

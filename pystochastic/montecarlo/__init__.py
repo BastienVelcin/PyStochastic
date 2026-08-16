@@ -1,3 +1,3 @@
-from .montecarlo import MonteCarloEstimator, MonteCarloProcess
+from .montecarlo import MonteCarlo, MonteCarloProcess
 
-__all__ = ["MonteCarloEstimator", "MonteCarloProcess"]
+__all__ = ["MonteCarlo", "MonteCarloProcess"]

@@ -55,7 +55,7 @@ def duniform(N=2,n=1):
     >> duniform(N=3,n=10)
     """
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -91,7 +91,7 @@ def bernoulli(p=0.5,n=1):
             "The success probability must be between 0 and 1."
         )
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -132,7 +132,7 @@ def rademacher(p=0.5, n=1):
             "The gain probability must be between 0 and 1."
         )
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -176,7 +176,7 @@ def binomial(p,k,n=1):
             "The number of samples must be a strictly positive integer."
         )
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -213,7 +213,7 @@ def poisson(lam=1,n=1):
             "The rate parameter must be greater than 0."
         )
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -289,7 +289,7 @@ def hypergeometric(N=2,k=1,m=1,n=1):
             "The parameters must satisfy 0 <= k <= N and 0 <= m < N."
         )
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -332,7 +332,7 @@ def geometric(p=0.5,n=1):
             "The success probability must be between 0 and 1."
         )
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -377,7 +377,7 @@ def negative_binomial(p=0.5,k=1,n=1):
             "The number of target success occurrence must be a strictly positive integer."
         )
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )
@@ -414,7 +414,7 @@ def yule_simon(rho=1,n=1):
             "The shape parameter must be strictly positive."
         )
 
-    if n < 1 or type(n) != int:
+    if n < 1 or not isinstance(n, (int, np.integer)):
         raise ValueError(
             "The number of samples must be a strictly positive integer."
         )

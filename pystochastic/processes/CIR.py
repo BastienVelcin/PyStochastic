@@ -26,14 +26,13 @@ Examples
 
 import numpy as np
 import plotly.graph_objects as go
-import scipy
 
 class CIR:
 
     """
     CIR class
 
-    A Cox-Ingersoll-Ross process is an unidimensional stochastic process that satisfies the following equation:
+    A Cox-Ingersoll-Ross process is a unidimensional stochastic process that satisfies the following equation:
                                  dR_t = a*(b - R_t)dt + sigma*sqrt(R_t)dW_t,
     For more information, please refer to :
         - https://en.wikipedia.org/wiki/Cox%E2%80%93Ingersoll%E2%80%93Ross_model
