@@ -8,7 +8,7 @@ Description
 This module provides a way to simulate a Geometric Brownian Motion (GBM) with a given mean and covariance matrix.
 
 This module provides a general class "GeometricBrownianMotion", with the following built-in methods:
-    - .simulate() : Simulate a Geometric Brownian Motion path, with both exact and Euler-Maruyama methods.
+    - .simulate() : Simulate a Geometric Brownian Motion path, with both exact, Milstein (only in 1D) and Euler-Maruyama methods.
     - .plot() : Plot the Geometric Brownian Motion path.
     - .mean() : Mean of the Geometric Brownian Motion process at a given time.
     - .covariance() : Covariance between two coordinates of the Geometric Brownian Motion process at a given time.
@@ -27,6 +27,7 @@ Examples
 import numpy as np
 import plotly.graph_objects as go
 from pystochastic.processes.brownian import Brownian
+from pystochastic.utils import _decompose
 
 class GeometricBrownianMotion:
 
@@ -44,7 +45,7 @@ class GeometricBrownianMotion:
         Constant vector drift of the model.
     sigma : float, or np.ndarray
         Constant matrix drift of the model. The dimension of the matrix must coincide with the dimension of the starting point and the vector drift.
-    S_0 : float, or list, or np.ndarray
+    S_0 : None, float, or list, or np.ndarray
         Initial condition of the model. The dimension of the starting point must coincide with the dimension of the covariance matrix and the vector drift.
     t_0 : float
         Initial time.
@@ -59,7 +60,7 @@ class GeometricBrownianMotion:
         Constant vector drift of the model.
     sigma : float, or np.ndarray
         Factor diffusion matrix of the model.
-    S_0 : float, or list, or np.ndarray
+    S_0 : None, float, or list, or np.ndarray
         Initial condition of the model.
     t_0 : float
         Initial time.
@@ -75,6 +76,8 @@ class GeometricBrownianMotion:
         Time interval on which we want to simulate the GBM.
     path : np.ndarray
         Path of the simulated GBM.
+    _diagonal : bool
+        Specify if sigma is an array that works well with vectorization.
 
     Examples
     --------
@@ -83,25 +86,92 @@ class GeometricBrownianMotion:
     >> S.plot()
     """
 
-    def __init__(self, mu=1, sigma=1, S_0=1,t_0=0, t_n=1, n_steps=1000):
+    def __init__(self, mu=1, sigma=1, S_0=None,t_0=0, t_n=1, n_steps=1000):
 
         self.mu = np.atleast_1d(mu)
+
         self.sigma = np.atleast_2d(sigma)
+
+        self.dim = np.size(self.mu)
+        if S_0 == None:
+            S_0 = np.ones(np.size(mu))
         self.S_0 = np.atleast_1d(S_0)
-        self.t_0 = t_0
-        self.t_n = t_n
-        self.n_steps = n_steps
-        self.n_simulations = None
-        self.dim = np.size(S_0)
-        self.t = np.linspace(t_0, t_n, n_steps+1)
-        self.path = None
 
         if not(np.shape(self.sigma)[0] == np.shape(self.sigma)[1] == self.dim == np.size(self.mu)):
             raise ValueError(
                 "The dimension of the volatility matrix, of the drift and of the starting point must coincide."
             )
 
-    def simulate(self,n_simulations=1, method="exact"):
+        # We check if the diffusion is a scalar, a vector or a diagonal matrix.
+        _sigma, _sigma_diag = _decompose(sigma) # Form : (Scalar/Vec/Matrix, Bool)
+
+        self._diagonal = _sigma_diag # True or False depending on the type of sigma.
+
+        # If sigma is a scalar, a vector or a diagonal matrix, we force it to be vector to use vectorization
+        # Otherwise, we assign to the diffusion the matrix, and we will use the sequential method.
+        if self._diagonal:
+            self.sigma = _sigma
+
+        self.t_0 = t_0
+        self.t_n = t_n
+        self.n_steps = n_steps
+        self.n_simulations = None
+        self.t = np.linspace(t_0, t_n, n_steps+1)
+        self.path = None
+
+
+
+    def drift(self, x, t=None):
+
+        """
+        Drift function
+
+        Evaluate the drift of the GBM at a given point x and time t.
+
+        Parameters
+        ----------
+        x : np.ndarray
+            Point at which the drift is evaluated.
+        t : float
+            Time at which the drift is evaluated.
+
+        Returns
+        -------
+        float :
+            Drift evaluated at x and t.
+        """
+
+        return self.mu * x
+
+    def diffusion(self, x, t=None):
+
+        """
+        Diffusion function
+
+        Evaluate the diffusion of the GBM at a given point x and time t.
+
+        Parameters
+        ----------
+        x : np.ndarray
+            Point at which the diffusion is evaluated.
+        t : float
+            Time at which the diffusion is evaluated.
+
+        Returns
+        -------
+        float :
+            Diffusion evaluated at x and t.
+        """
+
+        # If sigma is a scalar, a vector or a diagonal matrix, then self.sigma is a vector, and the diffusion is given
+        # by sigma * x. Otherwise, self.sigma is a matrix, and the diffusion is given by sigma @ x.
+
+        if self._diagonal:
+            return self.sigma * x
+
+        return self.sigma @ x
+
+    def simulate(self,n_simulations=1, method="exact",parallel=False,n_workers=None):
 
         """
         Simulate method.
@@ -110,20 +180,40 @@ class GeometricBrownianMotion:
 
         Parameters
         ----------
-        n_simulations : int, default=1
+        n_simulations : int
             Number of trajectories to simulate.
-        method : {"exact", "euler-maruyama"}, default="exact"
+        method : {"exact", "euler-maruyama", "milstein"}
             Simulation method to use.
+        parallel: bool
+            In the case the vectorization doesn't work, the user can specify the usage of parallel computing.
+        n_workers: int
+            Number of workers to use in parallel computing.
 
         Returns
         -------
         np.ndarray
             Path of the simulated Geometric Brownian Motion of the form ``(n_simulations, n_steps + 1, dim)``.
         """
+
         if method == "euler-maruyama":
             from pystochastic.sde import EulerMaruyama
-            self.path = EulerMaruyama(lambda x, t: self.mu * x,
-                                      lambda x, t: x[..., :, None] * self.sigma,
+            self.path = EulerMaruyama(self.drift,
+                                      self.diffusion,
+                                      self.S_0,
+                                      self.t_0,
+                                      self.t_n,
+                                      self.n_steps,
+                                      n_simulations).solve(parallel=parallel,
+                                                           n_workers=n_workers)
+        elif method == "milstein":
+            if self.dim > 1:
+                raise ValueError(
+                    "The Milstein method is only implemented for 1D processes."
+                )
+
+            from pystochastic.sde import Milstein
+            self.path = Milstein(self.drift,
+                                      self.diffusion,
                                       self.S_0,
                                       self.t_0,
                                       self.t_n,
@@ -144,7 +234,7 @@ class GeometricBrownianMotion:
                         (self.mu - np.sum(self.sigma ** 2, axis=1) / 2) * self.t[i] + self.sigma  @ W.path[sim,i,:])
         else:
             raise ValueError(
-                "The method must be either 'euler-maruyama' or 'exact'."
+                "The method must be either 'euler-maruyama', 'milstein' or 'exact'."
             )
 
         self.n_simulations = n_simulations

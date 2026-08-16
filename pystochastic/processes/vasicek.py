@@ -10,7 +10,7 @@ This module provides a way to simulate a Vasieck process with a given long-term 
 This module provides a general class "Vasieck", with the following built-in methods:
     - .drift() : Drift function of the Vasieck model.
     - .diffusion() : Diffusion function of the Vasieck model.
-    - .simulate() : Simulate an Vasieck process path, with both exact (only in 1D) and Euler-Maruyama methods.
+    - .simulate() : Simulate an Vasieck process path, with both exact (only in 1D), Milstein (only in 1D) and Euler-Maruyama methods.
     - .plot() : Plot the Vasieck process path.
     - .mean() : Mean of the Vasieck process at a given time.
     - .covariance_matrix() : Covariance matrix of the Vasieck process at a given time.
@@ -85,57 +85,103 @@ class Vasicek():
         Time step length.
     path : np.ndarray
         Path of the simulated process.
+    _diagonal : bool
+        Specify if sigma is an array that works well with vectorization.
 
     Examples
     --------
-    >> R = Vasieck(reversion_speed=1,mean=3,volatility=1,r_0=0,t_0=0,t_n=1,n_steps=1000)
+    >> R = Vasieck(reversion_speed=2,mean=3,volatility=1,r_0=0,t_0=0,t_n=1,n_steps=1000)
     >> R.simulate()
     >> R.plot()
     """
 
-    def __init__(self, mu=1, reversion_speed=1, volatility=1, r_0=0, t_0=0, t_n=1, n_steps=1000, n_simulations=1):
-
-        rs, rs_diag = _decompose(reversion_speed)
-        vol, vol_diag = _decompose(volatility)
-
-        # We check if the reversion speed and volatility can be vectorized. If both cannot be vectorized at the same time,
-        self._diagonal = rs_diag and vol_diag #True if the reversion speed and volatility are diagonal matrices or vectors, else False.
-
-        if self._diagonal:
-            self.reversion_speed = rs
-            self.volatility = vol
-
-        else:
-            self.reversion_speed = np.atleast_2d(reversion_speed)
-            self.volatility = np.atleast_2d(volatility)
+    def __init__(self,mu=1,reversion_speed=1,volatility=1,r_0=0,t_0=0, t_n=1, n_steps=1000, n_simulations=1):
 
         self.mu = np.atleast_1d(mu)
+
+        self.reversion_speed = np.atleast_2d(reversion_speed)
+        self.volatility = np.atleast_2d(volatility)
+
+        self.dim = self.mu.size
+        self.r_0 = np.atleast_1d(r_0)
+
+        if not(np.shape(self.reversion_speed)[0] == np.shape(self.reversion_speed)[1] == self.dim == np.shape(self.volatility)[0] == np.shape(self.volatility)[1]  == self.r_0.size):
+            raise ValueError(
+                "The dimension of the the mean, signa, theta, and of the starting point must coincide."
+            )
+
+        # We check if the reversion_speed and volatility are a scalar, a vector or a diagonal matrix.
+        _reversion_speed, _reversion_speed_diag = _decompose(reversion_speed)  # Form : (Scalar/Vec/Matrix, Bool)
+        _volatility, _volatility_diag = _decompose(volatility)  # Form : (Scalar/Vec/Matrix, Bool)
+
+        self._diagonal = _reversion_speed_diag and _volatility_diag # True if the reversion speed and the volatility supports vectorization, False otherwise.
+
+        # If the reversion speed and the volatility are a scalar, a vector or a diagonal matrix, we force it to be vector to use vectorization
+        # Otherwise, we assign them their matrix form, and we will use the sequential method.
+        if self._diagonal:
+            self.reversion_speed = _reversion_speed
+            self.volatility = _volatility
 
         if np.all(self.reversion_speed <= 0) or np.all(self.volatility < 0):
             raise ValueError(
                 "The sigma and theta parameters should be greater than 0."
             )
 
-        self.r_0 = np.atleast_1d(r_0)
         self.t_0 = t_0
         self.t_n = t_n
         self.n_steps = n_steps
         self.n_simulations = None
-        self.dim = np.size(self.mu)
-        self.t = np.linspace(t_0, t_n, n_steps + 1)
-        self.dt = (t_n - t_0) / n_steps
+        self.t = np.linspace(t_0,t_n,n_steps+1)
+        self.dt = (t_n-t_0)/n_steps
         self.path = None
-        # ... (le check de coherence des dimensions existant reste valable tel quel)
 
-    def drift(self, x, t):
+    def drift(self,x,t=None):
+
+        """
+        Drift function
+
+        Evaluate the drift of the Vasicek process at a given point x and time t.
+
+        Parameters
+        ----------
+        x : np.ndarray
+            Point at which the drift is evaluated.
+        t : float
+            Time at which the drift is evaluated.
+
+        Returns
+        -------
+        float :
+            Drift evaluated at x and t.
+        """
+
         if self._diagonal:
             return self.reversion_speed * (self.mu - x)
         return self.reversion_speed @ (self.mu - x)
 
-    def diffusion(self, x, t):
+    def diffusion(self,x,t=None):
+
+        """
+        Diffusion function
+
+        Evaluate the diffusion of the Vasicek process at a given point x and time t.
+
+        Parameters
+        ----------
+        x : np.ndarray
+            Point at which the diffusion is evaluated.
+        t : float
+            Time at which the diffusion is evaluated.
+
+        Returns
+        -------
+        float :
+            Diffusion evaluated at x and t.
+        """
+
         return self.volatility
 
-    def simulate(self, n_simulations=1, method="euler-maruyama"):
+    def simulate(self, n_simulations=1, method="euler-maruyama",parallel=False,n_workers=None):
 
         """
         Simulate method.
@@ -144,10 +190,14 @@ class Vasicek():
 
         Parameters
         ----------
-        n_simulations : int, default=1
+        n_simulations : int
             Number of trajectories to simulate.
-        method : {"exact", "euler-maruyama"}, default="euler-maruyama"
+        method : {"exact", "euler-maruyama", "milstein"}
             Simulation method to use.
+        parallel: bool
+            In the case the vectorization doesn't work, the user can specify the usage of parallel computing.
+        n_workers: int
+            Number of workers to use in parallel computing.
 
         Returns
         -------
@@ -163,8 +213,21 @@ class Vasicek():
                                       self.t_0,
                                       self.t_n,
                                       self.n_steps,
-                                      n_simulations).solve()
-
+                                      n_simulations).solve(parallel=parallel,
+                                                           n_workers=n_workers)
+        elif method == "milstein":
+            if self.dim > 1:
+                raise ValueError(
+                    "The Milstein method is only implemented for 1D processes."
+                )
+            from pystochastic.sde import Milstein
+            self.path = Milstein(self.drift,
+                                 self.diffusion,
+                                 self.r_0,
+                                 self.t_0,
+                                 self.t_n,
+                                 self.n_steps,
+                                 n_simulations).solve()
         elif method == "exact":
             if self.dim > 1:
                 raise ValueError(
@@ -184,7 +247,7 @@ class Vasicek():
 
         else:
             raise ValueError(
-                "The method must be either 'euler-maruyama' or 'exact'."
+                "The method must be either 'euler-maruyama', 'milstein' or 'exact'."
             )
 
         # When the first simulation is launched, we define the global number of simulations
@@ -263,7 +326,7 @@ class Vasicek():
                 "The time must be between t_0 and t_n."
             )
 
-        return self.volatility + scipy.linalg.expm(-self.reversion_speed*(t-self.t_0)) @ (self.r_0 - self.volatility)
+        return self.mu + scipy.linalg.expm(-self.reversion_speed * (t - self.t_0)) @ (self.r_0 - self.mu)
 
     def covariance_matrix(self, t):
 
