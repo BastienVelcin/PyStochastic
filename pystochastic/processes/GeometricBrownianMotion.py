@@ -246,7 +246,6 @@ class GeometricBrownianMotion:
                 for i in range(0, self.n_steps+1):
                     # The explicit solution is given by S_t = S_0 * exp((mu - 1/2 * sigma^2) * t + sigma * W_t)
 
-
                     self.path[:,i, :] = self.S_0 * np.exp(
                         (self.mu - np.sum(self.sigma ** 2, axis=0) / 2) * self.t[i] + self.sigma * W.path[:,i,:])
             else:

@@ -252,13 +252,11 @@ class Vasicek():
             self.path = np.zeros((n_simulations, self.n_steps+1, 1))
             self.path[:,0] = self.r_0
 
-            for sim in range(n_simulations):
-                # For every simulation, we compute different normal samples
-                Z = crandom.normal(0, 1, self.n_steps)
+            Z = crandom.normal(0, 1, self.n_steps * n_simulations).reshape((n_simulations, self.n_steps))
 
-                for i in range(1,self.n_steps+1):
-                    #  The induction formula is given by R_t = (mean + R_{t-1} - mean) * exp(-reversion_speed * dt) + volatility * sqrt(1 - exp(-2 * reversion_speed * dt)) / (2 * theta)) * Z[i-1])
-                    self.path[sim,i] = (self.mu+ (self.path[sim,i-1] - self.mu) * np.exp(-self.reversion_speed * self.dt) + self.volatility * np.sqrt((1 - np.exp(-2 * self.reversion_speed * self.dt)) / (2 * self.reversion_speed)) * Z[i-1])
+            for i in range(1,self.n_steps+1):
+                #  The induction formula is given by R_t = (mean + R_{t-1} - mean) * exp(-reversion_speed * dt) + volatility * sqrt(1 - exp(-2 * reversion_speed * dt)) / (2 * theta)) * Z[i-1])
+                self.path[:,i,0] = (self.mu+ (self.path[:,i-1,0] - self.mu) * np.exp(-self.reversion_speed * self.dt) + self.volatility * np.sqrt((1 - np.exp(-2 * self.reversion_speed * self.dt)) / (2 * self.reversion_speed)) * Z[:,i-1])
 
         else:
             raise ValueError(

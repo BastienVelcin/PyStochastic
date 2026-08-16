@@ -185,12 +185,11 @@ class CIR:
         elif method == "exact":
             self.path = np.zeros((n_simulations,self.n_steps+1, 1))
             self.path[:,0] = self.r_0
-            for sim in range(n_simulations):
-                for i in range(1,self.n_steps+1):
+            for i in range(1,self.n_steps+1):
 
-                    # The induction formula is given by R_{t+1} = c*Z, where Z ~ NCX2(df=nu, nc=R_t * factor)
-                    Y = scipy.stats.ncx2.rvs(df=self.nu, nc=self.path[sim,i-1] * self.factor)
-                    self.path[sim,i] = self.c*Y
+                # The induction formula is given by R_{t+1} = c*Z, where Z ~ NCX2(df=nu, nc=R_t * factor)
+                Y = scipy.stats.ncx2.rvs(df=self.nu, nc=self.path[:,i-1] * self.factor)
+                self.path[:,i] = self.c*Y
 
         else:
             raise ValueError(

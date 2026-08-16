@@ -251,13 +251,12 @@ class OrnsteinUhlenbeck:
             self.path = np.zeros((n_simulations,self.n_steps+1, 1))
             self.path[:,0] = self.r_0
 
-            for sim in range(n_simulations):
-                # For every simulation, we compute different normal samples
-                Z = crandom.normal(0, 1, self.n_steps)
+            # For every simulation, we compute different normal samples
+            Z = crandom.normal(0, 1, self.n_steps*n_simulations).reshape((n_simulations,self.n_steps))
 
-                for i in range(1,self.n_steps+1):
-                    # The induction formula is given by R_t = (mean + R_{t-1} - mean) * exp(-theta * dt) + sigma * sqrt(1 - exp(-2 * theta * dt)) / (2 * theta)) * Z[i-1])
-                    self.path[sim,i] = (self.mu+ (self.path[sim,i-1] - self.mu) * np.exp(-self.theta * self.dt) + self.sigma * np.sqrt((1 - np.exp(-2 * self.theta * self.dt)) / (2 * self.theta)) * Z[i-1])
+            for i in range(1,self.n_steps+1):
+                # The induction formula is given by R_t = (mean + R_{t-1} - mean) * exp(-theta * dt) + sigma * sqrt(1 - exp(-2 * theta * dt)) / (2 * theta)) * Z[i-1])
+                self.path[:,i,0] = (self.mu+ (self.path[:,i-1,0] - self.mu) * np.exp(-self.theta * self.dt) + self.sigma * np.sqrt((1 - np.exp(-2 * self.theta * self.dt)) / (2 * self.theta)) * Z[:,i-1])
 
         else:
             raise ValueError(
