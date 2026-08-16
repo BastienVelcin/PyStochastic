@@ -93,12 +93,25 @@ class OrnsteinUhlenbeck:
     >> R.plot()
     """
 
-    def __init__(self,mu=0,sigma=1,theta=1,r_0=0,t_0=0, t_n=1, n_steps=1000):
+    def __init__(self,
+                 mu=0,
+                 sigma=1,
+                 theta=1,
+                 r_0=0,
+                 t_0=0,
+                 t_n=1,
+                 n_steps=1000):
 
         self.mu = np.atleast_1d(mu)
 
-        self.theta = np.atleast_2d(theta)
-        self.sigma = np.atleast_2d(sigma)
+        self.sigma = np.atleast_1d(sigma)
+        self.theta = np.atleast_1d(theta)
+
+        if self.theta.ndim == 1:
+            self.theta = np.diag(self.theta)
+
+        if self.sigma.ndim == 1:
+            self.sigma = np.diag(self.sigma)
 
         self.dim = np.size(self.mu)
         self.r_0 = np.atleast_1d(r_0)

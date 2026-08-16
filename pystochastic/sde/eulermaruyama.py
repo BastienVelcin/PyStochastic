@@ -102,10 +102,10 @@ def _simulate_vectorized(mu, sigma, x_0, t, dt, n_steps, dim, dW):
 
     for i in range(1, n_steps + 1):
 
-        x_prev = Y[:, i - 1, :]
+        y_prev = Y[:, i - 1, :]
         t_prev = t[i - 1]
 
-        Y[:, i, :] = x_prev + mu(x_prev, t_prev) * dt + sigma(x_prev, t_prev) * dW[:, i - 1, :]
+        Y[:, i, :] = y_prev + mu(y_prev, t_prev) * dt + sigma(y_prev, t_prev) * dW[:, i - 1, :]
 
     return Y
 

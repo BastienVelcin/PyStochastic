@@ -76,7 +76,12 @@ class Poisson():
     >> P.plot()
     """
 
-    def __init__(self,intensity=1,t_0=0, t_n=10, n_steps=1000):
+    def __init__(self,
+                 intensity=1,
+                 t_0=0,
+                 t_n=10,
+                 n_steps=1000):
+
         self.intensity = intensity
         self.t_0 = t_0
         self.t_n = t_n

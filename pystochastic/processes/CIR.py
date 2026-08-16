@@ -95,7 +95,14 @@ class CIR:
     >> R.plot()
     """
 
-    def __init__(self, a=1, b=1, sigma=1, r_0=0, t_0=0, t_n=1, n_steps=1000):
+    def __init__(self,
+                 a=1,
+                 b=1,
+                 sigma=1,
+                 r_0=0,
+                 t_0=0,
+                 t_n=1,
+                 n_steps=1000):
 
         self.a = a
         self.b = b
@@ -160,7 +167,8 @@ class CIR:
                                       self.t_n,
                                       self.n_steps,
                                       n_simulations).solve()
-        if method == "milstein":
+
+        elif method == "milstein":
             from pystochastic.sde import Milstein
             if (2 * self.a * self.b < self.sigma ** 2):
                 raise ValueError(

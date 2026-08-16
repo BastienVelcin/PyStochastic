@@ -95,12 +95,27 @@ class Vasicek():
     >> R.plot()
     """
 
-    def __init__(self,mu=1,reversion_speed=1,volatility=1,r_0=0,t_0=0, t_n=1, n_steps=1000, n_simulations=1):
+    def __init__(self,
+                 mu=1,
+                 reversion_speed=1,
+                 volatility=1,
+                 r_0=0,
+                 t_0=0,
+                 t_n=1,
+                 n_steps=1000,
+                 n_simulations=1):
 
         self.mu = np.atleast_1d(mu)
 
-        self.reversion_speed = np.atleast_2d(reversion_speed)
-        self.volatility = np.atleast_2d(volatility)
+        self.reversion_speed = np.atleast_1d(reversion_speed)
+        self.volatility = np.atleast_1d(volatility)
+
+
+        if self.reversion_speed.ndim == 1:
+            self.reversion_speed = np.diag(self.reversion_speed)
+
+        if self.volatility.ndim == 1:
+            self.volatility = np.diag(self.volatility)
 
         self.dim = self.mu.size
         self.r_0 = np.atleast_1d(r_0)

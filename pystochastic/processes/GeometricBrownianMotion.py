@@ -86,18 +86,33 @@ class GeometricBrownianMotion:
     >> S.plot()
     """
 
-    def __init__(self, mu=1, sigma=1, S_0=None,t_0=0, t_n=1, n_steps=1000):
+    def __init__(self,
+                 mu=1,
+                 sigma=1,
+                 S_0=None,
+                 t_0=0,
+                 t_n=1,
+                 n_steps=1000):
 
         self.mu = np.atleast_1d(mu)
 
-        self.sigma = np.atleast_2d(sigma)
+        self.sigma = np.atleast_1d(sigma)
 
-        self.dim = np.size(self.mu)
+        if self.sigma.ndim == 1:
+            self.sigma = np.diag(self.sigma)
+
         if S_0 == None:
             S_0 = np.ones(np.size(mu))
-        self.S_0 = np.atleast_1d(S_0)
 
-        if not(np.shape(self.sigma)[0] == np.shape(self.sigma)[1] == self.dim == np.size(self.mu)):
+        self.S_0 = np.atleast_1d(S_0)
+        self.dim = np.size(self.S_0)
+
+        if self.sigma.ndim == 1 and not(np.shape(self.sigma) == self.dim == np.size(self.mu)):
+            raise ValueError(
+                "The dimension of the volatility matrix, of the drift and of the starting point must coincide."
+            )
+
+        elif self.sigma.ndim != 1 and not(np.shape(self.sigma)[0] == np.shape(self.sigma)[1] == self.dim == np.size(self.mu)):
             raise ValueError(
                 "The dimension of the volatility matrix, of the drift and of the starting point must coincide."
             )
@@ -169,7 +184,7 @@ class GeometricBrownianMotion:
         if self._diagonal:
             return self.sigma * x
 
-        return self.sigma @ x
+        return  x @ self.sigma.T
 
     def simulate(self,n_simulations=1, method="exact",parallel=False,n_workers=None):
 
@@ -225,13 +240,21 @@ class GeometricBrownianMotion:
             W = Brownian(np.eye(self.dim), self.t_0, self.t_n, self.n_steps)
             W.simulate(n_simulations=n_simulations)
 
-            for sim in range(n_simulations):
-                # For every simulation, we compute a different Brownian increment array.
-                print(W.path)
+            #If the volatility is a scalar, a vector or a diagonal matrix, then sigma is reshaped as a vector,
+            # so we need to sum on the only available axis. Otherwise, sigma is a matrix, and we need to sum on the axis 1.
+            if self._diagonal:
                 for i in range(0, self.n_steps+1):
                     # The explicit solution is given by S_t = S_0 * exp((mu - 1/2 * sigma^2) * t + sigma * W_t)
-                    self.path[sim,i, :] = self.S_0 * np.exp(
-                        (self.mu - np.sum(self.sigma ** 2, axis=1) / 2) * self.t[i] + self.sigma  @ W.path[sim,i,:])
+
+
+                    self.path[:,i, :] = self.S_0 * np.exp(
+                        (self.mu - np.sum(self.sigma ** 2, axis=0) / 2) * self.t[i] + self.sigma * W.path[:,i,:])
+            else:
+                for i in range(0, self.n_steps + 1):
+                    # The explicit solution is given by S_t = S_0 * exp((mu - 1/2 * sigma^2) * t + sigma * W_t)
+
+                    self.path[:, i, :] = self.S_0 * np.exp(
+                        (self.mu - np.sum(self.sigma * 2, axis=1) / 2) * self.t[i] + self.sigma  @ W.path[:,i,:])
         else:
             raise ValueError(
                 "The method must be either 'euler-maruyama', 'milstein' or 'exact'."
