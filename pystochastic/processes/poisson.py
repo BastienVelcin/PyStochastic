@@ -24,7 +24,7 @@ Examples
 
 import numpy as np
 import plotly.graph_objects as go
-from pystochastic.pyrandom import crandom
+from pystochastic.pyrandom import crandom, drandom
 
 class Poisson():
 
@@ -66,6 +66,8 @@ class Poisson():
         Dimension of the process. Here, the dimension is 1.
     t : np.ndarray
         Time interval on which we want to simulate the process.
+    dt : float
+        Time step length.
     path : np.ndarray
         Path of the simulated process.
 
@@ -89,15 +91,16 @@ class Poisson():
         self.n_simulations = None
         self.dim = 1
         self.t = np.linspace(t_0,t_n,n_steps+1)
+        self.dt = (t_n-t_0)/n_steps
         self.path = None
 
 
-    def simulate(self,n_simulations=1):
+    def simulate(self,n_simulations=1,plot=False):
 
         """
         Simulate method.
 
-        Simulate a Poisson process path using exponential random variables.
+        Simulate a Poisson process path using Poisson random variables
 
         Parameters
         ----------
@@ -110,23 +113,19 @@ class Poisson():
             Path of the simulated Poisson process of the form ``(n_simulations, n_steps + 1)``.
         """
 
-        self.path = np.zeros((n_simulations,self.n_steps+1))
+        self.path = np.zeros((n_simulations, self.n_steps + 1))
 
-        for sim in range(n_simulations):
-            T = []
-            current_time = 0
-            # We simulate exponential random variables until the total sum of them exceeds the final time.
-            while current_time < self.t_n:
-                E = crandom.exponential(self.intensity).item()
-                current_time += E
-                T.append(current_time)
+        # The increments of a Poisson process follows : N_t_{i+1} - N_t_i ~ Poisson(intensity*dt)
+        increments = drandom.poisson(self.intensity * self.dt, n_simulations* self.n_steps).reshape((n_simulations, self.n_steps))
 
-            for i in range(1,self.n_steps+1):
-                # The Poisson process value is given by the number of exponential sums that are smaller than the current time.
-                self.path[sim,i]= sum(T<= self.t[i])
+        # We compute N_t with cumsum
 
-        # When the first simulation is launched, we define the global number of simulations
+        self.path[:, 1:] = np.cumsum(increments, axis=1)
+
         self.n_simulations = n_simulations
+
+        if plot:
+            self.plot()
 
         return self.path
 

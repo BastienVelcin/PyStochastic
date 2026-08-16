@@ -193,7 +193,7 @@ class OrnsteinUhlenbeck:
 
         return self.sigma
 
-    def simulate(self, n_simulations=1, method="euler-maruyama",parallel=False,n_workers=None):
+    def simulate(self, n_simulations=1, method="euler-maruyama",plot=False,parallel=False,n_workers=None):
 
         """
         Simulate method.
@@ -206,6 +206,8 @@ class OrnsteinUhlenbeck:
             Number of trajectories to simulate.
         method : {"exact", "euler-maruyama", "milstein"}, default="euler-maruyama"
             Simulation method to use.
+        plot : bool
+            Specify if the path should be plotted.
         parallel: bool
             In the case the vectorization doesn't work, the user can specify the usage of parallel computing.
         n_workers: int
@@ -225,7 +227,8 @@ class OrnsteinUhlenbeck:
                                       self.t_0,
                                       self.t_n,
                                       self.n_steps,
-                                      n_simulations).solve(parallel=parallel,
+                                      n_simulations).solve(plot = plot,
+                                                           parallel=parallel,
                                                            n_workers=n_workers)
         elif method == "milstein":
             if self.dim > 1:
@@ -240,7 +243,7 @@ class OrnsteinUhlenbeck:
                                       self.t_0,
                                       self.t_n,
                                       self.n_steps,
-                                      n_simulations).solve()
+                                      n_simulations).solve(plot=plot)
 
         elif method == "exact":
             if self.dim > 1:
@@ -258,6 +261,9 @@ class OrnsteinUhlenbeck:
                 # The induction formula is given by R_t = (mean + R_{t-1} - mean) * exp(-theta * dt) + sigma * sqrt(1 - exp(-2 * theta * dt)) / (2 * theta)) * Z[i-1])
                 self.path[:,i,0] = (self.mu+ (self.path[:,i-1,0] - self.mu) * np.exp(-self.theta * self.dt) + self.sigma * np.sqrt((1 - np.exp(-2 * self.theta * self.dt)) / (2 * self.theta)) * Z[:,i-1])
 
+            if plot:
+                self.n_simulations = n_simulations
+                self.plot()
         else:
             raise ValueError(
                 "The method must be either 'euler-maruyama', 'milstein' or 'exact'."

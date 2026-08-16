@@ -28,7 +28,7 @@ array([12,  4,  6,  4,  8,  8,  3,  6,  2,  7,  2, 12,  3,  3, 22])
 """
 
 import numpy as np
-from crandom import uniform, exponential
+from pystochastic.pyrandom.crandom import uniform, exponential
 from math import comb
 
 def duniform(N=2,n=1):
@@ -218,19 +218,29 @@ def poisson(lam=1,n=1):
             "The number of samples must be a strictly positive integer."
         )
 
-    P = np.zeros(n)
-    for k in range(n):
-        total_time  = 0
-        i = -1
-        verif = 0
-        while verif == 0:
-            U = uniform(0,1)
-            total_time  += -np.log(U)/lam
-            if total_time  > 1:
-                verif = 1
-            i += 1
-        P[k] = i
-    return P
+
+    count = np.zeros(n, dtype=int)
+    total_time = np.zeros(n)
+    active = np.arange(n) #Index of non simulated elements
+
+    while active.size > 0:
+        # One uniform call for all non simulated elements
+        U = uniform(0, 1, active.size)
+
+        # Adding an exponential distribution of parameter lambda to the total time
+        new_total = total_time[active] + (-np.log(U) / lam) # Adding an exponential distribution of parameter lambda to the total time
+
+        # We consider only the elements that are still below 1
+        still_below = new_total <= 1
+
+        # We update the count and the total time of the elements that are still below 1
+        idx_below = active[still_below]
+        total_time[idx_below] = new_total[still_below]
+        count[idx_below] += 1
+
+        # Active elements are the ones that are still below 1
+        active = idx_below
+    return count
 
 def hypergeometric(N=2,k=1,m=1,n=1):
 
@@ -410,4 +420,5 @@ def yule_simon(rho=1,n=1):
         )
 
     W = exponential(rho,n)
-    return geometric(np.exp(-W))
+
+    return np.array([geometric(np.exp(-W[i])).item() for i in range(n)])

@@ -186,7 +186,7 @@ class GeometricBrownianMotion:
 
         return  x @ self.sigma.T
 
-    def simulate(self,n_simulations=1, method="exact",parallel=False,n_workers=None):
+    def simulate(self,n_simulations=1, method="exact",plot=False,parallel=False,n_workers=None):
 
         """
         Simulate method.
@@ -199,6 +199,8 @@ class GeometricBrownianMotion:
             Number of trajectories to simulate.
         method : {"exact", "euler-maruyama", "milstein"}
             Simulation method to use.
+        plot : bool
+            Specify if the path should be plotted.
         parallel: bool
             In the case the vectorization doesn't work, the user can specify the usage of parallel computing.
         n_workers: int
@@ -218,7 +220,8 @@ class GeometricBrownianMotion:
                                       self.t_0,
                                       self.t_n,
                                       self.n_steps,
-                                      n_simulations).solve(parallel=parallel,
+                                      n_simulations).solve(plot=plot,
+                                                           parallel=parallel,
                                                            n_workers=n_workers)
         elif method == "milstein":
             if self.dim > 1:
@@ -233,7 +236,7 @@ class GeometricBrownianMotion:
                                       self.t_0,
                                       self.t_n,
                                       self.n_steps,
-                                      n_simulations).solve()
+                                      n_simulations).solve(plot=plot)
 
         elif method == "exact":
             self.path = np.zeros((n_simulations,self.n_steps+1, self.dim))
@@ -254,6 +257,10 @@ class GeometricBrownianMotion:
 
                     self.path[:, i, :] = self.S_0 * np.exp(
                         (self.mu - np.sum(self.sigma * 2, axis=1) / 2) * self.t[i] + self.sigma  @ W.path[:,i,:])
+
+            if plot:
+                self.n_simulations = n_simulations
+                self.plot()
         else:
             raise ValueError(
                 "The method must be either 'euler-maruyama', 'milstein' or 'exact'."

@@ -123,7 +123,7 @@ class Brownian:
         self.t = np.linspace(self.t_0,self.t_n,self.n_steps+1)
 
 
-    def simulate(self,n_simulations=1):
+    def simulate(self,n_simulations=1,plot=False):
 
         """
         Simulate method.
@@ -145,6 +145,9 @@ class Brownian:
         self.increments = self.sim[1]
 
         self.n_simulations = n_simulations
+
+        if plot:
+            self.plot()
         return self.path
 
     def plot(self):

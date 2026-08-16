@@ -196,7 +196,7 @@ class Vasicek():
 
         return self.volatility
 
-    def simulate(self, n_simulations=1, method="euler-maruyama",parallel=False,n_workers=None):
+    def simulate(self, n_simulations=1, method="euler-maruyama",plot=False, parallel=False,n_workers=None):
 
         """
         Simulate method.
@@ -209,6 +209,8 @@ class Vasicek():
             Number of trajectories to simulate.
         method : {"exact", "euler-maruyama", "milstein"}
             Simulation method to use.
+        plot : bool
+            Specify if the path should be plotted.
         parallel: bool
             In the case the vectorization doesn't work, the user can specify the usage of parallel computing.
         n_workers: int
@@ -228,7 +230,8 @@ class Vasicek():
                                       self.t_0,
                                       self.t_n,
                                       self.n_steps,
-                                      n_simulations).solve(parallel=parallel,
+                                      n_simulations).solve(plot=plot,
+                                                           parallel=parallel,
                                                            n_workers=n_workers)
         elif method == "milstein":
             if self.dim > 1:
@@ -242,7 +245,7 @@ class Vasicek():
                                  self.t_0,
                                  self.t_n,
                                  self.n_steps,
-                                 n_simulations).solve()
+                                 n_simulations).solve(plot=plot)
         elif method == "exact":
             if self.dim > 1:
                 raise ValueError(
@@ -258,6 +261,9 @@ class Vasicek():
                 #  The induction formula is given by R_t = (mean + R_{t-1} - mean) * exp(-reversion_speed * dt) + volatility * sqrt(1 - exp(-2 * reversion_speed * dt)) / (2 * theta)) * Z[i-1])
                 self.path[:,i,0] = (self.mu+ (self.path[:,i-1,0] - self.mu) * np.exp(-self.reversion_speed * self.dt) + self.volatility * np.sqrt((1 - np.exp(-2 * self.reversion_speed * self.dt)) / (2 * self.reversion_speed)) * Z[:,i-1])
 
+            if plot:
+                self.n_simulations = n_simulations
+                self.plot()
         else:
             raise ValueError(
                 "The method must be either 'euler-maruyama', 'milstein' or 'exact'."

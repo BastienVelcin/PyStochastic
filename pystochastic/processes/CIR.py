@@ -133,7 +133,7 @@ class CIR:
     def diffusion(self,x,t=None):
         return self.sigma * np.sqrt(np.maximum(x,0))
 
-    def simulate(self, n_simulations=1,method="exact"):
+    def simulate(self, n_simulations=1,method="exact",plot=False):
 
         """
         Simulate method.
@@ -146,6 +146,8 @@ class CIR:
             Number of trajectories to simulate.
         method : {"exact", "euler-maruyama", "milstein"}, default="exact"
             Simulation method to use.
+        plot : bool
+            Specify if the path should be plotted.
 
         Returns
         -------
@@ -166,7 +168,7 @@ class CIR:
                                       self.t_0,
                                       self.t_n,
                                       self.n_steps,
-                                      n_simulations).solve()
+                                      n_simulations).solve(plot=plot)
 
         elif method == "milstein":
             from pystochastic.sde import Milstein
@@ -181,14 +183,14 @@ class CIR:
                                       self.t_0,
                                       self.t_n,
                                       self.n_steps,
-                                      n_simulations).solve()
+                                      n_simulations).solve(plot=plot)
         elif method == "exact":
             self.path = np.zeros((n_simulations,self.n_steps+1, 1))
             self.path[:,0] = self.r_0
             for i in range(1,self.n_steps+1):
 
                 # The induction formula is given by R_{t+1} = c*Z, where Z ~ NCX2(df=nu, nc=R_t * factor)
-                Y = scipy.stats.ncx2.rvs(df=self.nu, nc=self.path[:,i-1] * self.factor)
+                Y = np.random.noncentral_chisquare(df=self.nu, nonc=self.path[:,i-1] * self.factor)
                 self.path[:,i] = self.c*Y
 
         else:
