@@ -110,6 +110,9 @@ class Vasicek():
         self.reversion_speed = np.atleast_1d(reversion_speed)
         self.volatility = np.atleast_1d(volatility)
 
+        self.m_reversion_speed = np.atleast_2d(reversion_speed)
+        self.m_volatility = np.atleast_2d(volatility)
+
 
         if self.reversion_speed.ndim == 1:
             self.reversion_speed = np.diag(self.reversion_speed)
@@ -345,7 +348,7 @@ class Vasicek():
                 "The time must be between t_0 and t_n."
             )
 
-        return self.mu + scipy.linalg.expm(-self.reversion_speed * (t - self.t_0)) @ (self.r_0 - self.mu)
+        return self.mu + scipy.linalg.expm(-self.m_reversion_speed * (t - self.t_0)) @ (self.r_0 - self.mu)
 
     def covariance_matrix(self, t):
 
@@ -372,7 +375,7 @@ class Vasicek():
                 "The time must be between t_0 and t_n."
             )
 
-        Q = self.volatility @ self.volatility.T
+        Q = self.m_volatility @ self.m_volatility.T
 
         # We define the Lyapunov equation, where s is the time at which we want to evaluate the solution of the
         # Lyapunov equation, and p is the state of the process at time t (as a vector).
@@ -382,7 +385,7 @@ class Vasicek():
             P = p.reshape(self.dim, self.dim)
 
             # We define the right-hand side of the Lyapunov equation
-            dP = -self.reversion_speed @ P- P @ self.reversion_speed.T + Q
+            dP = -self.m_reversion_speed @ P- P @ self.m_reversion_speed.T + Q
 
             # We return the flattened version of the right-hand side of the Lyapunov equation. We use the method ravel
             # to flatten the array column by column instead of row by row.

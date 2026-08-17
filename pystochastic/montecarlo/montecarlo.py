@@ -225,12 +225,13 @@ class MonteCarloProcess:
     >> mc.mean_path()
     """
 
-    def __init__(self,process,n_simulations=100):
+    def __init__(self,process,n_simulations=100, method=None):
 
         self.process = process
         self.n_simulations = n_simulations
         self.t = self.process.t
-        self.ech = self.process.simulate(self.n_simulations)
+        self.ech = self.process.simulate(self.n_simulations,method=method)
+        self.dim = self.process.dim
 
     def simulate(self):
 
@@ -248,7 +249,7 @@ class MonteCarloProcess:
         self.ech = self.process.simulate(self.n_simulations)
         return self.ech
 
-    def estimate(self, t_0=None, function = lambda x: x[:,0],n=None):
+    def estimate(self, t_0=None, function = lambda x: x,n=None):
 
         """
         Estimate method.
@@ -261,8 +262,6 @@ class MonteCarloProcess:
         float
             Estimation of the mean.
         """
-
-
 
         if n is None:
             n = self.n_simulations
@@ -284,14 +283,16 @@ class MonteCarloProcess:
         # The specified time might not be in the time interval of the process. In this case, the closest time is used.
         if t_0 not in self.t:
             t_index = np.argmin(np.abs(t_0 - self.t))
+
         else:
             t_index = np.where(self.t == t_0)[0][0]
 
-        means = np.zeros(np.size(n))
-        for i in range(np.size(n)):
-            means[i] = np.mean(function(self.ech[:n[i],t_index]), axis=0)
-        return means
+        ech = function(self.ech)
 
+        means = np.zeros((np.size(n),self.dim))
+        means[::] = np.mean(ech[:,t_index],axis=0)
+
+        return means
 
     def mean_path(self, plot_sim=True):
 

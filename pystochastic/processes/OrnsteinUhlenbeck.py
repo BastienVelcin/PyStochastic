@@ -107,6 +107,9 @@ class OrnsteinUhlenbeck:
         self.sigma = np.atleast_1d(sigma)
         self.theta = np.atleast_1d(theta)
 
+        self.m_sigma = np.atleast_2d(sigma)
+        self.m_theta = np.atleast_2d(theta)
+
         if self.theta.ndim == 1:
             self.theta = np.diag(self.theta)
 
@@ -344,7 +347,7 @@ class OrnsteinUhlenbeck:
                 "The time must be between t_0 and t_n."
             )
 
-        return self.r_0 @ scipy.linalg.expm(- self.theta * t) + self.mu @ (np.eye(self.dim) - scipy.linalg.expm(- self.theta * t))
+        return self.r_0 @ scipy.linalg.expm(- self.m_theta * t) + self.mu @ (np.eye(self.dim) - scipy.linalg.expm(- self.m_theta * t))
 
     def covariance_matrix(self, t):
 
@@ -371,7 +374,7 @@ class OrnsteinUhlenbeck:
                 "The time must be between t_0 and t_n."
             )
 
-        Q = self.sigma @ self.sigma.T
+        Q = self.m_sigma @ self.m_sigma.T
 
         # We define the Lyapunov equation, where s is the time at which we want to evaluate the solution of the
         # Lyapunov equation, and p is the state of the process at time t (as a vector).
@@ -381,7 +384,7 @@ class OrnsteinUhlenbeck:
             P = p.reshape(self.dim, self.dim)
 
             # We define the right-hand side of the Lyapunov equation
-            dP = -self.theta @ P- P @ self.theta.T + Q
+            dP = -self.m_theta @ P- P @ self.m_theta.T + Q
 
             # We return the flattened version of the right-hand side of the Lyapunov equation. We use the method ravel
             # to flatten the array column by column instead of row by row.

@@ -85,7 +85,7 @@ def rmse(process):
             process.t_n,
             steps + 1
         )
-        process.dt = (process.t[-1]-process.t[1])/steps
+        process.dt = (process.t[-1]-process.t[0])/steps
 
         seed(n_seed)
         solverEM = process.simulate(

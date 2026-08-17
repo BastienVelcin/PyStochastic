@@ -97,6 +97,7 @@ class GeometricBrownianMotion:
         self.mu = np.atleast_1d(mu)
 
         self.sigma = np.atleast_1d(sigma)
+        self.m_sigma = np.atleast_2d(sigma)
 
         if self.sigma.ndim == 1:
             self.sigma = np.diag(self.sigma)
@@ -383,7 +384,7 @@ class GeometricBrownianMotion:
             raise ValueError(
                 "The second coordinate must be between 0 and the dimension (excluded)."
             )
-        return self.S_0[i]*self.S_0[j]*np.exp((self.mu[i]+self.mu[j])*t)*(np.exp((self.sigma*self.sigma.T)[i,j] * t)-1)
+        return self.S_0[i]*self.S_0[j]*np.exp((self.mu[i]+self.mu[j])*t)*(np.exp((self.m_sigma*self.m_sigma.T)[i,j] * t)-1)
 
     def covariance_matrix(self,t):
 
