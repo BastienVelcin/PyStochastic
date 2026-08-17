@@ -33,7 +33,9 @@ Examples
 import numpy as np
 import plotly.graph_objects as go
 from pystochastic.processes import *
-from scipy.stats import norm
+import sys, inspect
+from scipy.stats import norm, t
+from pystochastic.dist.dist import *
 
 class MonteCarlo:
 
@@ -79,8 +81,14 @@ class MonteCarlo:
                 "n_simulations cannot be greater than the number of samples provided."
             )
 
-        self.samples = np.asarray(samples).flatten()
+        self.samples = np.atleast_3d(samples)
         self.n_simulations = n_simulations
+
+
+
+    ##################################
+    #    I.  ESTIMATORS & MOMENTS    #
+    ##################################
 
     def estimate(self, n=None, function = lambda x: x):
 
@@ -89,7 +97,7 @@ class MonteCarlo:
 
         Provides an estimation of the mean of a function of a given random variable with the Law of large numbers.
                         E[f(X)] ~~ (f(X_1) + ... + f(X_n)) / n
-
+        and eventually the half-width of the confidence interval.
         Returns
         -------
         float
@@ -98,35 +106,63 @@ class MonteCarlo:
 
         if n is None:
             n = self.n_simulations
-        return np.mean(function(self.samples[:n]), axis=0)
+        return np.mean(function(self.samples[:n]), axis=1)
 
-    def mean_estimator(self, n= None, confidence = 0.95):
-
-        """
-        Mean Estimator method.
-
-        Provides an estimation of the mean of a function of a given random variable with the Law of large numbers,
-                        E[f(X)] ~~ (f(X_1) + ... + f(X_n)) / n
-        with the half width of the associated confidence interval.
-
-        Returns
-        -------
-        tuple
-            (mean, half width)
-        """
+    def half_width(self, n=None, function = lambda x: x, confidence=0.95, type="normal"):
 
         if n is None:
             n = self.n_simulations
-        mean_est = self.estimate(n)
-        sd_estimate = np.std(self.samples[:n], axis=0)
 
-        #Quantile function of the standard normal distribution
-        z = norm.ppf(0.5 + confidence / 2)
-        half_width = z * sd_estimate / np.sqrt(n)
+        sd_estimate = self.std(n,function,correction=True)
 
-        return mean_est, half_width
+        if type == "normal":
+            #Quantile function of the standard normal distribution
+            z = norm.ppf(0.5 + confidence / 2)
 
-    def confidence_interval(self, n = None,confidence = 0.95):
+        elif type == "student":
+            # Quantile function of the Student distribution with n-1 degrees of freedom
+            z = t.ppf(0.5 + confidence / 2, df=n-1)
+        else:
+            raise ValueError(
+                "type must be 'normal' or 'student'."
+            )
+
+        hw = z * sd_estimate / np.sqrt(n)
+        return hw
+
+    def moments(self,n=None, order=1):
+        if n is None:
+            n = self.n_simulations
+        return self.estimate(n, lambda x: np.power(x, order))
+
+    def variance(self,n=None, function = lambda x: x, correction=True):
+
+        if n is None:
+            n = self.n_simulations
+
+        if not n > 1:
+            raise ValueError("n must be strictly greater than 1.")
+
+        var = self.estimate(n, lambda x : x**2) - (self.estimate(n, lambda x : x))**2
+        if correction:
+            return n*var/(n-1)
+        return var
+
+    def std(self,n=None, function = lambda x: x, correction=True):
+
+        return np.sqrt(self.variance(n,function,correction))
+
+    def standard_error(self, n = None, function = lambda x: x, confidence = 0.95):
+        if n is None:
+            n = self.n_simulations
+        return self.std(n,function)/np.sqrt(n)
+
+
+    ############################################
+    #    II.  CONFIDENCE INTERVALS & CURVES    #
+    ############################################
+
+    def confidence_interval(self, n = None, function = lambda x : x, confidence = 0.95,type="normal"):
 
         """
         Confidence Interval method.
@@ -142,10 +178,12 @@ class MonteCarlo:
         if n is None:
             n = self.n_simulations
 
-        mean_est, half_width = self.mean_estimator(n,confidence)
+        mean_est = self.estimate(n, function=function)
+        half_width = self.half_width(n,function=function,confidence=confidence,type=type)
+
         return mean_est - half_width, mean_est + half_width
 
-    def confidence_curve(self,n=None,confidence = 0.95):
+    def confidence_curve(self,n=None,function = lambda x : x, confidence = 0.95,type="normal",plot=True):
 
         """
         Confidence Curve method.
@@ -160,9 +198,9 @@ class MonteCarlo:
         n_axis = np.arange(1, n + 1)
 
         #Computation of the mean and variance of the estimator
-
-        S1 = np.cumsum(self.samples[:n])
-        S2 = np.cumsum(self.samples[:n] ** 2)
+        samples = function(self.samples)
+        S1 = np.cumsum(samples[:n])
+        S2 = np.cumsum(samples[:n] ** 2)
         cum_mean = S1 / n_axis
 
         #Ignore the division by zero when the number of samples is 1
@@ -172,22 +210,177 @@ class MonteCarlo:
         # Cumulative variance computation: replacing the NaN values by 0)
         cum_var = np.nan_to_num(cum_var, nan=0)
 
-        #Quantile function of the standard normal distribution
-        z = norm.ppf(0.5 + confidence / 2)
+        z = self.half_width(n,function=function,confidence=confidence,type=type)
         half_width = z * np.sqrt(cum_var) / np.sqrt(n_axis)
 
         # Plot the mean estimator curve and the confidence interval with polygons
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=np.concatenate([n_axis, n_axis[::-1]]),
-                                 y=np.concatenate([cum_mean + half_width, (cum_mean - half_width)[::-1]]),
-                                 fill="toself", fillcolor="rgba(100,149,237,0.2)",
-                                 line=dict(width=0), name=f"CI {int(confidence * 100)}%", showlegend=True,
-                                 ))
+        if plot:
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=np.concatenate([n_axis, n_axis[::-1]]),
+                                     y=np.concatenate([cum_mean + half_width, (cum_mean - half_width)[::-1]]),
+                                     fill="toself", fillcolor="rgba(100,149,237,0.2)",
+                                     line=dict(width=0), name=f"CI {int(confidence * 100)}%", showlegend=True,
+                                     ))
 
-        fig.add_trace(go.Scatter(x=n_axis,
-                                 y=cum_mean,
-                                 mode="lines",
-                                 name="Cumulative estimator"))
+            fig.add_trace(go.Scatter(x=n_axis,
+                                     y=cum_mean,
+                                     mode="lines",
+                                     name=f"Cumulative estimator with {type} law"))
+            fig.show()
+
+
+    ##################################
+    #    III.  STATISTICAL ERRORS    #
+    ##################################
+
+    def bias(self, reference, n=None, function = lambda x: x):
+        return self.estimate(n, function=function) - reference
+
+    def mse(self, reference, n=None, function = lambda x: x):
+
+        if n is None:
+            n = self.n_simulations
+
+        return self.estimate(n, function = lambda x : (reference - x)**2)
+
+    def rmse(self, reference, n=None, function = lambda x: x):
+
+        if n is None:
+            n = self.n_simulations
+
+        return np.sqrt(self.mse(reference,n,function))
+
+
+    ######################################
+    #    III.  DESCRIPTIVE STATISTICS    #
+    ######################################
+
+    def quantile(self, q, n=None, function = lambda x: x):
+
+        if n is None:
+            n = self.n_simulations
+
+        return np.quantile(function(self.samples[:n]),q, axis=1)
+
+    def min(self,n = None,function = lambda x: x):
+
+        if n is None:
+            n = self.n_simulations
+
+        return np.min(function(self.samples[:,:n]), axis=1)
+
+    def max(self,n = None, function = lambda x: x):
+
+        if n is None:
+            n = self.n_simulations
+
+        return np.max(function(self.samples[:,:n]), axis=1)
+
+    def median(self, n = None, function = lambda x: x):
+
+        if n is None:
+            n = self.n_simulations
+
+        return np.median(function(self.samples[:,:n]), axis=1)
+
+    def skewness(self,n=None, function = lambda x: x):
+
+        std = self.std(n, function, correction=True)
+        mean = self.estimate(n, function)
+
+        return self.estimate(n, lambda x : np.power((self.samples - mean) / std,3))
+
+    def kurtosis(self, n=None, function = lambda x: x):
+
+        std = self.std(n, function, correction=True)
+        mean = self.estimate(n, function)
+
+        return self.estimate(n, lambda x: np.power((self.samples - mean) / std, 4))
+
+
+    #################################
+    #    IV.  EMPIRICAL ANALYSIS    #
+    #################################
+
+    def histogram(self,n=None, function = lambda x: x, dim=0, bins = 10, normalized = True, plot = True, distribution = None):
+
+        if n is None:
+            n = self.n_simulations
+
+        # If the samples array contains samples from different simulations, we get the number of simulations.
+        size = self.samples.shape[0]
+        histograms = np.empty((size, bins))
+        bins_val = np.empty((size, bins+1))
+
+
+        for i in range(0,size):
+            histograms[i], bins_val[i] = np.histogram(function(self.samples[i,:n,dim]), bins=bins, density=normalized)
+
+        if plot:
+            fig = go.Figure()
+
+            for i in range(size):
+                fig.add_trace(go.Bar(x=(bins_val[i, :-1] + bins_val[i, 1:]) / 2,
+                                     y=histograms[i],
+                                     width=np.diff(bins_val[i]),
+                                     name=f"Sample pool {i}"))
+
+            fig.update_layout(
+                title=f"Distribution of samples values",
+                xaxis_title="Values",
+                yaxis_title="Frequency",
+                template="plotly_white",
+            )
+
+            if distribution != None :
+                t = np.linspace(bins_val[0,0],bins_val[0,-1], int(100*np.floor(bins_val[0,-1]-bins_val[0,0])))
+                fig.add_trace(go.Scatter(x=t,
+                                         y=distribution.pdf(t),
+                                         mode="lines",
+                                         line=dict(width=2),
+                                         name=f"Target PDF ({type(distribution).__name__})"))
+            fig.show()
+
+        return histograms
+
+    def ecdf(self,n=None, function = lambda x: x, dim=0, plot = True, distribution=None):
+
+        if n is None:
+            n = self.n_simulations
+
+        # If the samples array contains samples from different simulations, we get the number of simulations.
+        size = self.samples.shape[0]
+
+        min_val = np.min(self.min(n, function))
+        max_val = np.max(self.max(n, function))
+
+        fig = go.Figure()
+        for i in range(size):
+
+            x = np.sort(self.samples[i, :, dim])
+            f = np.arange(1, len(x) + 1) / len(x)
+            fig.add_trace(go.Scatter(x=x,
+                                     y=f,
+                                     mode="lines",
+                                     line=dict(width=2),
+                                     name=f"eCDE for sample pool {i}"))
+
+        fig.update_layout(
+            title=f"Empirical Cumulative Distribution Function",
+            xaxis_title="Time",
+            yaxis_title="Probability",
+            template="plotly_white",
+        )
+
+        if distribution != None:
+            t = np.linspace(min_val, max_val, int(1000 * np.floor(max_val - min_val)))
+            fig.add_trace(go.Scatter(x=t,
+                                     y=distribution.cdf(t),
+                                     mode="lines",
+                                     line=dict(width=2),
+                                     name=f"Target CDF ({type(distribution).__name__})"))
+
+
         fig.show()
 
 class MonteCarloProcess:
@@ -225,7 +418,7 @@ class MonteCarloProcess:
     >> mc.mean_path()
     """
 
-    def __init__(self,process,n_simulations=100, method=None):
+    def __init__(self,process,n_simulations=100, method="euler-maruyama"):
 
         self.process = process
         self.n_simulations = n_simulations
@@ -266,12 +459,10 @@ class MonteCarloProcess:
         if n is None:
             n = self.n_simulations
 
-        n = np.atleast_1d(n)
-
-        if n.any() <= 0:
+        if n <= 0:
             raise ValueError("n must be strictly positive.")
 
-        if n.any() > self.n_simulations:
+        if n > self.n_simulations:
 
             raise ValueError(
                 "n cannot be greater than the number of simulations."
@@ -283,16 +474,19 @@ class MonteCarloProcess:
         # The specified time might not be in the time interval of the process. In this case, the closest time is used.
         if t_0 not in self.t:
             t_index = np.argmin(np.abs(t_0 - self.t))
-
         else:
             t_index = np.where(self.t == t_0)[0][0]
 
-        ech = function(self.ech)
+        # Apply function to the process samples
+        samples = self.ech[:n, t_index]
 
-        means = np.zeros((np.size(n),self.dim))
-        means[::] = np.mean(ech[:,t_index],axis=0)
+        # Apply f to X(t_0)
+        samples = function(samples)
 
-        return means
+        # Monte Carlo estimate
+        means = np.mean(samples, axis=0)
+
+        return np.atleast_1d(means)
 
     def mean_path(self, plot_sim=True):
 
