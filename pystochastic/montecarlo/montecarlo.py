@@ -102,7 +102,7 @@ class MonteCarlo:
         """
 
         if n is None:
-            n = self.n_simulations
+            n = self.n_pool_values
         return np.mean(function(self.samples[:,:n]), axis=1)
 
     def half_width(self, n=None, function = lambda x: x, confidence=0.95, type="normal"):
@@ -284,6 +284,7 @@ class MonteCarlo:
 
     def confidence_interval(self, n = None, function = lambda x : x, confidence = 0.95,type="normal"):
 
+
         """
         Confidence Interval method.
 
@@ -296,7 +297,12 @@ class MonteCarlo:
         """
 
         if n is None:
-            n = self.n_simulations
+            n = self.n_pool_values
+
+        if n <= 1:
+            raise ValueError(
+                "n must be strictly greater than 1."
+            )
 
         mean_est = self.estimate(n, function=function)
         half_width = self.half_width(n,function=function,confidence=confidence,type=type)
@@ -439,7 +445,7 @@ class MonteCarlo:
         """
 
         if n is None:
-            n = self.n_simulations
+            n = self.n_pool_values
 
         return np.sqrt(self.mse(reference,n,function))
 
@@ -471,7 +477,7 @@ class MonteCarlo:
         """
 
         if n is None:
-            n = self.n_simulations
+            n = self.n_pool_values
 
         return np.quantile(function(self.samples[:,:n]),q, axis=1)
 
@@ -496,7 +502,7 @@ class MonteCarlo:
         """
 
         if n is None:
-            n = self.n_simulations
+            n = self.n_pool_values
 
         return np.min(function(self.samples[:,:n]), axis=1)
 
@@ -521,7 +527,7 @@ class MonteCarlo:
         """
 
         if n is None:
-            n = self.n_simulations
+            n = self.n_pool_values
 
         return np.max(function(self.samples[:,:n]), axis=1)
 
@@ -546,7 +552,7 @@ class MonteCarlo:
         """
 
         if n is None:
-            n = self.n_simulations
+            n = self.n_pool_values
 
         return np.median(function(self.samples[:,:n]), axis=1)
 
@@ -636,7 +642,7 @@ class MonteCarlo:
         """
 
         if n is None:
-            n = self.n_simulations
+            n = self.n_pool_values
 
         # If the samples array contains samples from different simulations, we get the number of simulations.
         size = self.samples.shape[0]
@@ -663,7 +669,7 @@ class MonteCarlo:
                 template="plotly_white",
             )
 
-            if distribution != None :
+            if distribution is not None :
                 t = np.linspace(bins_val[0,0],bins_val[0,-1], int(100*np.floor(bins_val[0,-1]-bins_val[0,0])))
                 fig.add_trace(go.Scatter(x=t,
                                          y=distribution.pdf(t),
@@ -702,7 +708,7 @@ class MonteCarlo:
             template="plotly_white",
         )
 
-        if distribution != None:
+        if distribution is not None:
             t = np.linspace(min_val, max_val, int(1000 * np.floor(max_val - min_val)))
             fig.add_trace(go.Scatter(x=t,
                                      y=distribution.cdf(t),

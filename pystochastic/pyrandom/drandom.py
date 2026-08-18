@@ -269,7 +269,7 @@ def hypergeometric(N=2,k=1,m=1,n=1):
     >> hypergeometric(N=12,k=6,m=3,n=10)
     """
 
-    if type(N) != int or N < 1:
+    if not isinstance(N, (int, np.integer)) or N < 1:
         raise ValueError(
             "The population size must be a strictly positive integer."
         )
@@ -279,7 +279,7 @@ def hypergeometric(N=2,k=1,m=1,n=1):
             "The number of success states in the considered population must be a positive integer."
         )
 
-    if type(k) != int or k < 0:
+    if not isinstance(k, (int, np.integer)) or k < 0:
         raise ValueError(
             "The number of draws must be a positive integer."
         )
