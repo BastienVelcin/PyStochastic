@@ -67,22 +67,11 @@ class MonteCarlo:
     >> mc.confidence_curve(confidence=0.90)
     """
 
-    def __init__(self,samples,n_simulations=None):
-        if n_simulations is None:
-            n_simulations = len(samples)
-
-        if n_simulations <= 1:
-            raise ValueError(
-                "n_simulations cannot be less than or equal to 1."
-            )
-
-        if n_simulations > len(samples):
-            raise ValueError(
-                "n_simulations cannot be greater than the number of samples provided."
-            )
+    def __init__(self,samples):
 
         self.samples = np.atleast_3d(samples)
-        self.n_simulations = n_simulations
+        self.n_simulations = self.samples.shape[0]
+        self.n_pool_values = self.samples.shape[1]
 
 
 
@@ -95,23 +84,56 @@ class MonteCarlo:
         """
         Estimate method.
 
-        Provides an estimation of the mean of a function of a given random variable with the Law of large numbers.
+        Provides an estimation of the mean of a function of samples from a random variable with the Law of large numbers.
                         E[f(X)] ~~ (f(X_1) + ... + f(X_n)) / n
         and eventually the half-width of the confidence interval.
+
+        Parameters
+        ----------
+        n : int
+            Number of considered samples from each sample pool. Must be a strictly positive integer.
+        function : function
+            Functional of the samples of which we want to estimate the mean E[f(X)].
+
         Returns
         -------
-        float
+        float or np.ndarray
             Estimation of the mean.
         """
 
         if n is None:
             n = self.n_simulations
-        return np.mean(function(self.samples[:n]), axis=1)
+        return np.mean(function(self.samples[:,:n]), axis=1)
 
     def half_width(self, n=None, function = lambda x: x, confidence=0.95, type="normal"):
 
+        """
+        Half Width method.
+
+        Provide the Half Width estimation of the confidence interval of specified confidence level. The half width can
+        be computed with two laws :
+            - Normal law : when the variance is known.
+            - Student law : when the variance is unknown.
+
+        Parameters
+        ----------
+        n : int
+            Number of considered samples from each sample pool. Must be a strictly positive integer.
+        function : function
+            Functional of the samples of which we want to estimate the half width for the mean estimator of E[f(X)].
+        confidence : float
+            Confidence level. Must be a float between 0 and 1.
+        type : {"normal", "student"}
+            Law used for the confidence interval.
+
+        Returns
+        -------
+        float or np.ndarray
+            Estimation of the half width.
+        """
+
         if n is None:
-            n = self.n_simulations
+            n = self.n_pool_values
 
         sd_estimate = self.std(n,function,correction=True)
 
@@ -122,6 +144,7 @@ class MonteCarlo:
         elif type == "student":
             # Quantile function of the Student distribution with n-1 degrees of freedom
             z = t.ppf(0.5 + confidence / 2, df=n-1)
+
         else:
             raise ValueError(
                 "type must be 'normal' or 'student'."
@@ -130,32 +153,129 @@ class MonteCarlo:
         hw = z * sd_estimate / np.sqrt(n)
         return hw
 
-    def moments(self,n=None, order=1):
+    def moment(self, order=1, n=None, function = lambda x: x):
+
+        """
+        Moment method.
+
+        Determines an estimation of a moment of a given order of a function of a samples from a random variable.
+        This methods does not check if the specified moment exists.
+
+        Parameters
+        ----------
+        order : int
+            Moment order. Must be a strictly positive integer.
+        n : int
+            Number of considered samples from each sample pool. Must be a strictly positive integer.
+        function : function
+            Functional of the samples of which we want to estimate the moment E[f(X)^order].
+
+        Returns
+        -------
+        float or np.ndarray
+            Estimation of the moment of specified order.
+        """
+
         if n is None:
-            n = self.n_simulations
-        return self.estimate(n, lambda x: np.power(x, order))
+            n = self.n_pool_values
+
+        return self.estimate(n, lambda x: np.power(function(x), order))
+
 
     def variance(self,n=None, function = lambda x: x, correction=True):
 
+        """
+        Variance method.
+
+        Provides an estimation of the variance of a function of samples from a random variable with the
+        Konig-Huygens formula :
+                                       Var(f(X)) = E(f(X)^2) - E(f(X))^2
+        Both corrected and uncorrected variance can be computed with this method.
+
+        Parameters
+        ----------
+        n : int
+            Number of considered samples from each sample pool. Must be a strictly positive integer.
+        function : function
+            Functional of the samples of which we want to estimate the variance Var[f(X)].
+        correction : bool
+            Specify if the Bessel's correction should be applied to the variance.
+
+        Returns
+        -------
+        float or np.ndarray
+            Estimation of the variance.
+        """
+
         if n is None:
-            n = self.n_simulations
+            n = self.n_pool_values
 
         if not n > 1:
-            raise ValueError("n must be strictly greater than 1.")
+            raise ValueError(
+                "n must be strictly greater than 1."
+            )
 
-        var = self.estimate(n, lambda x : x**2) - (self.estimate(n, lambda x : x))**2
+        var = self.estimate(n, lambda x : function(x)**2) - (self.estimate(n, lambda x : function(x)))**2
+
         if correction:
             return n*var/(n-1)
+
         return var
 
     def std(self,n=None, function = lambda x: x, correction=True):
 
+        """
+        Standard Deviation method.
+
+        Provides an estimation of standard deviation from the variance estimation :
+                                std(f(X)) = sqrt(Var(f(X)))
+        Both corrected and uncorrected variance can be used to compute the standard deviation.
+
+        Parameters
+        ----------
+        n : int
+            Number of considered samples from each sample pool. Must be a strictly positive integer.
+        function : function
+            Functional of the samples of which we want to estimate the standard deviation std[f(X)].
+        correction : bool
+            Specify if the Bessel's correction should be applied to the variance.
+
+        Returns
+        -------
+        float or np.ndarray
+            Estimation of the standard deviation.
+        """
+
         return np.sqrt(self.variance(n,function,correction))
 
-    def standard_error(self, n = None, function = lambda x: x, confidence = 0.95):
+    def standard_error(self, n = None, function = lambda x: x, correction = True):
+
+        """
+        Standard Error method.
+
+        Provides an estimation of standard error from the standard deviation estimation :
+                                ste[f(X)] = std[f(X)] / sqrt(n)
+        Both corrected and uncorrected standard deviation can be used to compute the standard error.
+
+        Parameters
+        ----------
+        n : int
+            Number of considered samples from each sample pool. Must be a strictly positive integer.
+        function : function
+            Functional of the samples of which we want to estimate the standard error sde[f(X)].
+        correction : bool
+            Specify if the Bessel's correction should be applied to the standard deviation.
+
+        Returns
+        -------
+        float or np.ndarray
+            Estimation of the standard error.
+        """
+
         if n is None:
-            n = self.n_simulations
-        return self.std(n,function)/np.sqrt(n)
+            n = self.n_pool_values
+
+        return self.std(n,function,correction)/np.sqrt(n)
 
 
     ############################################
@@ -183,7 +303,7 @@ class MonteCarlo:
 
         return mean_est - half_width, mean_est + half_width
 
-    def confidence_curve(self,n=None,function = lambda x : x, confidence = 0.95,type="normal",plot=True):
+    def confidence_curve(self,n=None,n_pool = 0,function = lambda x : x, confidence = 0.95,type="normal"):
 
         """
         Confidence Curve method.
@@ -193,57 +313,130 @@ class MonteCarlo:
         """
 
         if n is None:
-            n = self.n_simulations
+            n = self.n_pool_values
 
         n_axis = np.arange(1, n + 1)
 
-        #Computation of the mean and variance of the estimator
-        samples = function(self.samples)
+        # Computation of the mean and variance of the estimator
+        samples = function(self.samples[n_pool])
         S1 = np.cumsum(samples[:n])
         S2 = np.cumsum(samples[:n] ** 2)
         cum_mean = S1 / n_axis
 
-        #Ignore the division by zero when the number of samples is 1
+        # Ignore the division by zero when the number of samples is 1
         with np.errstate(invalid="ignore", divide="ignore"):
             cum_var = (S2 - S1 ** 2 / n_axis) / (n_axis - 1)
 
         # Cumulative variance computation: replacing the NaN values by 0)
         cum_var = np.nan_to_num(cum_var, nan=0)
 
-        z = self.half_width(n,function=function,confidence=confidence,type=type)
-        half_width = z * np.sqrt(cum_var) / np.sqrt(n_axis)
+        if type == "normal":
+            q = norm.ppf(0.5 + confidence / 2)
+
+        elif type == "student":
+            q = t.ppf(0.5 + confidence / 2, df=n_axis - 1)
+
+        half_width = q * np.sqrt(cum_var) / np.sqrt(n_axis)
 
         # Plot the mean estimator curve and the confidence interval with polygons
-        if plot:
-            fig = go.Figure()
-            fig.add_trace(go.Scatter(x=np.concatenate([n_axis, n_axis[::-1]]),
-                                     y=np.concatenate([cum_mean + half_width, (cum_mean - half_width)[::-1]]),
-                                     fill="toself", fillcolor="rgba(100,149,237,0.2)",
-                                     line=dict(width=0), name=f"CI {int(confidence * 100)}%", showlegend=True,
-                                     ))
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=np.concatenate([n_axis, n_axis[::-1]]),
+                                 y=np.concatenate([cum_mean + half_width, (cum_mean - half_width)[::-1]]),
+                                 fill="toself", fillcolor="rgba(100,149,237,0.2)",
+                                 line=dict(width=0),
+                                 name=f"CI {int(confidence * 100)}%",
+                                 showlegend=True,))
 
-            fig.add_trace(go.Scatter(x=n_axis,
-                                     y=cum_mean,
-                                     mode="lines",
-                                     name=f"Cumulative estimator with {type} law"))
-            fig.show()
+        fig.add_trace(go.Scatter(x=n_axis,
+                                 y=cum_mean,
+                                 mode="lines",
+                                 name=f"Cumulative estimator with {type} law"))
 
+        fig.update_layout(
+            title=f"Confidence curve with sample pool {n_pool}.",
+            xaxis_title="Number of samples",
+            yaxis_title="Estimation",
+            template="plotly_white",
+        )
+
+        fig.show()
 
     ##################################
     #    III.  STATISTICAL ERRORS    #
     ##################################
 
     def bias(self, reference, n=None, function = lambda x: x):
+
+        """
+        Bias method
+
+        Provides the bias of the likelihood estimator of E[f(X)] when E[f(X)] is known.
+
+        Parameters
+        ----------
+        reference :
+            Known estimated value.
+        n : int
+            Number of considered samples from each sample pool. Must be a strictly positive integer.
+        function : function
+            Functional of the samples of which we want to estimate the bias of E[f(X)].
+
+        Returns
+        -------
+        float or np.ndarray
+            Bias of the likelihood estimator.
+        """
+
         return self.estimate(n, function=function) - reference
 
     def mse(self, reference, n=None, function = lambda x: x):
 
-        if n is None:
-            n = self.n_simulations
+        """
+        MSE method
 
-        return self.estimate(n, function = lambda x : (reference - x)**2)
+        Provides the mean squared error of the likelihood estimator of E[f(X)] when E[f(X)] is known.
+
+        Parameters
+        ----------
+        reference :
+            Known estimated value.
+        n : int
+            Number of considered samples from each sample pool. Must be a strictly positive integer.
+        function : function
+            Functional of the samples of which we want to compute the MSE.
+
+        Returns
+        -------
+        float or np.ndarray
+            Bias of the likelihood estimator.
+        """
+
+        if n is None:
+            n = self.n_pool_values
+
+        return self.estimate(n, function = lambda x : (reference - function(x))**2)
 
     def rmse(self, reference, n=None, function = lambda x: x):
+
+        """
+        RMSE method
+
+        Provides the root mean squared error of the likelihood estimator of E[f(X)] when E[f(X)] is known.
+
+        Parameters
+        ----------
+        reference :
+            Known estimated value.
+        n : int
+            Number of considered samples from each sample pool. Must be a strictly positive integer.
+        function : function
+            Functional of the samples of which we want to compute the RMSE.
+
+        Returns
+        -------
+        float or np.ndarray
+            Bias of the likelihood estimator.
+        """
 
         if n is None:
             n = self.n_simulations
@@ -257,12 +450,50 @@ class MonteCarlo:
 
     def quantile(self, q, n=None, function = lambda x: x):
 
+        """
+        Quantile method
+
+        Provides the quantile of order q of a specified array of values.
+
+        Parameters
+        ----------
+        q : float
+            Quantile. Must be a float between 0 and 1.
+        n : int
+            Number of considered samples from each sample pool. Must be a strictly positive integer.
+        function : function
+            Functional of the samples of which we want to search the quantile.
+
+        Returns
+        -------
+        float or np.ndarray
+            Quantile of order q.
+        """
+
         if n is None:
             n = self.n_simulations
 
-        return np.quantile(function(self.samples[:n]),q, axis=1)
+        return np.quantile(function(self.samples[:,:n]),q, axis=1)
 
     def min(self,n = None,function = lambda x: x):
+
+        """
+        Min method
+
+        Provides the minimum value from samples.
+
+        Parameters
+        ----------
+        n : int
+            Number of considered samples from each sample pool. Must be a strictly positive integer.
+        function : function
+            Functional of the samples of which we want to search the minimum value.
+
+        Returns
+        -------
+        float or np.ndarray
+            Minimum value(s).
+        """
 
         if n is None:
             n = self.n_simulations
@@ -271,12 +502,48 @@ class MonteCarlo:
 
     def max(self,n = None, function = lambda x: x):
 
+        """
+        Max method
+
+        Provides the maximum value from samples.
+
+        Parameters
+        ----------
+        n : int
+            Number of considered samples from each sample pool. Must be a strictly positive integer.
+        function : function
+            Functional of the samples of which we want to search the maximum value.
+
+        Returns
+        -------
+        float or np.ndarray
+            Maximum value(s).
+        """
+
         if n is None:
             n = self.n_simulations
 
         return np.max(function(self.samples[:,:n]), axis=1)
 
     def median(self, n = None, function = lambda x: x):
+
+        """
+        Median method
+
+        Provides the median value from samples.
+
+        Parameters
+        ----------
+        n : int
+            Number of considered samples from each sample pool. Must be a strictly positive integer.
+        function : function
+            Functional of the samples of which we want to search the median value.
+
+        Returns
+        -------
+        float or np.ndarray
+            Median value(s).
+        """
 
         if n is None:
             n = self.n_simulations
@@ -285,12 +552,48 @@ class MonteCarlo:
 
     def skewness(self,n=None, function = lambda x: x):
 
+        """
+        Skewness method
+
+        Provides the skewness coefficient from samples.
+
+        Parameters
+        ----------
+        n : int
+            Number of considered samples from each sample pool. Must be a strictly positive integer.
+        function : function
+            Functional of the samples of which we want to search the skewness coefficient.
+
+        Returns
+        -------
+        float or np.ndarray
+            Skewness coefficient(s).
+        """
+
         std = self.std(n, function, correction=True)
         mean = self.estimate(n, function)
 
         return self.estimate(n, lambda x : np.power((self.samples - mean) / std,3))
 
     def kurtosis(self, n=None, function = lambda x: x):
+
+        """
+        Kurtosis method
+
+        Provides the unormalized kurtosis coefficient from samples.
+
+        Parameters
+        ----------
+        n : int
+            Number of considered samples from each sample pool. Must be a strictly positive integer.
+        function : function
+            Functional of the samples of which we want to search the unormalized kurtosis coefficient.
+
+        Returns
+        -------
+        float or np.ndarray
+            Unormalized kurtosis coefficient(s).
+        """
 
         std = self.std(n, function, correction=True)
         mean = self.estimate(n, function)
@@ -303,6 +606,34 @@ class MonteCarlo:
     #################################
 
     def histogram(self,n=None, function = lambda x: x, dim=0, bins = 10, normalized = True, plot = True, distribution = None):
+
+        """
+        Histogram method
+
+        Plot an histogram of samples values.
+
+        Parameters
+        ----------
+        n : int
+            Number of considered samples from each sample pool. Must be a strictly positive integer.
+        function : function
+            Functional of the samples of which we want to plot the histogram.
+        dim: int
+            Considered and plotted dimension of the samples. Must be a positive integer.
+        bins: int
+            Number of bars in the histogram. Must be a strictly positive integer.
+        normalized: bool
+            Specify if the histogram should be normalized, so it can provides an estimation of the probability density function.
+        plot: bool
+            Specify if the histogram should be plotted.
+        distribution: Distribution
+            Distribution of which we want to plot the PDF.
+
+        Returns
+        -------
+        np.ndarray
+            Histogram of samples values.
+        """
 
         if n is None:
             n = self.n_simulations
@@ -346,7 +677,7 @@ class MonteCarlo:
     def ecdf(self,n=None, function = lambda x: x, dim=0, plot = True, distribution=None):
 
         if n is None:
-            n = self.n_simulations
+            n = self.n_pool_values
 
         # If the samples array contains samples from different simulations, we get the number of simulations.
         size = self.samples.shape[0]
@@ -364,7 +695,6 @@ class MonteCarlo:
                                      mode="lines",
                                      line=dict(width=2),
                                      name=f"eCDE for sample pool {i}"))
-
         fig.update_layout(
             title=f"Empirical Cumulative Distribution Function",
             xaxis_title="Time",
