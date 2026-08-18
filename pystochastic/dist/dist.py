@@ -30,9 +30,9 @@ This module provides a general class "DiscreteDistribution" for discrete distrib
 From this general class, we introduce various subclasses for each implemented probability distribution.
 The available distributions are :
 
-    CONTINUOUS DISTRIBUTIONS                                      DISCRETE DISTRIBUTIONS
-    - Continuous-Time Uniform                                     - Discrete-Time Uniform
-    - Exponential                                                 -
+    CONTINUOUS DISTRIBUTIONS
+    - Continuous-Time Uniform
+    - Exponential
     - Normal
     - Gamma
     - Beta
@@ -44,6 +44,17 @@ The available distributions are :
     - Fisher
     - Pareto
     - Rayleigh
+
+    DISCRETE DISTRIBUTIONS
+    - Discrete-Time Uniform
+    - Bernouilli
+    - Rademacher
+    - Binomial
+    - Poisson
+    - Hypergeometric
+    - Geometric
+    - Negative Binomial
+    - Yule Simon
 
 Examples
 --------
@@ -1900,10 +1911,10 @@ class Poisson(DiscreteDistribution):
     def support(self):
         return "N"
 
-class HyperGeometric(DiscreteDistribution):
+class Hypergeometric(DiscreteDistribution):
 
     """
-    HyperGeometric probability distribution.
+    Hypergeometric probability distribution.
 
     The Hypergeometric distribution is parameterized by a the population size ''N'', a number
     of successes ''m'' and a number of draws ''k''.
