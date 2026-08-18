@@ -674,7 +674,7 @@ class MonteCarlo:
 
         return histograms
 
-    def ecdf(self,n=None, function = lambda x: x, dim=0, plot = True, distribution=None):
+    def ecdf(self,n=None, function = lambda x: x, dim=0, distribution=None):
 
         if n is None:
             n = self.n_pool_values
@@ -697,7 +697,7 @@ class MonteCarlo:
                                      name=f"eCDE for sample pool {i}"))
         fig.update_layout(
             title=f"Empirical Cumulative Distribution Function",
-            xaxis_title="Time",
+            xaxis_title="Values",
             yaxis_title="Probability",
             template="plotly_white",
         )
