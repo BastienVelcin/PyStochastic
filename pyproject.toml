@@ -18,7 +18,6 @@ dependencies = [
     "scipy",
     "plotly",
     "sympy",
-    "pytest"
 ]
 
 [tool.setuptools.packages.find]
