@@ -1,11 +1,7 @@
-[build-system]
-requires = ["setuptools>=61"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "pystochastic"
 version = "0.2.0"
-description = "A Python library for stochastic processes and Monte Carlo simulation"
+description = "A Python library for probability, stochastic calculus and modelling, stochastic differential equations, and Monte Carlo simulation"
 readme = "README.md"
 requires-python = ">=3.10"
 
@@ -13,12 +9,34 @@ authors = [
     {name = "Bastien Velcin"}
 ]
 
+license = {file = "LICENSE"}
+
 dependencies = [
     "numpy",
     "scipy",
     "plotly",
-    "sympy",
+    "sympy"
 ]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+
+[project.urls]
+Homepage = "https://github.com/BastienVelcin/PyStochastic"
+Repository = "https://github.com/BastienVelcin/PyStochastic"
+Issues = "https://github.com/BastienVelcin/PyStochastic/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
