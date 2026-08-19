@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: pystochastic
-Version: 0.1.0
+Version: 0.2.0
 Summary: A Python library for stochastic processes and Monte Carlo simulation
 Author: Bastien Velcin
 Requires-Python: >=3.10
@@ -173,7 +173,7 @@ X.plot_cdf()
 
 ### `pystochastic.pyrandom`
 
-`pyrandom` provides the random number generation layer used by the rest of the library.
+`test_pyrandom.py` provides the random number generation layer used by the rest of the library.
 
 The goal is to keep random sampling separated from the mathematical description of probability distributions and stochastic processes.
 
@@ -201,7 +201,6 @@ from pystochastic.processes import Brownian
 
 brownian = Brownian(
     var=1,
-    dim=1,
     t_0=0,
     t_n=1,
     n_steps=1000
@@ -233,7 +232,7 @@ path = brownian.simulate()
 
 ### `pystochastic.sde`
 
-The `sde` module contains numerical methods for solving stochastic differential equations.
+The `test_sde.py` module contains numerical methods for solving stochastic differential equations.
 
 The general SDE considered is
 
