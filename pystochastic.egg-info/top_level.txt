@@ -1,2 +1,6 @@
+benchmarks
+dist
+examples
 pystochastic
+release_test
 tests
