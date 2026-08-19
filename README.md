@@ -158,7 +158,7 @@ X.plot_cdf()
 
 ### `pystochastic.pyrandom`
 
-`pyrandom` provides the random number generation layer used by the rest of the library.
+`test_pyrandom.py` provides the random number generation layer used by the rest of the library.
 
 The goal is to keep random sampling separated from the mathematical description of probability distributions and stochastic processes.
 
@@ -217,7 +217,7 @@ path = brownian.simulate()
 
 ### `pystochastic.sde`
 
-The `sde` module contains numerical methods for solving stochastic differential equations.
+The `test_sde.py` module contains numerical methods for solving stochastic differential equations.
 
 The general SDE considered is
 
