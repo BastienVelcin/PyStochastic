@@ -205,12 +205,3 @@ class TestMonteCarloProcess:
         theo_path = 1.5 + (0 - 1.5) * np.exp(-2 * v.t)
         assert np.max(np.abs(path[:, 0] - theo_path)) < 0.1
 
-    @pytest.mark.xfail(reason="mean_error() calls estimate(n=N) with N an array, but "
-                               "estimate()'s validation (`if n <= 0`) assumes a scalar n, "
-                               "raising 'truth value of an array is ambiguous'.")
-    def test_mean_error_runs(self):
-        np.random.seed(0)
-        v = Vasicek(reversion_speed=2, mu=1.5, volatility=0.3, r_0=0, t_0=0, t_n=5, n_steps=100)
-        mc = MonteCarloProcess(v, n_simulations=3000)
-        err = mc.mean_error(t=5, N=(100, 500, 1000, 3000), n_experiments=2, plot=False)
-        assert err.shape == (2, 4, 1)

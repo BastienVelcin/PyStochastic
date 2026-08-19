@@ -10,6 +10,8 @@ This module provides a set of classes to work with probability distributions.
 This module provides a general class "Distribution" for continuous distributions, which yields to general methods :
     - .pdf() : Probability density function, which can be evaluated at any point with an optional argument
     - .cdf() : Cumulative distribution function, which can be evaluated at any point with an optional argument
+    - .plot_pdf() : Plot the probability density function of the distribution
+    - .plot_cdf() : Plot the cumulative distribution function of the distribution
     - .sample() : Sample from the distribution
     - .mean() : Mean of the distribution
     - .variance() : Variance of the distribution
@@ -20,6 +22,8 @@ This module provides a general class "Distribution" for continuous distributions
 This module provides a general class "DiscreteDistribution" for discrete distributions, which yields to general methods :
     - .pmf() : Probability mass function, which can be evaluated at any integer point with an optional argument
     - .cdf() : Cumulative distribution function, which can be evaluated at any point with an optional argument
+    - .plot_pmf() : Plot the probability mass function of the distribution
+    - .plot_cdf() : Plot the cumulative distribution function of the distribution
     - .sample() : Sample from the distribution
     - .mean() : Mean of the distribution
     - .variance() : Variance of the distribution
@@ -47,7 +51,7 @@ The available distributions are :
 
     DISCRETE DISTRIBUTIONS
     - Discrete-Time Uniform
-    - Bernouilli
+    - Bernoulli
     - Rademacher
     - Binomial
     - Poisson
@@ -215,7 +219,7 @@ class Distribution(ABC):
 
         supp = self.support()
         mu = self.mean() if callable(self.mean) else 0
-        sd = np.sqrt(self.variance()) if callable(self.variance) else 1
+        sd = np.sqrt(self.variance()) if (callable(self.variance) or self.variance is not None) else 1
 
         lo_bound = supp[0] if supp[0] > -np.inf else mu - 8 * sd
         up_bound = supp[1] if supp[1] < np.inf else mu + 8 * sd
@@ -1735,7 +1739,7 @@ class Rademacher(DiscreteDistribution):
         return 2*self.p - 1
 
     def variance(self):
-        return 0
+        return 1
 
     def entropy(self):
         return -self.q*np.log(self.q) - self.p*np.log(self.p)
@@ -1815,10 +1819,10 @@ class Binomial(DiscreteDistribution):
             print(f"| IncBeta({self.q}, {self.n} - floor(x), 1 + floor(x) ) if 0 <= x < n")
             print(f"| 1 for x >= n")
         else:
-            if 0 <= x < self.n:
-                return scipy.special.betainc(self.n-np.floor(x), 1+np.floor(x), self.q)*scipy.special.beta(self.n-np.floor(x), 1+np.floor(x))
+            if 0 <= x:
+                return scipy.special.betainc(self.n-np.floor(x), 1+np.floor(x), self.q)
             else:
-                return 0
+                return 1 if x >= self.n else 0
 
     def sample(self, n=1):
         return drandom.binomial(self.p,self.n,n)
@@ -1895,6 +1899,7 @@ class Poisson(DiscreteDistribution):
         else:
             if x >= 0:
                 return scipy.special.gammaincc(np.floor(x)+1,self.lam)
+            return 0
 
     def sample(self, n=1):
         return drandom.poisson(self.lam,n)
@@ -2135,7 +2140,7 @@ class NegativeBinomial(DiscreteDistribution):
                 "The success probability must be between 0 and 1."
             )
 
-        if type(k) != int or k < 1:
+        if type(n) != int or n < 1:
             raise ValueError(
                 "The number of target success occurrence must be a strictly positive integer."
             )
@@ -2170,7 +2175,7 @@ class NegativeBinomial(DiscreteDistribution):
 
         else:
             if x >= 1:
-                return scipy.special.gammainc(p,self.n,np.floor(x)+1)
+                return scipy.special.betainc(self.n,np.floor(x)+1,self.p)
             else:
                 return 0
 

@@ -72,7 +72,7 @@ class MonteCarlo:
         self.samples = np.atleast_3d(samples)
         self.n_simulations = self.samples.shape[0]
         self.n_pool_values = self.samples.shape[1]
-
+        self.dim = self.samples.shape[2]
 
 
     ##################################

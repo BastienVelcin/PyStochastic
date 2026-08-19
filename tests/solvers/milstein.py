@@ -184,63 +184,115 @@ def strong_convergence_order():
 
 
 
-def weak_error(
+def monte_carlo_convergence(
     process,
-    n_steps=[100, 500, 1000, 2000, 3000, 4000, 5000],
-    n_simulations=100000
+    n_simulations=np.array([100, 1000, 10_000, 100_000]),
+    n_experiments=30,
 ):
+    """
+    Test the Monte Carlo convergence rate.
 
-    n_steps = np.array(n_steps, dtype=int)
+    The theoretical Monte Carlo error is expected to behave as
 
+        RMSE ~ N^(-1/2)
+
+    where N is the number of simulations.
+    """
+
+    n_simulations = np.asarray(n_simulations, dtype=int)
+
+    # Exact theoretical expectation
     t = process.t_n
-    exact_mean = process.mean(t)
+    exact_mean = np.asarray(process.mean(t)).item()
 
-    approx_mean = np.zeros(n_steps.size)
+    mc_rmse = np.zeros(n_simulations.size)
 
-    for i, steps in enumerate(n_steps):
+    for i, n in enumerate(n_simulations):
 
-        process.n_steps = int(steps)
+        errors = np.zeros(n_experiments)
 
-        process.t = np.linspace(
-            process.t_0,
-            process.t_n,
-            steps + 1
+        for j in range(n_experiments):
+
+            # Different Monte Carlo experiment each time
+            seed(None)
+
+            mc = MonteCarloProcess(
+                process,
+                n_simulations=int(n),
+                method="milstein"
+            )
+
+            mean = mc.estimate(
+                function=lambda x: x,
+                t_0=t,
+                n=int(n)
+            )
+
+            mean = np.asarray(mean).item()
+
+            errors[j] = mean - exact_mean
+
+        # RMSE over the independent Monte Carlo experiments
+        mc_rmse[i] = np.sqrt(
+            np.mean(errors ** 2)
         )
-
-        process.dt = (
-            process.t[-1] - process.t[0]
-        ) / steps
-        mc = MonteCarloProcess(
-            process,
-            n_simulations=n_simulations,
-            method="milstein"
-        )
-
-        mean = mc.estimate(
-            function=lambda x: x[:, 0],
-            t_0=t,
-            n=n_simulations
-        )
-
-        approx_mean[i] = mean.item()
 
         print(
-            f"N={steps:5d} | "
-            f"mean={approx_mean[i]:.8e} | "
-            f"error={abs(approx_mean[i] - exact_mean)}"
+            f"N = {n:7d} | "
+            f"MC RMSE = {mc_rmse[i]:.8e}"
         )
 
-    weak_err = np.abs(approx_mean - exact_mean)
+    # Estimate convergence order
+    p = np.polyfit(
+        np.log(n_simulations),
+        np.log(mc_rmse),
+        1
+    )[0]
 
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=n_steps, y=weak_err, mode="lines+markers", name="Weak error"))
-    fig.update_layout(
-        title=f"{type(process).__name__} — Weak error (Milstein)",
-        xaxis_title="N", yaxis_title="|E[f(X_T)] estime - theorique|",
-        xaxis_type="log", yaxis_type="log",
+    estimated_order = -p
+
+    print()
+    print(
+        f"Estimated Monte Carlo order: "
+        f"{estimated_order:.4f}"
     )
+
+    # Theoretical N^(-1/2) reference
+    reference = (
+        mc_rmse[0]
+        * (n_simulations / n_simulations[0]) ** (-0.5)
+    )
+
+    # Plot
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Scatter(
+            x=n_simulations,
+            y=mc_rmse,
+            mode="lines+markers",
+            name="Monte Carlo RMSE"
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=n_simulations,
+            y=reference,
+            mode="lines",
+            name=r"$N^{-1/2}$ reference"
+        )
+    )
+
+    fig.update_layout(
+        title=f"{type(process).__name__} — Monte Carlo convergence",
+        xaxis_title="Number of simulations",
+        yaxis_title="Monte Carlo RMSE",
+        xaxis_type="log",
+        yaxis_type="log",
+    )
+
     fig.show()
 
-    p = np.polyfit(np.log(n_steps), np.log(weak_err), 1)[0]
-    print(f"Estimated weak order: {-p}")
-    return weak_err
+    return mc_rmse, estimated_order
+
