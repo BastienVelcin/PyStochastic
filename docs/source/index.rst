@@ -6,15 +6,11 @@
 PyStochastic documentation
 ==========================
 
-
+Welcome to the PyStochastic documentation!
 
 .. toctree::
-   :maxdepth: 3
-   :caption: Probability Distributions
+   :maxdepth: 2
+   :caption: Contents
 
+   getting_started
    dist/index
-   dist/ContinuousDistribution
-   dist/continuous/uniform
-   dist/continuous/exponential
-   dist/continuous/normal
-   dist/continuous/gamma

@@ -3,6 +3,20 @@
 The dist module provides a set of classic discrete and continuous probability distributions, with
 a common interface. This page explores all the distributions available and their properties.
 
+```{toctree}
+:maxdepth: 2
+:caption: Distribution module
+
+ContinuousDistribution
+:maxdepth: 1
+:caption: Continuous distributions
+
+continuous/exponential
+continuous/gamma
+continuous/normal
+continuous/uniform
+```
+
 ## Import line
 You can import all the distributions listed in the `dist` module as follows:
 ```python

@@ -25,7 +25,7 @@ f(x) = \frac{\theta^k}{\Gamma(k)} x^{k-1}e^{-\theta x}.
 `k` : _float_
 : Shape parameter of the gamma distribution. Must be strictly positive.
 
-`sd` : _float_
+`theta` : _float_
 : Rate parameter of the gamma distribution. Must be strictly positive.
 
 ### Methods
