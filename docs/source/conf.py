@@ -37,7 +37,6 @@ myst_enable_extensions = [
     "gfm_autolink",
     "html_admonition",
     "html_image",
-    "linkify",
     "replacements",
     "smartquotes",
     "strikethrough",
