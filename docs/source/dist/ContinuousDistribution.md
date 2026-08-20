@@ -16,7 +16,11 @@ The `ContinuousDistribution` class has no attributes.
 
 ## Methods
 
-#### pdf(x = None)
+#### pdf()
+
+```python
+.pdf(x=None)
+```
 
 The `pdf` method returns the probability density function of the distribution. If no argument is provided,
 the method prints the probability density function. Otherwise, if the parameter `x` is provided,
@@ -35,7 +39,11 @@ _np.ndarray_
 
 ___
 
-####cdf(x = None)
+#### cdf(x = None)
+
+```python
+.cdf(x = None)
+```
 
 The `cdf` method returns the cumulative distribution function of the distribution. If no argument is provided,
 the method prints the cumulative distribution function. Otherwise, if the parameter `x` is provided,
@@ -56,6 +64,10 @@ ___
 
 #### plot_pdf()
 
+```python
+.plot_pdf()
+```
+
 The `plot_pdf` method plots the probability density function of the distribution. The plotting
 is done using the `plotly` library.
 
@@ -70,6 +82,10 @@ ___
 
 #### plot_cdf()
 
+```python
+.plot_cdf()
+```
+
 The `plot_pdf` method plots the cumulative distribution function of the distribution. The plotting
 is done using the `plotly` library.
 
@@ -82,8 +98,10 @@ No parameters.
 No return value.
 ___
 
-#### samples(n = 1)
-
+#### samples()
+```python
+.samples(n = 1)
+```
 The `samples` method returns `n` samples from the current distribution. By default, the number of samples is set to 1.
 
 **Parameters**
@@ -91,7 +109,7 @@ The `samples` method returns `n` samples from the current distribution. By defau
 `n` : _int_ or _np.integer_
 : Number of desired samples. If `n` is not provided, the method returns 1 sample.
 
-**Returns**
+##### **Returns**
 
 _np.ndarray_
 : Array of `n` samples from the current distribution.
