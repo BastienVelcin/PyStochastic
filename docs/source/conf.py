@@ -11,7 +11,7 @@ import sys
 sys.path.insert(0, os.path.abspath("../.."))
 
 project = 'PyStochastic'
-copyright = '2026 - Bastien Velcin'
+copyright = '2026, Bastien Velcin'
 author = 'Bastien Velcin'
 release = '0.2.0'
 
