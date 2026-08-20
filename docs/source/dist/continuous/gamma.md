@@ -15,8 +15,10 @@ pystochastic.dist.Gamma(k = 1, theta = 1)
 
 Create an instance of the Gamma distribution. A gamma distribution is a continuous probability distribution used to model econometrics or insurance problems. 
 
+The probability density function of the Gamma distribution is given by:
+
 \begin{equation*}
-f(x) = \frac{\theta^k}{\Gamma(k)} x^{k-1}e^{-\theta x}.
+f(x) = \frac{\theta^k}{\Gamma(k)} x^{k-1}e^{-\theta x}\chi_{\mathbb{R}_+}(x).
 \end{equation*}
 
 

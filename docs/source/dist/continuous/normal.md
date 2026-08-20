@@ -14,6 +14,7 @@ pystochastic.dist.Normal(mu = 0, sd = 1)
 **Type :** Class
 
 Create an instance of the Normal distribution. A normal distribution is a continuous probability distribution used to model random natural phenomena.
+
 The probability density function of the Normal distribution is given by:
 
 \begin{equation*}

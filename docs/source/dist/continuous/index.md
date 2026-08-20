@@ -1,5 +1,14 @@
 # Continuous Distribution class
 
+```{toctree}
+:maxdepth: 1
+
+exponential
+gamma
+normal
+uniform
+```
+
 The `ContinuousDistribution` class provides the common
 interface for continuous probability distributions in PyStochastic.
 
