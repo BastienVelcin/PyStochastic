@@ -530,7 +530,7 @@ class Gamma(Distribution):
 
         if k <=0:
             raise ValueError(
-                "The form parameter should be greater than 0."
+                "The shape parameter should be greater than 0."
             )
 
         if theta <=0:

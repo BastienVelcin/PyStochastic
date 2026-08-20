@@ -16,3 +16,5 @@ PyStochastic documentation
    dist/ContinuousDistribution
    dist/continuous/uniform
    dist/continuous/exponential
+   dist/continuous/normal
+   dist/continuous/gamma

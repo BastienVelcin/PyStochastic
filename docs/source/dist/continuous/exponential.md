@@ -9,7 +9,7 @@ from pystochastic.dist.dist import Exponential
 
 ## Description
 ```{py:class} 
-pystochastic.dist.Exponential(alpha=2)
+pystochastic.dist.Exponential(alpha = 2)
 ```
 **Type :** Class
 
@@ -18,7 +18,7 @@ Create an instance of the Exponential distribution. An exponential distribution 
 The probability density function of the Exponential distribution is given by:
 
 \begin{equation*}
-f(x) = \alpha e^{-\alpha x}\chi_{\mathbb{R}_+}(x)
+f(x) = \alpha e^{-\alpha x}\chi_{\mathbb{R}_+}(x).
 \end{equation*}
 
 > [!NOTE]

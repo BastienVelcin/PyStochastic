@@ -9,7 +9,7 @@ from pystochastic.dist.dist import Uniform
 
 ## Description
 ```{py:class} 
-pystochastic.dist.Uniform(a=0, b=1)
+pystochastic.dist.Uniform(a = 0, b = 1)
 ```
 **Type :** Class
 
@@ -19,7 +19,7 @@ where a and b are real numbers such that $a \leq b$.
 The probability density function of the Continuous-Time Uniform distribution is given by:
 
 \begin{equation*}
-f(x) = \frac{1}{b-a} \chi_{a \leq x \leq b}(x)
+f(x) = \frac{1}{b-a} \chi_{a \leq x \leq b}(x).
 \end{equation*}
 
 > [!NOTE]
