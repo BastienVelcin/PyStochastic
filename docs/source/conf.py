@@ -26,6 +26,17 @@ extensions = [
     "myst_parser",
 ]
 
+myst_enable_extensions = [
+    "colon_fence",
+    "deflist",
+    "tasklist",
+    "strikethrough",
+    "linkify",
+    "dollarmath",
+    "amsmath",
+    "alert",
+]
+
 templates_path = ['_templates']
 exclude_patterns = []
 
