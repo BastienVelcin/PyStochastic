@@ -9,10 +9,10 @@ PyStochastic documentation
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Probability Distributions
 
    dist/index
    dist/ContinuousDistribution
-   dist/continuoustimeuniform
+   dist/continuous/uniform
    dist/continuoustimeuniformrst

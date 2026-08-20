@@ -4,9 +4,7 @@ The `ContinuousDistribution` class provides the common
 interface for continuous probability distributions in PyStochastic.
 
 > [!WARNING]
-> `ContinuousDistribution` is an abstract class and cannot be
-    instantiated directly. It is intended to be subclassed by
-    concrete continuous distributions.
+> `ContinuousDistribution` is an abstract class and cannot be instantiated directly. It is intended to be subclassed by concrete continuous distributions.
 
 ## Description
 
@@ -39,7 +37,7 @@ _np.ndarray_
 
 ___
 
-#### cdf(x = None)
+#### cdf()
 
 ```python
 .cdf(x = None)
@@ -109,8 +107,87 @@ The `samples` method returns `n` samples from the current distribution. By defau
 `n` : _int_ or _np.integer_
 : Number of desired samples. If `n` is not provided, the method returns 1 sample.
 
-##### **Returns**
+**Returns**
 
 _np.ndarray_
 : Array of `n` samples from the current distribution.
 
+#### mean()
+
+```python
+.mean()
+```
+The `mean` method returns the exact mean of the distribution. For a random variable $X$ defined on a probability space $(\Omega, \mathcal{F}, \mathbb{P}), the mean of $X$ is defined as
+\begin{equation*}
+\mathbb{E}[X] = \int_\Omega Xd\mathbb{P}.
+\end{equation*}
+
+Moreover, if $X$ follows a continuous distribution that admits an integrable density $f$, then
+\begin{equation*}
+\mathbb{E}[X] = \int_\mathbb{R} xf(x)dx
+\end{equation*}
+
+**Parameters**
+
+No parameters.
+
+**Returns**
+
+_float_
+: Mean of the distribution.
+
+#### variance()
+
+```python
+.variance()
+```
+The `variance` method returns the exact variance of the distribution. For a random variable $X$ defined on a probability space $(\Omega, \mathcal{F}, \mathbb{P}), the variance of $X$ is defined as
+\begin{equation*}
+\mathbb{V}[X] = \mathbb{E}[(X-\mathbb{E}[X])^2].
+\end{equation*}
+
+Moreover, if $X$ is a square-integrable random variable, then the variance can be obtained by the König-Huygens formula:
+\begin{equation*}
+\mathbb{V}[X] = \mathbb{E}[X^2]-\mathbb{E}[X]^2.
+\end{equation*}
+
+**Parameters**
+
+No parameters.
+
+**Returns**
+
+_float_
+: Variance of the distribution.
+
+#### entropy()
+
+```python
+.entropy()
+```
+The `entropy` method returns the exact Shannon entropy of the distribution.
+
+**Parameters**
+
+No parameters.
+
+**Returns**
+
+_float_
+: Shannon Entropy of the distribution.
+
+#### support()
+
+```python
+.support()
+```
+The `support` method returns the support of the distribution.
+
+**Parameters**
+
+No parameters.
+
+**Returns**
+
+_tuple_ or _str_
+: Support of the distribution.
