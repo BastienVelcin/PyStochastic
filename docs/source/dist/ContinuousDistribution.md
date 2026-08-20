@@ -27,7 +27,7 @@ By default, the argument `x` is set to `None`, so that the method prints the pro
 
 **Parameters**
 
-`x` : _float_ or `None`
+`x` : _float_, _np.float_ or `None`
 : Point at which the probability density function is evaluated. If `None`, the method prints the expression of the probability density function.
 
 **Returns**
@@ -48,9 +48,14 @@ the method prints the cumulative distribution function. Otherwise, if the parame
 the method returns the cumulative distribution function evaluated at the point `x`.
 By default, the argument `x` is set to `None`, so that the method prints the cumulative distribution function.
 
+The cumulative distribution function of a random variable $X$ is the function defined, for all $t\in\mathbb{R}$, by
+\begin{equation*}
+F_X(t) = \mathbb{P}(X\leq t).
+\end{equation*}
+
 **Parameters**
 
-`x` : _float_ or `None`
+`x` : _float_, _np.float_ or `None`
 : Point at which the cumulative distribution function is evaluated. If `None`, the method prints the expression of the cumulative distribution function.
 
 **Returns**
@@ -117,7 +122,7 @@ _np.ndarray_
 ```python
 .mean()
 ```
-The `mean` method returns the exact mean of the distribution. For a random variable $X$ defined on a probability space $(\Omega, \mathcal{F}, \mathbb{P}), the mean of $X$ is defined as
+The `mean` method returns the exact mean of the distribution. For a random variable $X$ defined on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$, the mean of $X$ is defined as
 \begin{equation*}
 \mathbb{E}[X] = \int_\Omega Xd\mathbb{P}.
 \end{equation*}
@@ -133,7 +138,7 @@ No parameters.
 
 **Returns**
 
-_float_
+_float_ or _np.float_
 : Mean of the distribution.
 
 #### variance()
@@ -141,7 +146,7 @@ _float_
 ```python
 .variance()
 ```
-The `variance` method returns the exact variance of the distribution. For a random variable $X$ defined on a probability space $(\Omega, \mathcal{F}, \mathbb{P}), the variance of $X$ is defined as
+The `variance` method returns the exact variance of the distribution. For a random variable $X$ defined on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$, the variance of $X$ is defined as
 \begin{equation*}
 \mathbb{V}[X] = \mathbb{E}[(X-\mathbb{E}[X])^2].
 \end{equation*}
@@ -157,7 +162,7 @@ No parameters.
 
 **Returns**
 
-_float_
+_float_ or _np.float_
 : Variance of the distribution.
 
 #### entropy()
@@ -166,6 +171,10 @@ _float_
 .entropy()
 ```
 The `entropy` method returns the exact Shannon entropy of the distribution.
+The Shannon entropy of a random variable $X$ admitting a density $f$ is defined as
+\begin{equation*}
+H(X) = -\int_\mathbb{R} f(x)log(f(x))dx
+\end{equation*}
 
 **Parameters**
 
@@ -173,7 +182,7 @@ No parameters.
 
 **Returns**
 
-_float_
+_float_ or _np.float_
 : Shannon Entropy of the distribution.
 
 #### support()
@@ -181,7 +190,10 @@ _float_
 ```python
 .support()
 ```
-The `support` method returns the support of the distribution.
+The `support` method returns the support of the distribution. The support of a random variable $X$ is the smallest closed $F$ set of $\mathbb{R}$ such that
+\begin{equation*}
+\mathbb{P}(X \in F) = 1.
+\end{equation*}
 
 **Parameters**
 
@@ -191,3 +203,18 @@ No parameters.
 
 _tuple_ or _str_
 : Support of the distribution.
+
+#### info()
+
+```python
+.info()
+```
+The `info` method summarizes the information of the current distribution.
+
+**Parameters**
+
+No parameters.
+
+**Returns**
+
+No return value.

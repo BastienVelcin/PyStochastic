@@ -46,7 +46,25 @@ The Continuous-Time Uniform distribution inherits all methods from the [Continuo
 >>> from pystochastic.dist.dist import Uniform
 >>> U = Uniform(a=0, b=1)
 >>> U.sample(10)
-array([0.12345679, 0.3456789 , 0.56789012, 0.78901234, 0.90123456,
-       0.01234567, 0.23456789, 0.45678901, 0.67890123, 0.89012345])
->>> U.
->>
+array([0.21551514, 0.67418772, 0.72580384, 0.44785791, 0.16345073,
+       0.06059345, 0.6648661 , 0.74893065, 0.4546897 , 0.17916723])
+>>> U.pdf(1)
+1.0
+>>> U.cdf(0.5)
+0.5
+>> U.mean()
+0.5
+>> U.info()
+Distribution : Uniform
+Parameters : {'lobound': 0, 'upbound': 1}
+Probability density function :
+| 1.0 for 0 <= x <= 1
+| 0 else
+Cumulative distribution function :
+| 0 for x < 0
+| (x-0)/1 for 0 <= x <= 1
+| 1 for x > 1
+Support : (0, 1)
+Mean : 0.5
+Variance : 0.08333333333333333
+Entropy : 0.0

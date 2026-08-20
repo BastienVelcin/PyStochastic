@@ -265,14 +265,14 @@ class Distribution(ABC):
 
         Print a recap of the effective distribution.
         """
-        print(f"| Distribution : {self.__class__.__name__}")
-        print(f"| Parameters : {self.__dict__}")
-        print(f"| Probability Density Function : {self.pdf()}")
-        print(f"| Cumulative Distribution Function : {self.cdf()}")
-        print(f"| Support : {self.support()}")
-        print(f"| mean : {self.mean()}")
-        print(f"| Variance : {self.variance()}")
-        print(f"| Entropy : {self.entropy()}")
+        print(f"Distribution : {self.__class__.__name__}")
+        print(f"Parameters : {self.__dict__}")
+        print(f"{self.pdf()}")
+        print(f"{self.cdf()}")
+        print(f"Support : {self.support()}")
+        print(f"Mean : {self.mean()}")
+        print(f"Variance : {self.variance()}")
+        print(f"Entropy : {self.entropy()}")
 
 class Uniform(Distribution):
 
@@ -318,7 +318,7 @@ class Uniform(Distribution):
     def pdf(self, x=None):
         if x is None:
             print("Probability density function :")
-            print(f"| {(1/{self.upbound-self.lobound})} for {self.lobound} <= x <= {self.upbound}" )
+            print(f"| {1/(self.upbound-self.lobound)} for {self.lobound} <= x <= {self.upbound}" )
             print(f"| 0 else")
 
         else:
