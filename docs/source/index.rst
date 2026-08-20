@@ -15,3 +15,4 @@ PyStochastic documentation
    dist/index
    dist/ContinuousDistribution
    dist/continuoustimeuniform
+   dist/continuoustimeuniformrst
