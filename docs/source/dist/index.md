@@ -11,10 +11,8 @@ ContinuousDistribution
 :maxdepth: 1
 :caption: Continuous distributions
 
-continuous/exponential
-continuous/gamma
-continuous/normal
-continuous/uniform
+continuous/index
+
 ```
 
 ## Import line

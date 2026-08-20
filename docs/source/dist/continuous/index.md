@@ -8,7 +8,6 @@ gamma
 normal
 uniform
 ```
-
 The `ContinuousDistribution` class provides the common
 interface for continuous probability distributions in PyStochastic.
 
