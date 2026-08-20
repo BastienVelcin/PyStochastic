@@ -25,14 +25,14 @@ f(x) = \frac{1}{b-a} \chi_{a \leq x \leq b}(x)
 > [!NOTE]
 > The Continuous-Time Uniform distribution is characterized by the following property:
 > 
-> Every same-length real interval within the support interval [a,b] have the same probability.
+> Every same-length real interval included in the support interval [a,b] have the same probability.
 
 ### Attributes
 
-- `a` : _float_
+`a` : _float_
 : Lower bound of the distribution.
 
-- `b` : _float_
+`b` : _float_
 : Upper bound of the distribution.
 
 Note that if a > b, the constructor will immediately change the roles of a and b.

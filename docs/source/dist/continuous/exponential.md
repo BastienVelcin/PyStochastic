@@ -28,7 +28,7 @@ f(x) = \alpha e^{-\alpha x}\chi_{\mathbb{R}_+}(x)
 
 ### Attributes
 
-- `alpha` : _float_
+`alpha` : _float_
 : Intensity parameter of the exponential distribution. Must be a **strictly positive real number**.
 
 
