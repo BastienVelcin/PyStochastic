@@ -8,10 +8,6 @@ interface for continuous probability distributions in PyStochastic.
     instantiated directly. It is intended to be subclassed by
     concrete continuous distributions.
 
-```{warning} `ContinuousDistribution` is an abstract class and cannot be
-instantiated directly. It is intended to be subclassed by
-concrete continuous distributions.
-
 ## Description
 
 ## Attributes
@@ -27,11 +23,11 @@ the method prints the probability density function. Otherwise, if the parameter 
 the method returns the probability density function evaluated at the point `x`.
 By default, the argument `x` is set to `None`, so that the method prints the probability density function.
 
-Parameters :
+Parameters
 `x` : _float_ or `None`
 : Point at which the probability density function is evaluated. If `None`, the method prints the expression of the probability density function.
 
-Returns :
+Returns
 _np.ndarray_
 : When `x` is provided, the method returns the probability density function evaluated at the point `x`.
 
