@@ -14,12 +14,12 @@ pystochastic.dist.Uniform(a=0, b=1)
 **Type :** Class
 
 Create an instance of the Continuous-Time Uniform distribution. A Continuous-Time Uniform distribution is a continuous-time distribution that takes values in the interval [a,b],
-where a and b are real numbers such that a <= b.
+where a and b are real numbers such that $a \leq b$.
 
 The probability density function of the Continuous-Time Uniform distribution is given by:
 
 \begin{equation*}
-f(x) = \frac{1}{b-a} \chi_{a \leq x \leq b}
+f(x) = \frac{1}{b-a} \chi_{a \leq x \leq b}(x)
 \end{equation*}
 
 > [!NOTE]
@@ -52,9 +52,9 @@ array([0.21551514, 0.67418772, 0.72580384, 0.44785791, 0.16345073,
 1.0
 >>> U.cdf(0.5)
 0.5
->> U.mean()
+>>> U.mean()
 0.5
->> U.info()
+>>> U.info()
 Distribution : Uniform
 Parameters : {'lobound': 0, 'upbound': 1}
 Probability density function :

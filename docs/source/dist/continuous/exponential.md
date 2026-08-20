@@ -18,13 +18,13 @@ Create an instance of the Exponential distribution. An exponential distribution 
 The probability density function of the Exponential distribution is given by:
 
 \begin{equation*}
-f(x) = \alpha e^{-\alpha x}
+f(x) = \alpha e^{-\alpha x}\chi_{\mathbb{R}_+}(x)
 \end{equation*}
 
 > [!NOTE]
-> The Continuous-Time Uniform distribution is characterized by the following property:
+> The Exponential distribution is characterized by the following property:
 > 
-> For all $s,t \in \mathbb{R},~~ \mathbb{P}(X>t+s ~|~ X>t)=\mathbb{P}(X>s)$.
+> If $X$ follows an exponential distribution, then, for all $s,t \in \mathbb{R},~~ \mathbb{P}(X>t+s ~|~ X>t)=\mathbb{P}(X>s)$.
 
 ### Attributes
 
@@ -47,9 +47,9 @@ array([1.11649568, 0.17226749, 0.06755954, 0.17814998, 0.03381519,
 np.float64(7.647558012545645e-07)
 >>> E.cdf(3)
 np.float64(0.9994469156298522)
->> U.variance()
+>>> E.variance()
 0.16
->> U.info()
+>>> E.info()
 Distribution : Exponential
 Parameters : {'alpha': 2.5}
 Probability density function :
