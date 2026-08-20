@@ -15,7 +15,7 @@ pystochastic.dist.Exponential(alpha = 2)
 
 Create an instance of the Exponential distribution. An exponential distribution is a continuous probability distribution that represents a memoryless phenomenon with an intensity parameter `alpha`.
 
-The probability density function of the Exponential distribution is given by:
+The probability density function of the Exponential distribution of parameter $\alpha$ is given by:
 
 \begin{equation*}
 f(x) = \alpha e^{-\alpha x}\chi_{\mathbb{R}_+}(x).
@@ -35,7 +35,7 @@ f(x) = \alpha e^{-\alpha x}\chi_{\mathbb{R}_+}(x).
 ### Methods
 The Exponential distribution inherits all methods from the [Continuous-Time Distribution](<project:../intro.md>) class.
 
-### Examples
+## Examples
 
 ```python
 >>> from pystochastic.dist.dist import Exponential

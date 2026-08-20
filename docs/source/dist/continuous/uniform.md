@@ -16,7 +16,7 @@ pystochastic.dist.Uniform(a = 0, b = 1)
 Create an instance of the Continuous-Time Uniform distribution. A Continuous-Time Uniform distribution is a continuous-time distribution that takes values in the interval [a,b],
 where a and b are real numbers such that $a \leq b$.
 
-The probability density function of the Continuous-Time Uniform distribution is given by:
+The probability density function of the Continuous-Time Uniform distribution of parameter $a$ and $b$ is given by:
 
 \begin{equation*}
 f(x) = \frac{1}{b-a} \chi_{a \leq x \leq b}(x).
@@ -40,7 +40,7 @@ Note that if a > b, the constructor will immediately change the roles of a and b
 ### Methods
 The Continuous-Time Uniform distribution inherits all methods from the [Continuous-Time Distribution](<project:../intro.md>) class.
 
-### Examples
+## Examples
 
 ```python
 >>> from pystochastic.dist.dist import Uniform

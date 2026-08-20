@@ -15,7 +15,7 @@ pystochastic.dist.Normal(mu = 0, sd = 1)
 
 Create an instance of the Normal distribution. A normal distribution is a continuous probability distribution used to model random natural phenomena.
 
-The probability density function of the Normal distribution is given by:
+The probability density function of the Normal distribution of mean $\mu$ and standard deviation $\sigma$ is given by:
 
 \begin{equation*}
 f(x) = \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.
@@ -38,7 +38,7 @@ f(x) = \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.
 ### Methods
 The Normal distribution inherits all methods from the [Continuous-Time Distribution](<project:../intro.md>) class.
 
-### Examples
+## Examples
 
 ```python
 >>> from pystochastic.dist.dist import Normal
@@ -53,7 +53,7 @@ np.float64(0.10648266850745075)
 np.float64(0.691462461274013)
 >>> N.variance()
 9
->>> E.info()
+>>> N.info()
 Distribution : Normal
 Parameters : {'mu': -1, 'sd': 3}
 Probability density function :

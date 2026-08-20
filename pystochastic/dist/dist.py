@@ -663,7 +663,7 @@ class Weibull(Distribution):
     Weibull probability distribution.
 
     The Weibull distribution is parameterized by a shape parameter
-    ``k`` and a scale parameter ''l''.
+    ``k`` and a scale parameter ''lam''.
 
     Parameters
     ----------
@@ -728,7 +728,7 @@ class Weibull(Distribution):
         return self.l ** 2 * scipy.special.gamma(1 + 2 / self.k) - self.mean()**2
 
     def entropy(self):
-        return scipy.special.gammainc(1-1/self.k)+(self.l/self.k)**self.k+np.log(self.l)-np.log(self.l/self.k)
+        return scipy.special.digamma(1-1/self.k)+(self.l/self.k)**self.k+np.log(self.l)-np.log(self.l/self.k)
 
     def support(self):
         return (0, np.inf)
