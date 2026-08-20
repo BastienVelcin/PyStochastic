@@ -8,7 +8,7 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, os.path.abspath("../.."))
 
 project = 'PyStochastic'
 copyright = '2026 - Bastien Velcin'
