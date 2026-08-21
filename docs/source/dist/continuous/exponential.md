@@ -33,7 +33,7 @@ f(x) = \alpha e^{-\alpha x}\chi_{\mathbb{R}_+}(x).
 
 
 ### Methods
-The Exponential distribution inherits all methods from the [Continuous-Time Distribution](<project:../intro.md>) class.
+The Exponential distribution inherits all methods from the [Continuous-Time Distribution](<project:/index.md>) class.
 
 ## Examples
 

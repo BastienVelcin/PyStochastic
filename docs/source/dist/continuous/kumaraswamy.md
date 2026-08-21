@@ -30,7 +30,7 @@ f(x) = ab x^{a-1} \left(1-x^a\right)^{b-1}\chi_{[0,1]}(x).
 : Second shape parameter of the Kumaraswamy distribution. Must be strictly positive.
 
 ### Methods
-The Kumaraswamy distribution inherits all methods from the [Continuous-Time Distribution](<project:../intro.md>) class.
+The Kumaraswamy distribution inherits all methods from the [Continuous-Time Distribution](<project:/index.md>) class.
 
 ## Examples
 

@@ -30,7 +30,7 @@ f(x) = \frac{1}{\pi a \left[1 + \left( \frac{x-x_0}{a}\right)^2 \right]}.
 : Scale parameter of the Cauchy distribution. Must be strictly positive.
 
 ### Methods
-The Cauchy distribution inherits all methods from the [Continuous-Time Distribution](<project:../intro.md>) class.
+The Cauchy distribution inherits all methods from the [Continuous-Time Distribution](<project:/index.md>) class.
 
 ## Examples
 

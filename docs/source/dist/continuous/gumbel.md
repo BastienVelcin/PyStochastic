@@ -30,7 +30,7 @@ f(x) = \frac{1}{\beta}\exp\left(-\exp\left(-\frac{x-\mu}{\beta}\right)\right)\ex
 : Scale parameter of the Gumbel distribution. Must be strictly positive.
 
 ### Methods
-The Gumbel distribution inherits all methods from the [Continuous-Time Distribution](<project:../intro.md>) class.
+The Gumbel distribution inherits all methods from the [Continuous-Time Distribution](<project:/index.md>) class.
 
 ## Examples
 

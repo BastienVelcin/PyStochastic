@@ -30,7 +30,7 @@ f(x) = \frac{k}{\lambda} \left(\frac{x}{\lambda}\right)^{k-1}e^{-\left(\frac{x}{
 : Shape parameter of the Weibull distribution. Must be strictly positive.
 
 ### Methods
-The Weibull distribution inherits all methods from the [Continuous-Time Distribution](<project:../intro.md>) class.
+The Weibull distribution inherits all methods from the [Continuous-Time Distribution](<project:/index.md>) class.
 
 ## Examples
 

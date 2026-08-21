@@ -31,7 +31,7 @@ f(x) = \frac{\theta^k}{\Gamma(k)} x^{k-1}e^{-\theta x}\chi_{\mathbb{R}_+}(x).
 : Rate parameter of the gamma distribution. Must be strictly positive.
 
 ### Methods
-The Gamma distribution inherits all methods from the [Continuous-Time Distribution](<project:../intro.md>) class.
+The Gamma distribution inherits all methods from the [Continuous-Time Distribution](<project:/index.md>) class.
 
 ## Examples
 

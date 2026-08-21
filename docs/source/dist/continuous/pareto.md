@@ -31,7 +31,7 @@ f(x) = \frac{k x_m^k}{x^{k+1}}\chi_{[x_m, +\infty)}(x).
 : Shape parameter of the Pareto distribution. Must be strictly positive.
 
 ### Methods
-The Pareto distribution inherits all methods from the [Continuous-Time Distribution](<project:../intro.md>) class.
+The Pareto distribution inherits all methods from the [Continuous-Time Distribution](<project:/index.md>) class.
 
 ## Examples
 

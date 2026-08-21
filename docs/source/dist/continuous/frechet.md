@@ -33,7 +33,7 @@ f(x) = \frac{a}{s} \left(\frac{x-m}{s} \right)^{k-1} e^{-\left(\frac{x-m}{s}\rig
 : Position parameter of the Fréchet distribution.
 
 ### Methods
-The Fréchet distribution inherits all methods from the [Continuous-Time Distribution](<project:../intro.md>) class.
+The Fréchet distribution inherits all methods from the [Continuous-Time Distribution](<project:/index.md>) class.
 
 ## Examples
 

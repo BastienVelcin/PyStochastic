@@ -28,7 +28,7 @@ f(x) = \frac{x}{\sigma^2}\exp\left(-\frac{x^2}{2\sigma^2}\right)\chi_{\mathbb{R}
 : Scale parameter of the Rayleigh distribution. Must be strictly positive.
 
 ### Methods
-The Rayleigh distribution inherits all methods from the [Continuous-Time Distribution](<project:../intro.md>) class.
+The Rayleigh distribution inherits all methods from the [Continuous-Time Distribution](<project:/index.md>) class.
 
 ## Examples
 

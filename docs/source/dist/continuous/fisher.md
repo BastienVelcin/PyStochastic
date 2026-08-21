@@ -34,7 +34,7 @@ f(x) = \frac{\sqrt{\frac{(d_1 x)^{d_1}d_2^{d_2}}{(d_1 x + d_2)^{d_1 + d_2}}}}{x 
 : Second degree of freedom of the Fisher distribution. Must be strictly positive.
 
 ### Methods
-The Fisher distribution inherits all methods from the [Continuous-Time Distribution](<project:../intro.md>) class.
+The Fisher distribution inherits all methods from the [Continuous-Time Distribution](<project:/index.md>) class.
 
 ## Examples
 

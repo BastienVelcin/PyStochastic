@@ -34,7 +34,7 @@ f(x) = \frac{1}{B(a,b)} x^{a-1}(1-x)^{b-1}\chi_{(0,1)}(x).
 > then $X$ and $Y$ follow the same distribution.
 
 ### Methods
-The Beta distribution inherits all methods from the [Continuous-Time Distribution](<project:../intro.md>) class.
+The Beta distribution inherits all methods from the [Continuous-Time Distribution](<project:/index.md>) class.
 
 ## Examples
 

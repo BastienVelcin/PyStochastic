@@ -36,7 +36,7 @@ f(x) = \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.
 
 
 ### Methods
-The Normal distribution inherits all methods from the [Continuous-Time Distribution](<project:../intro.md>) class.
+The Normal distribution inherits all methods from the [Continuous-Time Distribution](<project:/index.md>) class.
 
 ## Examples
 
