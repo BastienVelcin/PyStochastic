@@ -25,7 +25,7 @@ the method prints the probability mass function. Otherwise, if the parameter `x`
 the method returns the probability mass function evaluated at the point `x`.
 By default, the argument `x` is set to `None`, so that the method prints the probability mass function.
 
-For a discrete random variable $X$ with discrete support $D$, the probability mass function of $X$ is defined, for all $k\in\Omega$, by
+For a discrete random variable $X$ with discrete support $D$, the probability mass function of $X$ is defined, for all $k\in D$, by
 \begin{equation*}
 f_X(k) = \mathbb{P}(X=k).
 \end{equation*}
@@ -224,17 +224,8 @@ No return value.
 ```{toctree}
 :maxdepth: 1
 
-uniform
-exponential
-normal
-gamma
-beta
-weibull
-frechet
-cauchy
-gumbel
-kumaraswamy
-fisher
-pareto
-rayleigh
+duniform
+bernoulli
+rademacher
+binomial
 ```

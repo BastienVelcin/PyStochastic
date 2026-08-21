@@ -1493,14 +1493,14 @@ class DiscreteDistribution(ABC):
 
         Print a recap of the effective distribution.
         """
-        print(f"| Distribution : {self.__class__.__name__}")
-        print(f"| Parameters : {self.__dict__}")
-        print(f"| Probability Density Function : {self.pdf()}")
-        print(f"| Cumulative Distribution Function : {self.cdf()}")
-        print(f"| Support : {self.support()}")
-        print(f"| mean : {self.mean()}")
-        print(f"| Variance : {self.variance()}")
-        print(f"| Entropy : {self.entropy()}")
+        print(f"Distribution : {self.__class__.__name__}")
+        print(f"Parameters : {self.__dict__}")
+        print(f"{self.pmf()}")
+        print(f"{self.cdf()}")
+        print(f"Support : {self.support()}")
+        print(f"Mean : {self.mean()}")
+        print(f"Variance : {self.variance()}")
+        print(f"Entropy : {self.entropy()}")
 
 
 class DUniform(DiscreteDistribution):
