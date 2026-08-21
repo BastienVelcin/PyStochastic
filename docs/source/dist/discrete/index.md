@@ -173,7 +173,7 @@ _float_ or _np.float_
 The `entropy` method returns the exact Shannon entropy of the distribution.
 The Shannon entropy of a random variable $X$ admitting a density $f$ is defined as
 \begin{equation*}
-H(X) = -\sum_{k\in D} \mathbb{P}(X=k)log(\mathbb{P}(X=k))dx
+H(X) = -\sum_{k\in D} \mathbb{P}(X=k)\log(\mathbb{P}(X=k))dx
 \end{equation*}
 
 **Parameters**
