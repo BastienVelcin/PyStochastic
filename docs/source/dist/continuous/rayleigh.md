@@ -18,7 +18,7 @@ Create an instance of the Rayleigh distribution. A Rayleigh distribution is a co
 The probability density function of the Rayleigh distribution of parameter $\sigma$ is given by:
 
 \begin{equation*}
-f(x) = \frac{x}{\sigma^2}\exp\left(-\frac{x^2}{2\sigma^2}\right)\chi_{\mathbb{R}_+}(x),
+f(x) = \frac{x}{\sigma^2}\exp\left(-\frac{x^2}{2\sigma^2}\right)\chi_{\mathbb{R}_+}(x).
 \end{equation*}
 
 

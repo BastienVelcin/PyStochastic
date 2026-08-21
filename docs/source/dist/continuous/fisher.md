@@ -18,7 +18,7 @@ Create an instance of the Fisher distribution. A Fisher distribution is a contin
 The probability density function of the Fisher distribution of parameters $d_1$ and $d_2$ is given by:
 
 \begin{equation*}
-f(x) = \frac{\sqrt{\frac{(d_1 x)^{d_1}d_2^{d_2}}{(d_1 x + d_2)^{d_1 + d_2}}{x \text{B}\left(\frac{d_1}{2},\frac{d_2}{2}\right)}\chi_{\mathbb{R}_+}(x),
+\frac{\sqrt{\frac{(d_1 x)^{d_1}d_2^{d_2}}{(d_1 x + d_2)^{d_1 + d_2}}}}{x \text{B}\left(\frac{d_1}{2},\frac{d_2}{2}\right)}\chi_{\mathbb{R}_+}(x).
 \end{equation*}
 
 > [!NOTE]

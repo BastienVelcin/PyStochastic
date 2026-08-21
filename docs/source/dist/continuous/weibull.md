@@ -18,7 +18,7 @@ Create an instance of the Weibull distribution. A Weibull distribution is a cont
 The probability density function of the Weibull distribution of parameters $k$ and $\lambda$ is given by:
 
 \begin{equation*}
-f(x) = \frac{k}{\lambda} \left(\frac{x}{\lambda}\right)^{k-1}e^{-\left(\frac{x}{\lambda}\right)^k}\chi_{\mathbb{R}_+}(x),
+f(x) = \frac{k}{\lambda} \left(\frac{x}{\lambda}\right)^{k-1}e^{-\left(\frac{x}{\lambda}\right)^k}\chi_{\mathbb{R}_+}(x).
 \end{equation*}
 
 ### Attributes

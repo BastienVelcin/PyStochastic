@@ -9,7 +9,7 @@ from pystochastic.dist.dist import Cauchy
 
 ## Description
 ```python
-pystochastic.dist.Cauchy(x = 0, a = 1)
+pystochastic.dist.Cauchy(x_0 = 0, a = 1)
 ```
 **Type :** Class
 
@@ -18,12 +18,12 @@ Create an instance of the Cauchy distribution. A Cauchy distribution is a contin
 The probability density function of the Cauchy distribution of parameters $x_0$ and $a$ is given by:
 
 \begin{equation*}
-f(x) = \frac{1}{\pi a \left[1 + \left( \frac{x-x_0}{a}\right)^2 \right]}
+f(x) = \frac{1}{\pi a \left[1 + \left( \frac{x-x_0}{a}\right)^2 \right]}.
 \end{equation*}
 
 ### Attributes
 
-`x` : _float_
+`x_0` : _float_
 : Position parameter of the Cauchy distribution.
 
 `a` : _float_

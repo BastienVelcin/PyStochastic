@@ -848,32 +848,32 @@ class Cauchy(Distribution):
     >> C.sample(10)
     """
 
-    def __init__(self,x=0,a=1):
+    def __init__(self,x_0=0,a=1):
 
         if a <= 0:
             raise ValueError(
                 "The scale parameter must be greater than 0."
             )
 
-        self.x = x
+        self.x_0 = x_0
         self.a = a
 
     def pdf(self, x=None):
         if x is None:
             print("Probability density function :")
-            print(f"| 1/(pi*{self.a}*(1+(x-{self.x})/{self.a})^2)")
+            print(f"| 1/(pi*{self.a}*(1+(x-{self.x_0})/{self.a})^2)")
         else:
-            return 1/(np.pi*self.a*(1+(x-self.x)/self.a)**2)
+            return 1/(np.pi*self.a*(1+(x-self.x_0)/self.a)**2)
 
     def cdf(self, x=None):
         if x is None:
             print("Cumulative distribution function :")
-            print(f"| 1/pi * Arctan((x-{self.x})/{self.a}) + 1/2")
+            print(f"| 1/pi * Arctan((x-{self.x_0})/{self.a}) + 1/2")
         else:
-            return 1/np.pi * np.arctan((x-self.x)/self.a) + 1/2
+            return 1/np.pi * np.arctan((x-self.x_0)/self.a) + 1/2
 
     def sample(self, n=1):
-        return crandom.cauchy(self.x, self.a, n)
+        return crandom.cauchy(self.x_0, self.a, n)
 
     def mean(self):
         return None

@@ -18,7 +18,7 @@ Create an instance of the Gumbel distribution. A Gumbel distribution is a contin
 The probability density function of the Gumbel distribution of parameters $\mu$ and $\beta$ is given by:
 
 \begin{equation*}
-f(x) = \frac{1}{\beta}\exp\left(-\exp\left(-\frac{x-\mu}{\beta}\right)\right)\exp\left(-\frac{x-\mu}{\beta}\right)
+f(x) = \frac{1}{\beta}\exp\left(-\exp\left(-\frac{x-\mu}{\beta}\right)\right)\exp\left(-\frac{x-\mu}{\beta}\right).
 \end{equation*}
 
 ### Attributes
@@ -26,7 +26,7 @@ f(x) = \frac{1}{\beta}\exp\left(-\exp\left(-\frac{x-\mu}{\beta}\right)\right)\ex
 `mu` : _float_
 : Position parameter of the Gumbel distribution.
 
-`a` : _float_
+`beta` : _float_
 : Scale parameter of the Gumbel distribution. Must be strictly positive.
 
 ### Methods

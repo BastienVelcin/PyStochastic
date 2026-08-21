@@ -18,7 +18,7 @@ Create an instance of the Kumaraswamy distribution. A Kumaraswamy distribution i
 The probability density function of the Kumaraswamy distribution of parameters $a$ and $b$ is given by:
 
 \begin{equation*}
-f(x) = ab x^{a-1} \left(1-x^a\right)^{b-1}\chi_{[0,1]}(x),
+f(x) = ab x^{a-1} \left(1-x^a\right)^{b-1}\chi_{[0,1]}(x).
 \end{equation*}
 
 ### Attributes

@@ -18,7 +18,7 @@ Create an instance of the Pareto distribution. A Pareto distribution is a contin
 The probability density function of the Pareto distribution of parameters $x_m$ and $k$ is given by:
 
 \begin{equation*}
-f(x) = \frac{k x_m^k}{x^{k+1}}\chi_{[x_m, +\infty)}(x),
+f(x) = \frac{k x_m^k}{x^{k+1}}\chi_{[x_m, +\infty)}(x).
 \end{equation*}
 
 

@@ -18,7 +18,7 @@ Create an instance of the Fréchet distribution. A Fréchet distribution is a co
 The probability density function of the Fréchet distribution of parameters $a$, $s$ and $m$ is given by:
 
 \begin{equation*}
-f(x) = \frac{a}{s} \left(\frac{x-m}{s} \right)^{k-1} e^{-\left(\frac{x-m}{s}\right)}^{-a}\chi_{(m,+\infty)}(x),
+f(x) = \frac{a}{s} \left(\frac{x-m}{s} \right)^{k-1} e^{-\left(\frac{x-m}{s}\right)^{-a}}\chi_{(m,+\infty)}(x).
 \end{equation*}
 
 ### Attributes

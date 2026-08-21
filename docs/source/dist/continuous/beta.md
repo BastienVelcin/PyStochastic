@@ -30,7 +30,7 @@ f(x) = \frac{1}{B(a,b)} x^{a-1}(1-x)^{b-1}\chi_{(0,1)}(x).
 : Second shape parameter of the beta distribution. Must be strictly positive.
 
 > [!NOTE]
-> The parameters `a` and `b` are symmetric, which means that if $X \sim \text{Beta}(a,b)$ and $Y \sim \text{Beta}(b,a)$,
+> The parameters `a` and `b` are symmetric, which means that if $X \sim \text{Beta}(a,b)$ and $Y \sim \text{Beta}(b,a)$.
 > then $X$ and $Y$ follow the same distribution.
 
 ### Methods
