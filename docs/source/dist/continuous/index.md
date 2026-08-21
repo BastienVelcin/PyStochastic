@@ -1,22 +1,5 @@
 # Continuous Distribution class
 
-```{toctree}
-:maxdepth: 1
-
-uniform
-exponential
-normal
-gamma
-beta
-weibull
-frechet
-cauchy
-gumbel
-kumaraswamy
-fisher
-pareto
-rayleigh
-```
 The `ContinuousDistribution` class provides the common
 interface for continuous probability distributions in PyStochastic.
 
@@ -235,3 +218,23 @@ No parameters.
 **Returns**
 
 No return value.
+
+## Implemented continuous distributions
+
+```{toctree}
+:maxdepth: 1
+
+uniform
+exponential
+normal
+gamma
+beta
+weibull
+frechet
+cauchy
+gumbel
+kumaraswamy
+fisher
+pareto
+rayleigh
+```
