@@ -38,7 +38,7 @@ f(x) = \frac{1}{b-a} \chi_{a \leq x \leq b}(x).
 Note that if a > b, the constructor will immediately change the roles of a and b.
 
 ### Methods
-The Continuous-Time Uniform distribution inherits all methods from the [Continuous-Time Distribution](<project:../index.md>) class.
+The Continuous-Time Uniform distribution inherits all methods from the [Continuous-Time Distribution](<project:.../index.md>) class.
 
 ## Examples
 
