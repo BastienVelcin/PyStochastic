@@ -1,6 +1,14 @@
 # PyStochastic documentation
 ## Quick summary
 
+```{toctree}
+   :maxdepth: 2
+   :caption: Contents
+
+   getting_started
+   dist/index
+``` 
+
 Welcome to the PyStochastic documentation.
 
 PyStochastic is a Python library for probability, stochastic calculus and stochastic modelling, Monte Carlo methods and numerical methods for stochastic differential equations.
@@ -39,11 +47,3 @@ import pystochastic
 ```
    
 Now, you're ready to use PyStochastic!
-
-```{toctree}
-   :maxdepth: 2
-   :caption: Contents
-
-   getting_started
-   dist/index
-``` 

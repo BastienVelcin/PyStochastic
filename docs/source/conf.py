@@ -25,6 +25,10 @@ extensions = [
     "sphinx.ext.intersphinx",
     "myst_parser",
 ]
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+}
 
 myst_enable_extensions = [
     "alert",
