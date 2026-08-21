@@ -309,7 +309,7 @@ class Uniform(Distribution):
 
         if a == b:
             raise ValueError(
-                "The lower and upper bound should be different."
+                "The lower and upper bound must be different."
             )
 
         self.lobound = min(a,b)
@@ -385,7 +385,7 @@ class Exponential(Distribution):
 
         if alpha <=0:
             raise ValueError(
-                "The parameter should be greater than 0."
+                "The parameter must be greater than 0."
             )
 
         self.alpha = alpha
@@ -462,7 +462,7 @@ class Normal(Distribution):
 
         if sd <=0:
             raise ValueError(
-                "The standard deviation should be greater than 0."
+                "The standard deviation must be greater than 0."
             )
 
         self.mu = mu
@@ -530,12 +530,12 @@ class Gamma(Distribution):
 
         if k <=0:
             raise ValueError(
-                "The shape parameter should be greater than 0."
+                "The shape parameter must be greater than 0."
             )
 
         if theta <=0:
             raise ValueError(
-                "The rate parameter should be greater than 0."
+                "The rate parameter must be greater than 0."
             )
 
         self.k = k
@@ -608,11 +608,11 @@ class Beta(Distribution):
 
         if a <= 0:
             raise ValueError(
-                "The first shape parameter should be greater than 0."
+                "The first shape parameter must be greater than 0."
             )
         if b <= 0:
             raise ValueError(
-                "The second shape parameter should be greater than 0."
+                "The second shape parameter must be greater than 0."
             )
 
         self.a = a
@@ -689,12 +689,12 @@ class Weibull(Distribution):
 
         if k <=0:
             raise ValueError(
-                "The shape parameter should be greater than 0."
+                "The shape parameter must be greater than 0."
             )
 
         if l <=0:
             raise ValueError(
-                "The scale parameter should be greater than 0."
+                "The scale parameter must be greater than 0."
             )
 
         self.k = k
@@ -769,12 +769,12 @@ class Frechet(Distribution):
 
         if a <= 0:
             raise ValueError(
-                "The shape parameter should be greater than 0."
+                "The shape parameter must be greater than 0."
             )
 
         if s <= 0:
             raise ValueError(
-                "The scale parameter should be greater than 0."
+                "The scale parameter must be greater than 0."
             )
 
         self.a = a
@@ -852,7 +852,7 @@ class Cauchy(Distribution):
 
         if a <= 0:
             raise ValueError(
-                "The scale parameter should be greater than 0."
+                "The scale parameter must be greater than 0."
             )
 
         self.x = x
@@ -919,7 +919,7 @@ class Gumbel(Distribution):
 
         if beta <= 0:
             raise ValueError(
-                "The scale parameter should be greater than 0."
+                "The scale parameter must be greater than 0."
             )
 
         self.mu = mu
@@ -987,12 +987,12 @@ class Kumaraswamy(Distribution):
 
         if a <= 0:
             raise ValueError(
-                "The first shape parameter should be greater than 0."
+                "The first shape parameter must be greater than 0."
             )
 
         if b <= 0:
             raise ValueError(
-                "The second shape parameter should be greater than 0."
+                "The second shape parameter must be greater than 0."
             )
 
         self.a = a
@@ -1047,16 +1047,16 @@ class Fisher(Distribution):
 
     Parameters
     ----------
-    d1 : float
-        First degree of freedom. Must be strictly positive.
-    d1 : float
-        Second degree of freedom. Must be strictly positive.
+    d1 : int
+        First degree of freedom. Must be a strictly positive integer.
+    d1 : int
+        Second degree of freedom. Must be a strictly positive integer.
 
     Attributes
     ----------
-    d1 : float
+    d1 : int
         First degree of freedom.
-    d1 : float
+    d1 : int
         Second degree of freedom.
 
     Examples
@@ -1066,15 +1066,15 @@ class Fisher(Distribution):
     """
 
     def __init__(self,d1=1,d2=1):
-
-        if d1 <= 0:
+        
+        if d1 < 1 or not isinstance(d1, (int, np.integer)):
             raise ValueError(
-                "The first degree of freedom should be greater than 0."
+                "The first degree of freedom must be a strictly positive integer."
             )
 
-        if d2 <= 0:
+        if d2 < 1 or not isinstance(d1, (int, np.integer)):
             raise ValueError(
-                "The second degree of freedom should be greater than 0."
+                "The second degree of freedom must be a strictly positive integer."
             )
 
         self.d1 = d1
@@ -1149,12 +1149,12 @@ class Pareto(Distribution):
 
         if x_m <= 0:
             raise ValueError(
-                "The position parameter should be greater than 0."
+                "The position parameter must be greater than 0."
             )
 
         if k <= 0:
             raise ValueError(
-                "The shape parameter should be greater than 0."
+                "The shape parameter must be greater than 0."
             )
 
         self.x_m = x_m
@@ -1225,7 +1225,7 @@ class Rayleigh(Distribution):
 
         if s <= 0:
             raise ValueError(
-                "The scale parameter should be greater than 0."
+                "The scale parameter must be greater than 0."
             )
 
         self.s = s

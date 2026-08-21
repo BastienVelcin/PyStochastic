@@ -8,7 +8,7 @@ from pystochastic.dist.dist import Gamma
 ```
 
 ## Description
-```{py:class} 
+```python
 pystochastic.dist.Gamma(k = 1, theta = 1)
 ```
 **Type :** Class

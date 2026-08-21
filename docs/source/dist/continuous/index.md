@@ -9,7 +9,13 @@ normal
 gamma
 beta
 weibull
-
+frechet
+cauchy
+gumbel
+kumaraswamy
+fisher
+pareto
+rayleigh
 ```
 The `ContinuousDistribution` class provides the common
 interface for continuous probability distributions in PyStochastic.

@@ -8,7 +8,7 @@ from pystochastic.dist.dist import Uniform
 ```
 
 ## Description
-```{py:class} 
+```python
 pystochastic.dist.Uniform(a = 0, b = 1)
 ```
 **Type :** Class

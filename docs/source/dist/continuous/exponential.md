@@ -8,7 +8,7 @@ from pystochastic.dist.dist import Exponential
 ```
 
 ## Description
-```{py:class} 
+```python
 pystochastic.dist.Exponential(alpha = 2)
 ```
 **Type :** Class

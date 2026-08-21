@@ -8,7 +8,7 @@ from pystochastic.dist.dist import Beta
 ```
 
 ## Description
-```{py:class} 
+```python
 pystochastic.dist.Beta(a = 1, b = 1)
 ```
 **Type :** Class

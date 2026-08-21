@@ -8,7 +8,7 @@ from pystochastic.dist.dist import Normal
 ```
 
 ## Description
-```{py:class} 
+```python
 pystochastic.dist.Normal(mu = 0, sd = 1)
 ```
 **Type :** Class

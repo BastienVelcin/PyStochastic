@@ -8,7 +8,7 @@ from pystochastic.dist.dist import Weibull
 ```
 
 ## Description
-```{py:class} 
+```python
 pystochastic.dist.Weibull(a = 1, b = 1)
 ```
 **Type :** Class
@@ -18,7 +18,7 @@ Create an instance of the Weibull distribution. A Weibull distribution is a cont
 The probability density function of the Weibull distribution of parameters $k$ and $\lambda$ is given by:
 
 \begin{equation*}
-f(x) = \frac{k}{\lambda} \frac{x}{\lambda}^{k-1}{k}e^{-(x/\lambda)^k},
+f(x) = \frac{k}{\lambda} \left(\frac{x}{\lambda}\right)^{k-1}e^{-\left(\frac{x}{\lambda}\right)^k}\chi_{\mathbb{R}_+}(x),
 \end{equation*}
 
 ### Attributes
@@ -26,7 +26,7 @@ f(x) = \frac{k}{\lambda} \frac{x}{\lambda}^{k-1}{k}e^{-(x/\lambda)^k},
 `k` : _float_
 : Scale parameter of the Weibull distribution. Must be strictly positive.
 
-`b` : _float_
+`l` : _float_
 : Shape parameter of the Weibull distribution. Must be strictly positive.
 
 ### Methods
