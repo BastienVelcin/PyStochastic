@@ -2,7 +2,7 @@
 
 
 ## Import line
-You can import the Continuous-Time Uniform distribution from the `dist` module as follows:
+You can import the Exponential distribution from the `dist` module as follows:
 ```python
 from pystochastic.dist.dist import Exponential
 ```
@@ -13,7 +13,7 @@ pystochastic.dist.Exponential(alpha = 2)
 ```
 **Type :** Class
 
-Create an instance of the Exponential distribution. An exponential distribution is a continuous probability distribution that represents a memoryless phenomenon with an intensity parameter `$\alpha$`.
+Create an instance of the Exponential distribution. An exponential distribution is a continuous probability distribution that represents a memoryless phenomenon with an intensity parameter $\alpha$.
 
 The probability density function of the Exponential distribution of parameter $\alpha$ is given by:
 
