@@ -7,17 +7,12 @@ Description
 -----------
 This module provides a way to simulate an Ornstein-Uhlenbeck process with a given long-term mean, diffusion and form parameter.
 
-This module provides a general class "OrnsteinUhlenbeck", with the following built-in methods:
-    - .simulate() : Simulate an Ornstein-Uhlenbeck process path, with both exact (only in 1D), Milstein (only in 1D) and Euler-Maruyama methods.
-    - .plot() : Plot the Ornstein-Uhlenbeck process path.
-    - .mean() : Mean of the Ornstein-Uhlenbeck process at a given time.
-    - .covariance_matrix() : Covariance matrix of the Ornstein-Uhlenbeck process at a given time.
-    - .covariance() : Covariance between two coordinates of the Ornstein-Uhlenbeck process at a given time.
-    - .variance() : Variance of the Ornstein-Uhlenbeck process at a given time.
+This module provides a general class "OrnsteinUhlenbeck", which inherits from the methods of Process and
+DiffusionProcess abstract classes.
 
 Examples
 --------
->> R = OrnsteinUhlenbeck(mean=[2,1],sigma=np.ones((2,2)),theta=np.ones((2,2)),r_0=[1,1],t_0=0,t_n=1,steps=1000) #Ornstein-Uhlenbeck process with mean [2,1] and diffusion and form parameter np.ones((2,2)) and starting point [1,1]
+>> R = OrnsteinUhlenbeck(mean=[2,1],speed=np.ones((2,2)),speed=np.ones((2,2)),initial=[1,1],t_0=0,t_n=1,steps=1000) #Ornstein-Uhlenbeck process with mean [2,1] and diffusion and form parameter np.ones((2,2)) and starting point [1,1]
 >>
 >> R.simulate() #Simulate the  Ornstein-Uhlenbeck process path
 >>
@@ -38,20 +33,20 @@ class OrnsteinUhlenbeck(DiffusionProcess):
     Ornstein Uhlenbeck class
 
     An Ornstein Uhlenbeck process is a stochastic process that satisfies the following equation:
-                                 dR_t = - theta*(R_t - mean)dt+sigma*dW_t,
+                                 dR_t = - speed*(R_t - mean)dt+volatility*dW_t,
     For more information, please refer to :
         - https://en.wikipedia.org/wiki/Ornstein%E2%80%93Uhlenbeck_process
 
     Parameters
     ----------
-    mu : float, or list, or np.ndarray
+    mean : float, or list, or np.ndarray
         Long term mean vector of the model.
-    sigma : float, or np.ndarray
+    speed : float, or np.ndarray
         Constant matrix diffusion of the model. The dimension of the matrix must coincide with the dimension of the starting point and the vector drift.
-    theta : float, or np.ndarray
+    speed : float, or np.ndarray
         Constant matrix shape parameter. The dimension of the matrix must coincide with the dimension of the starting point and the vector drift.
-    r_0 : float, or list, or np.ndarray
-        Initial condition of the model. The dimension of the starting point must coincide with the dimension of sigma and theta.
+    initial : float, or list, or np.ndarray
+        Initial condition of the model. The dimension of the starting point must coincide with the dimension of volatility and speed.
     t_0 : float
         Initial time.
     t_n : float
@@ -61,13 +56,13 @@ class OrnsteinUhlenbeck(DiffusionProcess):
 
     Attributes
     ----------
-    mu : float, or list, or np.ndarray
+    mean : float, or list, or np.ndarray
         Long term mean vector of the model.
-    sigma : float, or np.ndarray
+    volatility : float, or np.ndarray
         Constant matrix diffusion of the model.
-    theta : float, or np.ndarray
+    speed : float, or np.ndarray
         Constant matrix shape parameter.
-    r_0 : float, or list, or np.ndarray
+    initial : float, or list, or np.ndarray
         Initial condition of the model.
     t_0 : float
         Initial time.
@@ -86,20 +81,20 @@ class OrnsteinUhlenbeck(DiffusionProcess):
     path : np.ndarray
         Path of the simulated process.
     _diagonal : bool
-        Specify if sigma is an array that works well with vectorization.
+        Specify if volatility is an array that works well with vectorization.
 
     Examples
     --------
-    >> R = OrnsteinUhlenbeck(mean=[2,2],sigma=np.ones((2,2)),theta=np.ones((2,2)),r_0=[1,1],t_0=0,t_n=1,steps=1000)
+    >> R = OrnsteinUhlenbeck(mean=[2,2],volatility=np.ones((2,2)),speed=np.ones((2,2)),initial=[1,1],t_0=0,t_n=1,steps=1000)
     >> R.simulate()
     >> R.plot()
     """
 
     def __init__(self,
-                 mu=0,
-                 sigma=1,
-                 theta=1,
-                 r_0=0,
+                 mean=0,
+                 speed=1,
+                 volatility=1,
+                 initial=0,
                  t_0=0,
                  t_n=1,
                  steps=1000):
@@ -109,42 +104,42 @@ class OrnsteinUhlenbeck(DiffusionProcess):
                          t_n=t_n,
                          steps=steps)
 
-        self.mu = np.atleast_1d(mu)
+        self.mean = np.atleast_1d(mean)
 
-        self.sigma = np.atleast_1d(sigma)
-        self.theta = np.atleast_1d(theta)
+        self.speed = np.atleast_1d(speed)
+        self.volatility = np.atleast_1d(volatility)
 
-        self.m_sigma = np.atleast_2d(sigma)
-        self.m_theta = np.atleast_2d(theta)
+        self.m_speed = np.atleast_2d(speed)
+        self.m_volatility = np.atleast_2d(volatility)
 
-        if self.theta.ndim == 1:
-            self.theta = np.diag(self.theta)
+        if self.volatility.ndim == 1:
+            self.volatility = np.diag(self.volatility)
 
-        if self.sigma.ndim == 1:
-            self.sigma = np.diag(self.sigma)
+        if self.speed.ndim == 1:
+            self.speed = np.diag(self.speed)
 
-        self.dim = np.size(self.mu)
-        self.r_0 = np.atleast_1d(r_0)
+        self.dim = np.size(self.mean)
+        self.initial = np.atleast_1d(initial)
 
-        if not(np.shape(self.sigma)[0] == np.shape(self.sigma)[1] == self.dim == np.shape(self.theta)[0] == np.shape(self.theta)[1] ==  self.r_0.size):
+        if not(np.shape(self.speed)[0] == np.shape(self.speed)[1] == self.dim == np.shape(self.volatility)[0] == np.shape(self.volatility)[1] ==  self.initial.size):
             raise ValueError(
-                "The dimension of the mean, sigma, theta, and of the starting point must coincide."
+                "The dimension of the mean, volatility, speed, and of the starting point must coincide."
             )
-        # We check if theta and sigma are a scalar, a vector or a diagonal matrix.
-        _sigma, _sigma_diag = _decompose(sigma) # Form : (Scalar/Vec/Matrix, Bool)
-        _theta, _theta_diag = _decompose(theta) # Form : (Scalar/Vec/Matrix, Bool)
+        # We check if the speed and the volatility are a scalar, a vector or a diagonal matrix.
+        _speed, _speed_diag = _decompose(speed) # Form : (Scalar/Vec/Matrix, Bool)
+        _volatility, _volatility_diag = _decompose(volatility) # Form : (Scalar/Vec/Matrix, Bool)
 
-        self._diagonal = _sigma_diag and _theta_diag # True if sigma and theta supports vectorization, False otherwise.
+        self._diagonal = _speed_diag and _volatility_diag # True if the speed and the volatility supports vectorization, False otherwise.
 
-        # If sigma and theta are a scalar, a vector or a diagonal matrix, we force it to be vector to use vectorization
+        # If volatility and speed are a scalar, a vector or a diagonal matrix, we force it to be vector to use vectorization
         # Otherwise, we assign them their matrix form, and we will use the sequential method.
         if self._diagonal:
-            self.theta = _theta
-            self.sigma = _sigma
+            self.volatility = _volatility
+            self.speed = _speed
 
-        if np.all(self.sigma < 0) or np.all(self.theta <=0):
+        if np.all(self.speed < 0) or np.all(self.volatility <=0):
             raise ValueError(
-                "The sigma and theta parameters should be greater than 0."
+                "The volatility and speed parameters should be greater than 0."
             )
 
     def drift(self, x, t=None):
@@ -168,9 +163,9 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         """
 
         if self._diagonal:
-            return self.theta * (self.mu - x)
+            return self.speed * (self.mean - x)
 
-        return self.theta @ (self.mu - x)
+        return self.speed @ (self.mean - x)
 
     def diffusion(self, x, t=None):
 
@@ -192,7 +187,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
             Diffusion evaluated at x and t.
         """
 
-        return self.sigma
+        return self.volatility
 
     def simulate(self, n_simulations=1, method="euler-maruyama",plot=False,parallel=False,n_workers=None):
 
@@ -224,7 +219,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
             from pystochastic.sde import EulerMaruyama
             self.path = EulerMaruyama(self.drift,
                                       self.diffusion,
-                                      self.r_0,
+                                      self.initial,
                                       self.t_0,
                                       self.t_n,
                                       self.steps,
@@ -240,7 +235,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
             from pystochastic.sde import Milstein
             self.path = Milstein(self.drift,
                                       self.diffusion,
-                                      self.r_0,
+                                      self.initial,
                                       self.t_0,
                                       self.t_n,
                                       self.steps,
@@ -253,14 +248,14 @@ class OrnsteinUhlenbeck(DiffusionProcess):
                 )
 
             self.path = np.zeros((n_simulations,self.steps+1, 1))
-            self.path[:,0] = self.r_0
+            self.path[:,0] = self.initial
 
             # For every simulation, we compute different normal samples
             Z = crandom.normal(0, 1, self.steps*n_simulations).reshape((n_simulations,self.steps))
 
             for i in range(1,self.steps+1):
-                # The induction formula is given by R_t = (mean + R_{t-1} - mean) * exp(-theta * dt) + sigma * sqrt(1 - exp(-2 * theta * dt)) / (2 * theta)) * Z[i-1])
-                self.path[:,i,0] = (self.mu+ (self.path[:,i-1,0] - self.mu) * np.exp(-self.theta * self.dt) + self.sigma * np.sqrt((1 - np.exp(-2 * self.theta * self.dt)) / (2 * self.theta)) * Z[:,i-1])
+                # The induction formula is given by R_t = (mean + R_{t-1} - mean) * exp(-speed * dt) + volatility * sqrt(1 - exp(-2 * speed * dt)) / (2 * speed)) * Z[i-1])
+                self.path[:,i,0] = (self.mean+ (self.path[:,i-1,0] - self.mean) * np.exp(-self.speed * self.dt) + self.volatility * np.sqrt((1 - np.exp(-2 * self.speed * self.dt)) / (2 * self.speed)) * Z[:,i-1])
 
             if plot:
                 self.n_simulations = n_simulations
@@ -275,35 +270,30 @@ class OrnsteinUhlenbeck(DiffusionProcess):
 
         return self.path
 
-    def mean(self,t):
+    def expectation(self,t):
 
         """
-        Mean method.
+        Expectation method.
 
-        Return the mean of the Ornstein-Uhlenbeck process at a given time t.
+        Return the expectation of the Ornstein-Uhlenbeck process at a given time t.
 
         Parameters
         ----------
         t : float
-            Time at which the mean is evaluated. Must be between t_0 and t_n.
+            Time at which the expectation is evaluated. Must be between t_0 and t_n.
 
         Returns
         -------
         float
-            Mean of the Ornstein-Uhlenbeck process at a time t
+            Expectation of the Ornstein-Uhlenbeck process at a time t
 
         Notes
         -----
-        The mean of the Ornstein-Uhlenbeck process  at every time t with a fixed R_0 is given by
-                            R_0 * exp(-theta*t) + mean * (Id - exp(-theta*t))
+        The expectation of the Ornstein-Uhlenbeck process at every time t with a fixed initial is given by
+                            initial * exp(-speed*t) + mean * (Id - exp(-volatility*t))
         """
 
-        if not self.t_0 <= t <= self.t_n:
-            raise ValueError(
-                "The time must be between t_0 and t_n."
-            )
-
-        return self.r_0 @ scipy.linalg.expm(- self.m_theta * t) + self.mu @ (np.eye(self.dim) - scipy.linalg.expm(- self.m_theta * t))
+        return self.initial @ scipy.linalg.expm(- self.m_speed * t) + self.mean @ (np.eye(self.dim) - scipy.linalg.expm(- self.m_speed * t))
 
     def covariance_matrix(self, t):
 
@@ -312,7 +302,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
 
         Return the covariance of the Ornstein-Uhlenbeck process at a given time t.
         The covariance matrix satisfies the following Lyapunov equation :
-            P'(t) = -theta*P(t) - P(t)*theta^T + (Sigma*Sigma^T)
+            P'(t) = -volatility*P(t) - P(t)*volatility^T + (speed*speed^T)
 
         Parameters
         ----------
@@ -325,12 +315,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
             Covariance matrix of the Ornstein-Uhlenbeck process at a time t.
         """
 
-        if not self.t_0 <= t <= self.t_n:
-            raise ValueError(
-                "The time must be between t_0 and t_n."
-            )
-
-        Q = self.m_sigma @ self.m_sigma.T
+        Q = self.m_volatility @ self.m_volatility.T
 
         # We define the Lyapunov equation, where s is the time at which we want to evaluate the solution of the
         # Lyapunov equation, and p is the state of the process at time t (as a vector).
@@ -340,14 +325,14 @@ class OrnsteinUhlenbeck(DiffusionProcess):
             P = p.reshape(self.dim, self.dim)
 
             # We define the right-hand side of the Lyapunov equation
-            dP = -self.m_theta @ P- P @ self.m_theta.T + Q
+            dP = -self.m_speed @ P- P @ self.m_speed.T + Q
 
             # We return the flattened version of the right-hand side of the Lyapunov equation. We use the method ravel
             # to flatten the array column by column instead of row by row.
             return dP.ravel()
 
         # We solve the Lyapunov equation using the scipy.integrate.solve_ivp function, with the initial condition p=0, since
-        # R_0, the initial condition of the process, is a deterministic vector.
+        # initial, the initial condition of the process, is a deterministic vector.
 
         solution = scipy.integrate.solve_ivp(ode, (0, t),np.zeros(self.dim ** 2))
 
@@ -385,10 +370,6 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         This method is using the covariance matrix method, which solves the Lyapunov equation.
         """
 
-        if not self.t_0 <= t <= self.t_n:
-            raise ValueError(
-                "The time must be between t_0 and t_n."
-            )
 
         return self.covariance_matrix(t)[i,j]
 

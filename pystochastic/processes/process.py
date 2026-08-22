@@ -15,8 +15,6 @@ class Process(ABC):
         self.steps = steps
         self.n_simulations = None
         self.path = None
-        self.t = np.linspace(self.t_0, self.t_n, self.steps + 1)
-        self.dt = (t_n - t_0) / steps
 
         if not t_0 < t_n:
             raise ValueError(
@@ -28,24 +26,60 @@ class Process(ABC):
                 "The number of steps must be strictly positive."
             )
 
+        self.t = np.linspace(self.t_0, self.t_n, self.steps + 1)
+        self.dt = (t_n - t_0) / steps
+
     @abstractmethod
     def simulate(self):
         pass
 
     @abstractmethod
-    def mean(self,t):
+    def expectation(self,t):
+
+        if not self.t_0 <= t <= self.t_n:
+            raise ValueError(
+                f"The time must be between {self.t_0} and {self.t_n}."
+            )
+
         pass
 
     @abstractmethod
     def covariance_matrix(self,t):
+
+        if not self.t_0 <= t <= self.t_n:
+            raise ValueError(
+                f"The time must be between {self.t_0} and {self.t_n}."
+            )
+
         pass
 
     @abstractmethod
     def covariance(self,t,i,j):
+
+        if not self.t_0 <= t <= self.t_n:
+            raise ValueError(
+                f"The time must be between {self.t_0} and {self.t_n}."
+            )
+
+        if not 0 <= i < self.dim:
+            raise ValueError(
+                "The first coordinate must be between 0 and the dimension (excluded)."
+            )
+
+        if not 0 <= j < self.dim:
+            raise ValueError(
+                "The second coordinate must be between 0 and the dimension (excluded)."
+            )
         pass
 
     @abstractmethod
     def variance(self,t):
+
+        if not self.t_0 <= t <= self.t_n:
+            raise ValueError(
+                f"The time must be between {self.t_0} and {self.t_n}."
+            )
+
         pass
 
     def plot(self):
@@ -64,11 +98,6 @@ class Process(ABC):
         if self.dim > 3:
             raise ValueError(
                 "The path can be plotted only for 1D, 2D and 3D."
-            )
-
-        if self.path is None:
-            raise ValueError(
-                "The path has not been simulated yet. Please run the simulate method first."
             )
 
         fig = go.Figure()

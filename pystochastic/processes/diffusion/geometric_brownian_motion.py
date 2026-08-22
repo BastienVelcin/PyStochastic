@@ -7,17 +7,12 @@ Description
 -----------
 This module provides a way to simulate a Geometric Brownian Motion (GBM) with a given mean and covariance matrix.
 
-This module provides a general class "GeometricBrownianMotion", with the following built-in methods:
-    - .simulate() : Simulate a Geometric Brownian Motion path, with both exact, Milstein (only in 1D) and Euler-Maruyama methods.
-    - .plot() : Plot the Geometric Brownian Motion path.
-    - .mean() : Mean of the Geometric Brownian Motion process at a given time.
-    - .covariance() : Covariance between two coordinates of the Geometric Brownian Motion process at a given time.
-    - .covariance_matrix() : Covariance matrix of the Geometric Brownian Motion process at a given time.
-    - .variance() : Variance of the Geometric Brownian Motion process at a given time.
+This module provides a general class "GeometricBrownianMotion", which inherits from the methods of Process and
+DiffusionProcess abstract classes.
 
 Examples
 --------
->> S = GeometricBrownianMotion(mu=[2,1],sigma=np.eye(2),S_0=[1,1],t_0=0,t_n=1,steps=1000) #Geometric Brownian Motion with mean [2,1] and covariance matrix np.eye(2) and starting point [1,1]
+>> S = GeometricBrownianMotion(mu=[2,1],volatility=np.eye(2),initial=[1,1],t_0=0,t_n=1,steps=1000) #Geometric Brownian Motion with mean [2,1] and covariance matrix np.eye(2) and starting point [1,1]
 >>
 >> S.simulate() #Simulate the Brownian motion path
 >>
@@ -36,7 +31,7 @@ class GeometricBrownianMotion(DiffusionProcess):
     Geometric Brownian Motion class
 
     The Geometric Brownian Motion is a stochastic process that satisfies the following equation:
-                                 dS_t = mu*S_tdt + sigma*S_t dW_t,
+                                 dS_t = mu*S_tdt + volatility*S_t dW_t,
     For more information, please refer to :
         - https://en.wikipedia.org/wiki/Geometric_Brownian_motion
 
@@ -44,10 +39,10 @@ class GeometricBrownianMotion(DiffusionProcess):
     ----------
     mu : float, or list, or np.ndarray
         Constant vector drift of the model.
-    sigma : float, or np.ndarray
-        Constant matrix drift of the model. The dimension of the matrix must coincide with the dimension of the starting point and the vector drift.
-    S_0 : None, float, or list, or np.ndarray
-        Initial condition of the model. The dimension of the starting point must coincide with the dimension of the covariance matrix and the vector drift.
+    volatility : float, or np.ndarray
+        Constant matrix drift of the model. The dimension of the matrix must coincide with the dimension of the starting point and the vector mu.
+    initial : None, float, or list, or np.ndarray
+        Initial condition of the model. The dimension of the starting point must coincide with the dimension of the covariance matrix and the vector mu.
     t_0 : float
         Initial time.
     t_n : float
@@ -59,9 +54,9 @@ class GeometricBrownianMotion(DiffusionProcess):
     ----------
     mu : float, or list, or np.ndarray
         Constant vector drift of the model.
-    sigma : float, or np.ndarray
+    volatility : float, or np.ndarray
         Factor diffusion matrix of the model.
-    S_0 : None, float, or list, or np.ndarray
+    initial : None, float, or list, or np.ndarray
         Initial condition of the model.
     t_0 : float
         Initial time.
@@ -78,19 +73,19 @@ class GeometricBrownianMotion(DiffusionProcess):
     path : np.ndarray
         Path of the simulated GBM.
     _diagonal : bool
-        Specify if sigma is an array that works well with vectorization.
+        Specify if volatility is an array that works well with vectorization.
 
     Examples
     --------
-    >> S = GeometricBrownianMotion(mu=[2,1],sigma=np.eye(2),S_0=[1,1],t_0=0,t_n=1,steps=1000)
+    >> S = GeometricBrownianMotion(mu=[2,1],volatility=np.eye(2),initial=[1,1],t_0=0,t_n=1,steps=1000)
     >> S.simulate()
     >> S.plot()
     """
 
     def __init__(self,
                  mu=1,
-                 sigma=1,
-                 S_0=None,
+                 volatility=1,
+                 initial=None,
                  t_0=0,
                  t_n=1,
                  steps=1000):
@@ -101,37 +96,37 @@ class GeometricBrownianMotion(DiffusionProcess):
 
         self.mu = np.atleast_1d(mu)
 
-        self.sigma = np.atleast_1d(sigma)
-        self.m_sigma = np.atleast_2d(sigma)
+        self.volatility = np.atleast_1d(volatility)
+        self.m_volatility = np.atleast_2d(volatility)
 
-        if self.sigma.ndim == 1:
-            self.sigma = np.diag(self.sigma)
+        if self.volatility.ndim == 1:
+            self.volatility = np.diag(self.volatility)
 
-        if S_0 == None:
-            S_0 = np.ones(np.size(mu))
+        if initial == None:
+            initial = np.ones(np.size(mu))
 
-        self.S_0 = np.atleast_1d(S_0)
-        self.dim = np.size(self.S_0)
+        self.initial = np.atleast_1d(initial)
+        self.dim = np.size(self.initial)
 
-        if self.sigma.ndim == 1 and not(np.shape(self.sigma) == self.dim == np.size(self.mu)):
+        if self.volatility.ndim == 1 and not(np.shape(self.volatility) == self.dim == np.size(self.mu)):
             raise ValueError(
                 "The dimension of the volatility matrix, of the drift and of the starting point must coincide."
             )
 
-        elif self.sigma.ndim != 1 and not(np.shape(self.sigma)[0] == np.shape(self.sigma)[1] == self.dim == np.size(self.mu)):
+        elif self.volatility.ndim != 1 and not(np.shape(self.volatility)[0] == np.shape(self.volatility)[1] == self.dim == np.size(self.mu)):
             raise ValueError(
                 "The dimension of the volatility matrix, of the drift and of the starting point must coincide."
             )
 
         # We check if the diffusion is a scalar, a vector or a diagonal matrix.
-        _sigma, _sigma_diag = _decompose(sigma) # Form : (Scalar/Vec/Matrix, Bool)
+        _volatility, _volatility_diag = _decompose(volatility) # Form : (Scalar/Vec/Matrix, Bool)
 
-        self._diagonal = _sigma_diag # True or False depending on the type of sigma.
+        self._diagonal = _volatility_diag # True or False depending on the type of volatility.
 
-        # If sigma is a scalar, a vector or a diagonal matrix, we force it to be vector to use vectorization
+        # If volatility is a scalar, a vector or a diagonal matrix, we force it to be vector to use vectorization
         # Otherwise, we assign to the diffusion the matrix, and we will use the sequential method.
         if self._diagonal:
-            self.sigma = _sigma
+            self.volatility = _volatility
 
 
     def drift(self, x, t=None):
@@ -140,13 +135,13 @@ class GeometricBrownianMotion(DiffusionProcess):
 
     def diffusion(self, x, t=None):
 
-        # If sigma is a scalar, a vector or a diagonal matrix, then self.sigma is a vector, and the diffusion is given
-        # by sigma * x. Otherwise, self.sigma is a matrix, and the diffusion is given by sigma @ x.
+        # If volatility is a scalar, a vector or a diagonal matrix, then self.volatility is a vector, and the diffusion is given
+        # by volatility * x. Otherwise, self.volatility is a matrix, and the diffusion is given by volatility @ x.
 
         if self._diagonal:
-            return self.sigma * x
+            return self.volatility * x
 
-        return  x @ self.sigma.T
+        return  x @ self.volatility.T
 
     def simulate(self,n_simulations=1, method="exact",plot=False,parallel=False,n_workers=None):
 
@@ -178,7 +173,7 @@ class GeometricBrownianMotion(DiffusionProcess):
             from pystochastic.sde import EulerMaruyama
             self.path = EulerMaruyama(self.drift,
                                       self.diffusion,
-                                      self.S_0,
+                                      self.initial,
                                       self.t_0,
                                       self.t_n,
                                       self.steps,
@@ -194,7 +189,7 @@ class GeometricBrownianMotion(DiffusionProcess):
             from pystochastic.sde import Milstein
             self.path = Milstein(self.drift,
                                       self.diffusion,
-                                      self.S_0,
+                                      self.initial,
                                       self.t_0,
                                       self.t_n,
                                       self.steps,
@@ -204,20 +199,20 @@ class GeometricBrownianMotion(DiffusionProcess):
             self.path = np.zeros((n_simulations,self.steps+1, self.dim))
             W = Brownian(np.eye(self.dim), self.t_0, self.t_n, self.steps)
             W.simulate(n_simulations=n_simulations)
-            #If the volatility is a scalar, a vector or a diagonal matrix, then sigma is reshaped as a vector,
-            # so we need to sum on the only available axis. Otherwise, sigma is a matrix, and we need to sum on the axis 1.
+            #If the volatility is a scalar, a vector or a diagonal matrix, then volatility is reshaped as a vector,
+            # so we need to sum on the only available axis. Otherwise, volatility is a matrix, and we need to sum on the axis 1.
             if self._diagonal:
                 for i in range(0, self.steps+1):
-                    # The explicit solution is given by S_t = S_0 * exp((mu - 1/2 * sigma^2) * t + sigma * W_t)
+                    # The explicit solution is given by S_t = initial * exp((mu - 1/2 * volatility^2) * t + volatility * W_t)
 
-                    self.path[:,i, :] = self.S_0 * np.exp(
-                        (self.mu - np.sum(self.sigma ** 2, axis=0) / 2) * self.t[i] + self.sigma * W.path[:,i,:])
+                    self.path[:,i, :] = self.initial * np.exp(
+                        (self.mu - np.sum(self.volatility ** 2, axis=0) / 2) * self.t[i] + self.volatility * W.path[:,i,:])
             else:
                 for i in range(0, self.steps + 1):
-                    # The explicit solution is given by S_t = S_0 * exp((mu - 1/2 * sigma^2) * t + sigma * W_t)
+                    # The explicit solution is given by S_t = initial * exp((mu - 1/2 * volatility^2) * t + volatility * W_t)
 
-                    self.path[:, i, :] = self.S_0 * np.exp(
-                        (self.mu - np.sum(self.sigma * 2, axis=1) / 2) * self.t[i] + self.sigma  @ W.path[:,i,:])
+                    self.path[:, i, :] = self.initial * np.exp(
+                        (self.mu - np.sum(self.volatility * 2, axis=1) / 2) * self.t[i] + self.volatility  @ W.path[:,i,:])
 
             if plot:
                 self.n_simulations = n_simulations
@@ -230,34 +225,29 @@ class GeometricBrownianMotion(DiffusionProcess):
         self.n_simulations = n_simulations
         return self.path
 
-    def mean(self, t):
+    def expectation(self, t):
 
         """
-        Mean method.
+        Expectation method.
 
-        Return the mean of the GBM path at a given time t.
+        Return the expectation of the GBM path at a given time t.
 
         Parameters
         ----------
         t : float
-            Time at which the mean is evaluated. Must be between t_0 and t_n.
+            Time at which the expectation is evaluated. Must be between t_0 and t_n.
 
         Returns
         -------
         float
-            Mean of the GBM path at a time t
+            Expectation of the GBM path at a time t
 
         Notes
         -----
-        The mean of the GBM path at every time t with a fixed S_0 is given by S_0 * exp(mu*t)
+        The expectation of the GBM path at every time t with a fixed initial is given by initial * exp(mu*t)
         """
 
-        if not self.t_0 <= t <= self.t_n:
-            raise ValueError(
-                "The time must be between t_0 and t_n."
-            )
-
-        return self.S_0 * np.exp(self.mu * t)
+        return self.initial * np.exp(self.mu * t)
 
     def covariance(self,t, i,j):
 
@@ -284,24 +274,10 @@ class GeometricBrownianMotion(DiffusionProcess):
         Notes
         -----
         The covariance of the i-th and j-th coordinate of the GBM path at a time t is given by
-            S_{0,i} * S_{0,j} * exp((mu_{i} + mu_{j})*t) * (exp((sigma*sigma^T)_{ij}*t) - 1).
+            S_{0,i} * S_{0,j} * exp((mu_{i} + mu_{j})*t) * (exp((volatility*volatility^T)_{ij}*t) - 1).
         """
 
-        if not self.t_0 <= t <= self.t_n:
-            raise ValueError(
-                "The time must be between t_0 and t_n."
-            )
-
-        if not 0 <= i < self.dim:
-            raise ValueError(
-                "The first coordinate must be between 0 and the dimension (excluded)."
-            )
-
-        if not 0 <= j < self.dim:
-            raise ValueError(
-                "The second coordinate must be between 0 and the dimension (excluded)."
-            )
-        return self.S_0[i]*self.S_0[j]*np.exp((self.mu[i]+self.mu[j])*t)*(np.exp((self.m_sigma*self.m_sigma.T)[i,j] * t)-1)
+        return self.initial[i]*self.initial[j]*np.exp((self.mu[i]+self.mu[j])*t)*(np.exp((self.m_volatility*self.m_volatility.T)[i,j] * t)-1)
 
     def covariance_matrix(self,t):
 
@@ -321,10 +297,6 @@ class GeometricBrownianMotion(DiffusionProcess):
             Covariance matrix of the GBM at a time t.
         """
 
-        if not self.t_0 <= t <= self.t_n:
-            raise ValueError(
-                "The time must be between t_0 and t_n."
-            )
 
         covar = np.zeros((self.dim,self.dim))
 
@@ -351,10 +323,5 @@ class GeometricBrownianMotion(DiffusionProcess):
         np.ndarray
             Variance of the GBM path coordinates at a given time t.
         """
-
-        if not self.t_0 <= t <= self.t_n:
-            raise ValueError(
-                "The time must be between t_0 and t_n."
-            )
 
         return np.array([self.covariance(t,i,i) for i in range(self.dim)])

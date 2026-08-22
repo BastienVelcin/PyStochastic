@@ -23,7 +23,7 @@ as well as an external trajectory simulation function.
 
 Examples
 --------
->> W = Brownian(var=np.eye(2),dim=2,t_0=0,t_n=1,steps=1000) #Brownian motion with covariance matrix np.eye(2)
+>> W = Brownian(variance=np.eye(2),dim=2,t_0=0,t_n=1,steps=1000) #Brownian motion with covariance matrix np.eye(2)
 >>
 >> W.simulate() #Simulate the Brownian motion path
 >>
@@ -50,7 +50,7 @@ class Brownian(Process):
 
     Parameters
     ----------
-    var : None, float, or np.ndarray
+    variance : None, float, or np.ndarray
         Covariance matrix of the Brownian motion. If None, the covariance matrix is set to identity. The matrix must be positive-definite.
     dim : int
         Dimension of the brownian motion. The dimension must coincide with the dimension of the covariance matrix. Must be a strictly positive integer.
@@ -63,7 +63,7 @@ class Brownian(Process):
 
     Attributes
     ----------
-    var : None, float, or np.ndarray
+    variance : None, float, or np.ndarray
         Covariance matrix of the Brownian motion. If None, the covariance matrix is set to identity.
     dim : int
         Dimension of the brownian motion.
@@ -84,13 +84,13 @@ class Brownian(Process):
 
     Examples
     --------
-    >> W = Brownian(var=np.eye(2),t_0=0,t_n=1,steps=1000)
+    >> W = Brownian(variance=np.eye(2),t_0=0,t_n=1,steps=1000)
     >> W.simulate()
     >> W.plot()
     """
 
     def __init__(self,
-                 var=1,
+                 variance=1,
                  t_0=0,
                  t_n=1,
                  steps=1000):
@@ -99,14 +99,14 @@ class Brownian(Process):
                          t_n=t_n,
                          steps=steps)
 
-        self.var = np.atleast_2d(var)
+        self.variance = np.atleast_2d(variance)
 
-        if not is_pos_def(self.var):
+        if not is_pos_def(self.variance):
             raise ValueError(
                 "The covariance matrix is not positive-definite."
             )
 
-        self.dim = np.shape(self.var)[0]
+        self.dim = np.shape(self.variance)[0]
         self.sim = None
         self.increments =None
 
@@ -127,7 +127,7 @@ class Brownian(Process):
         The function only returns the path and not the increments. The increments can be accessed through the 'increments' attribute.
         """
 
-        self.sim = brownian_motion(self.var, self.t_0,self.t_n,self.steps, n_simulations)
+        self.sim = brownian_motion(self.variance, self.t_0,self.t_n,self.steps, n_simulations)
         self.path = self.sim[0]
         self.increments = self.sim[1]
 
@@ -137,32 +137,27 @@ class Brownian(Process):
             self.plot()
         return self.path
 
-    def mean(self,t):
+    def expectation(self,t):
 
         """
-        Mean method.
+        Expectation method.
 
-        Return the mean of the Brownian motion at a given time t.
+        Return the expectation of the Brownian motion at a given time t.
 
         Parameters
         ----------
         t : float
-            Time at which the mean is evaluated. Must be between t_0 and t_n.
+            Time at which the expectation is evaluated. Must be between t_0 and t_n.
 
         Returns
         -------
         float
-            0 : Mean of the Brownian motion at a time t
+            0 : Expectation of the Brownian motion at a time t
 
         Notes
         -----
-        The mean of the Brownian motion at every time t is always 0, since W_t ~ N(0,t*Q), where Q is the covariance matrix.
+        The expectation of the Brownian motion at every time t is always 0, since W_t ~ N(0,t*Q), where Q is the covariance matrix.
         """
-
-        if not self.t_0 <= t <= self.t_n:
-            raise ValueError(
-                "The time must be between t_0 and t_n."
-            )
 
         return 0
 
@@ -188,12 +183,7 @@ class Brownian(Process):
         The covariance matrix of the Brownian motion at every time t is always t*Q, since W_t ~ N(0,t*Q), where Q is the Brownian matrix parameter
         """
 
-        if not self.t_0 <= t <= self.t_n:
-            raise ValueError(
-                "The time must be between t_0 and t_n."
-            )
-
-        return t*self.var
+        return t*self.variance
 
     def covariance(self, t,i,j):
 
@@ -219,11 +209,6 @@ class Brownian(Process):
             Covariance between the i-th and j-th coordinates.
         """
 
-        if not self.t_0 <= t <= self.t_n:
-            raise ValueError(
-                "The time must be between t_0 and t_n."
-            )
-
         return self.covariance_matrix(t)[i,j]
 
 
@@ -245,15 +230,10 @@ class Brownian(Process):
             Variance of the Brownian Motion path coordinates at a given time t.
         """
 
-        if not self.t_0 <= t <= self.t_n:
-            raise ValueError(
-                "The time must be between t_0 and t_n."
-            )
-
         return np.array([self.covariance(t,i,i) for i in range(self.dim)])
 
 
-def brownian_motion(var=1, t_0 = 0, t_n = 1, steps = 1000,n_simulations=1):
+def brownian_motion(variance=1, t_0 = 0, t_n = 1, steps = 1000,n_simulations=1):
 
     """
     Brownian motion function.
@@ -266,15 +246,15 @@ def brownian_motion(var=1, t_0 = 0, t_n = 1, steps = 1000,n_simulations=1):
         np.ndarray of the simulated brownian motion path and np.ndarray of the increments.
 
     """
-    var = np.atleast_2d(var)
-    d = np.shape(var)[0]
+    variance = np.atleast_2d(variance)
+    d = np.shape(variance)[0]
 
     W = np.zeros((n_simulations,steps+1, d))
     dW = np.zeros((n_simulations, steps, d))
 
     # Computation of the step length and Cholesky decomposition
     h = (t_n - t_0) / steps
-    L = np.linalg.cholesky(var)  # The Cholesky decomposition of the covariance matrix is analogous to the square root for matrices.
+    L = np.linalg.cholesky(variance)  # The Cholesky decomposition of the covariance matrix is analogous to the square root for matrices.
 
     N = crandom.normal(0,1,n_simulations*steps*d)
     Z = np.reshape(N,(n_simulations,steps,d))

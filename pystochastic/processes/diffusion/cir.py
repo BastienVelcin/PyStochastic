@@ -7,17 +7,11 @@ Description
 -----------
 This module provides a way to simulate a Cox-Ingersoll-Ross process with a given long-term mean, diffusion and form parameter.
 
-This module provides a general class "CIR", with the following built-in methods:
-    - .drift() : Drift function of the CIR model.
-    - .diffusion() : Diffusion function of the CIR model.
-    - .simulate() : Simulate a Cox-Ingersoll-Ross model path in 1D, with both exact, Milstein and Euler-Maruyama methods.
-    - .plot() : Plot the Cox-Ingersoll-Ross model path.
-    - .mean() : Mean of the CIR process at a given time.
-    - .variance() : Variance of the CIR process at a given time.
+This module provides a general class "CIR", which inherits from the methods of Process and DiffusionProcess abstract classes.
 
 Examples
 --------
->> R = CIR(a=2,b=3,sigma=1,r_0=0,t_0=0,t_n=1,steps=1000) #Cox-Ingersoll-Ross process with speed 2, mean 3 and volatility 1 and starting point 0.
+>> R = CIR(a=2,b=3,volatility=1,initial=0,t_0=0,t_n=1,steps=1000) #Cox-Ingersoll-Ross process with speed 2, mean 3 and volatility 1 and starting point 0.
 >>
 >> R.simulate() #Simulate the CIR process path
 >>
@@ -35,19 +29,19 @@ class CIR(DiffusionProcess):
     CIR class
 
     A Cox-Ingersoll-Ross process is a unidimensional stochastic process that satisfies the following equation:
-                                 dR_t = a*(b - R_t)dt + sigma*sqrt(R_t)dW_t,
+                                 dR_t = a*(b - R_t)dt + volatility*sqrt(R_t)dW_t,
     For more information, please refer to :
         - https://en.wikipedia.org/wiki/Cox%E2%80%93Ingersoll%E2%80%93Ross_model
 
     Parameters
     ----------
-    a : float
+    speed : float
         Speed of adjustment to the mean and volatility.
-    b : float
+    mean : float
         Mean parameter.
-    sigma : float
+    volatility : float
         Volatility parameter.
-    r_0 : float, or list, or np.ndarray
+    initial : float, or list, or np.ndarray
         Initial condition of the model.
     t_0 : float
         Initial time.
@@ -58,13 +52,13 @@ class CIR(DiffusionProcess):
 
     Attributes
     ----------
-    a : float
+    speed : float
         Speed of adjustment to the mean and volatility.
-    b : float
+    mean : float
         Mean parameter.
-    sigma : float
+    volatility : float
         Volatility parameter.
-    r_0 : float, or list, or np.ndarray
+    initial : float, or list, or np.ndarray
         Initial condition of the model.
     t_0 : float
         Initial time.
@@ -91,16 +85,16 @@ class CIR(DiffusionProcess):
 
     Examples
     --------
-    >> R = CIR(a=2,b=3,sigma=1,r_0=0,t_0=0,t_n=1,steps=1000)
+    >> R = CIR(a=2,b=3,volatility=1,initial=0,t_0=0,t_n=1,steps=1000)
     >> R.simulate()
     >> R.plot()
     """
 
     def __init__(self,
-                 a=1,
-                 b=1,
-                 sigma=1,
-                 r_0=0,
+                 speed=1,
+                 mean=1,
+                 volatility=1,
+                 initial=0,
                  t_0=0,
                  t_n=1,
                  steps=1000):
@@ -109,26 +103,26 @@ class CIR(DiffusionProcess):
                          t_n=t_n,
                          steps=steps)
 
-        self.a = a
-        self.b = b
-        self.sigma = sigma
-        self.r_0 = r_0
+        self.speed = speed
+        self.mean = mean
+        self.volatility = volatility
+        self.initial = initial
 
-        if (self.a <= 0) or (self.b < 0) or (self.sigma <= 0) or (self.r_0 < 0):
+        if (self.speed <= 0) or (self.mean < 0) or (self.volatility <= 0) or (self.initial < 0):
             raise ValueError(
-                "The model parameters must satisfy a > 0, b >= 0, sigma > 0 and r_0 >= 0."
+                "The model parameters must satisfy a > 0, b >= 0, volatility > 0 and initial >= 0."
             )
 
         self.dim = 1
-        self.nu = (4*self.a*self.b)/(self.sigma**2)
-        self.factor = (4*self.a*np.exp(-self.a * self.dt))/((self.sigma**2)*(1-np.exp(-self.a * self.dt)))
-        self.c = ((self.sigma**2)*(1-np.exp(-self.a * self.dt)))/(4*self.a)
+        self.nu = (4*self.speed*self.mean)/(self.volatility**2)
+        self.factor = (4*self.speed*np.exp(-self.speed * self.dt))/((self.volatility**2)*(1-np.exp(-self.speed * self.dt)))
+        self.c = ((self.volatility**2)*(1-np.exp(-self.speed * self.dt)))/(4*self.speed)
 
     def drift(self,x,t=None):
-        return self.a * (self.b-x)
+        return self.speed * (self.mean-x)
 
     def diffusion(self,x,t=None):
-        return self.sigma * np.sqrt(np.maximum(x,0))
+        return self.volatility * np.sqrt(np.maximum(x,0))
 
     def simulate(self, n_simulations=1,method="exact",plot=False):
 
@@ -154,14 +148,14 @@ class CIR(DiffusionProcess):
 
         if method == "euler-maruyama":
             from pystochastic.sde import EulerMaruyama
-            if (2 * self.a * self.b < self.sigma ** 2):
+            if (2 * self.speed * self.mean < self.volatility ** 2):
                 raise ValueError(
-                    "The model parameters are inconsistent with the model. Please choose a, b and sigma such that 2*a*b >= sigma^2"
+                    "The model parameters are inconsistent with the model. Please choose a, b and volatility such that 2*a*b >= volatility^2"
                 )
 
             self.path = EulerMaruyama(self.drift,
                                       self.diffusion,
-                                      self.r_0,
+                                      self.initial,
                                       self.t_0,
                                       self.t_n,
                                       self.steps,
@@ -169,21 +163,21 @@ class CIR(DiffusionProcess):
 
         elif method == "milstein":
             from pystochastic.sde import Milstein
-            if (2 * self.a * self.b < self.sigma ** 2):
+            if (2 * self.speed * self.mean < self.volatility ** 2):
                 raise ValueError(
-                    "The model parameters are inconsistent with the model. Please choose a, b and sigma such that 2*a*b >= sigma^2"
+                    "The model parameters are inconsistent with the model. Please choose a, b and volatility such that 2*a*b >= volatility^2"
                 )
 
             self.path = Milstein(self.drift,
                                       self.diffusion,
-                                      self.r_0,
+                                      self.initial,
                                       self.t_0,
                                       self.t_n,
                                       self.steps,
                                       n_simulations).solve(plot=plot)
         elif method == "exact":
             self.path = np.zeros((n_simulations,self.steps+1, 1))
-            self.path[:,0] = self.r_0
+            self.path[:,0] = self.initial
             for i in range(1,self.steps+1):
                 rng = get_rng()
                 # The induction formula is given by R_{t+1} = c*Z, where Z ~ NCX2(df=nu, nc=R_t * factor)
@@ -200,26 +194,26 @@ class CIR(DiffusionProcess):
 
         return self.path
 
-    def mean(self,t):
+    def expectation(self,t):
 
         """
-        Mean method.
+        Expectation method.
 
-        Return the mean of the CIR path at a given time t.
+        Return the expectation of the CIR path at a given time t.
 
         Returns
         -------
         float
-            Mean of the CIR path at a time t
+            Expectation of the CIR path at a time t
 
         Parameters
         ----------
         t : float
-            Time at which the mean is evaluated. Must be between t_0 and t_n.
+            Time at which the expectation is evaluated. Must be between t_0 and t_n.
 
         Notes
         -----
-        The mean of the CIR path at every time t with a fixed r_0 is given by r_0 * exp(-a*t) + b*(1-exp(-a*t))
+        The expectation of the CIR path at every time t with a fixed initial is given by initial * exp(-speed*t) + b*(1-exp(-speed*t))
         """
 
         if not self.t_0 <= t <= self.t_n:
@@ -227,7 +221,7 @@ class CIR(DiffusionProcess):
                 "The time must be between t_0 and t_n."
             )
 
-        return self.r_0 * np.exp(-self.a * t) + self.b*(1-np.exp(-self.a * t))
+        return self.initial * np.exp(-self.speed * t) + self.mean*(1-np.exp(-self.speed * t))
 
     def variance(self,t):
 
@@ -248,8 +242,8 @@ class CIR(DiffusionProcess):
 
         Notes
         -----
-        The variance of the CIR path at every time t with a fixed r_0 is given by
-        r_0 * sigma^2/a * (exp(-a*t)-exp(-2*a*t)) + (b*sigma^2)/(2*a) * (1-exp(-a*t))^2
+        The variance of the CIR path at every time t with a fixed initial is given by
+        initial * volatility^2/a * (exp(-a*t)-exp(-2*a*t)) + (b*volatility^2)/(2*a) * (1-exp(-a*t))^2
         """
 
         if not self.t_0 <= t <= self.t_n:
@@ -257,7 +251,7 @@ class CIR(DiffusionProcess):
                 "The time must be between t_0 and t_n."
             )
 
-        return self.r_0 * (self.sigma**2 / self.a) * (np.exp(-self.a*t)-np.exp(-2 * self.a * t)) + (self.b * self.sigma**2)/(2*self.a) * (1-np.exp(-self.a*t))**2
+        return self.initial * (self.volatility**2 / self.speed) * (np.exp(-self.speed*t)-np.exp(-2 * self.speed * t)) + (self.mean * self.volatility**2)/(2*self.speed) * (1-np.exp(-self.speed*t))**2
 
     def covariance_matrix(self,t):
         return self.variance(t)

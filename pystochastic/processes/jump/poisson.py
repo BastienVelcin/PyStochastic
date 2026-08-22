@@ -151,26 +151,26 @@ class Poisson:
                                      line=dict(width=2,shape="hv")))
         fig.show()
 
-    def mean(self,t):
+    def expectation(self,t):
 
         """
-        Mean method.
+        Expectation method.
 
-        Return the mean of the Poisson process at a given time t.
+        Return the expectation of the Poisson process at a given time t.
 
         Parameters
         ----------
         t : float
-            Time at which the mean is evaluated. Must be between t_0 and t_n.
+            Time at which the expectation is evaluated. Must be between t_0 and t_n.
 
         Returns
         -------
         float
-            Mean of the Poisson process at a time t
+            Expectation of the Poisson process at a time t
 
         Notes
         -----
-        The mean of the Poisson process at every time t is equal to the intensity times t, since the Poisson process at a time t
+        The expectation of the Poisson process at every time t is equal to the intensity times t, since the Poisson process at a time t
         follows a Poisson distribution of parameter intensity times t.
         """
 
