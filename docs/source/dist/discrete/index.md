@@ -228,4 +228,9 @@ duniform
 bernoulli
 rademacher
 binomial
+poisson
+geometric
+hypergeometric
+negativebinomial
+yulesimon
 ```

@@ -14,7 +14,7 @@ pystochastic.dist.Binomial(p = 0.5, n = 1)
 **Type :** Class
 
 Create an instance of the Binomial distribution. A Binomial distribution is a discrete-time distribution which represents `n` independant repetitions of the same experience with two issues: a success and a failure.
-The probability distribution of the Bernouilli distribution of parameters $p$ and $n$ is given by:
+The probability distribution of the Binomial distribution of parameters $p$ and $n$ is given by:
 \begin{equation*}
 \mathbb{P}_U = \sum_{k=0}^n \binom{n}{k} p^k (1-p)^{n-k}
 \end{equation*}
