@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 from pystochastic.montecarlo.montecarlo import MonteCarlo, MonteCarloProcess
-from pystochastic.pyrandom import crandom
+from pystochastic.random import crandom
 from pystochastic.processes.diffusion.vasicek import Vasicek
 
 
@@ -18,11 +18,11 @@ def make_normal_samples(
     n_simulations=5,
     n_pool_values=1000,
     dim=1,
-    mu=0.0,
+    mean=0.0,
     sigma=1.0,
 ):
     samples = crandom.normal(
-        mu,
+        mean,
         sigma,
         n_simulations * n_pool_values * dim,
     )
@@ -543,13 +543,13 @@ class TestMonteCarloProcess:
     @pytest.fixture
     def vasicek(self):
         return Vasicek(
-            reversion_speed=2,
-            mu=1.5,
+            speed=2,
+            mean=1.5,
             volatility=0.3,
-            r_0=0,
+            initial=0,
             t_0=0,
             t_n=5,
-            n_steps=100,
+            steps=100,
         )
 
     def test_values_at_shape(self, vasicek):

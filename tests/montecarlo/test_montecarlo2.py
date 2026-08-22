@@ -5,7 +5,7 @@ import pytest
 from scipy import stats
 
 from pystochastic.montecarlo.montecarlo import MonteCarlo, MonteCarloProcess
-from pystochastic.pyrandom import crandom
+from pystochastic.random import crandom
 from pystochastic.processes.diffusion.vasicek import Vasicek
 
 
@@ -184,7 +184,7 @@ class TestMonteCarloProcess:
 
     def test_estimate_matches_theoretical_mean(self):
         np.random.seed(0)
-        v = Vasicek(reversion_speed=2, mu=1.5, volatility=0.3, r_0=0, t_0=0, t_n=5, n_steps=100)
+        v = Vasicek(speed=2, mean=1.5, volatility=0.3, initial=0, t_0=0, t_n=5, steps=100)
         mc = MonteCarloProcess(v, n_simulations=5000)
         est = mc.estimate(t_0=5, function=lambda x: x[:, 0])
         theo = 1.5 + (0 - 1.5) * np.exp(-2 * 5)
@@ -192,14 +192,14 @@ class TestMonteCarloProcess:
 
     def test_values_at_shape(self):
         np.random.seed(0)
-        v = Vasicek(reversion_speed=2, mu=1.5, volatility=0.3, r_0=0, t_0=0, t_n=5, n_steps=100)
+        v = Vasicek(speed=2, mean=1.5, volatility=0.3, initial=0, t_0=0, t_n=5, steps=100)
         mc = MonteCarloProcess(v, n_simulations=500)
         vals = mc.values_at(t_0=5)
         assert vals.shape == (500,)
 
     def test_mean_path_matches_theory(self):
         np.random.seed(0)
-        v = Vasicek(reversion_speed=2, mu=1.5, volatility=0.3, r_0=0, t_0=0, t_n=5, n_steps=100)
+        v = Vasicek(speed=2, mean=1.5, volatility=0.3, initial=0, t_0=0, t_n=5, steps=100)
         mc = MonteCarloProcess(v, n_simulations=3000)
         path = mc.mean_path(plot_sim=False)
         theo_path = 1.5 + (0 - 1.5) * np.exp(-2 * v.t)

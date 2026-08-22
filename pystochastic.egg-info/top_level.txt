@@ -1,6 +1,10 @@
 benchmarks
+build
 dist
+docs
 examples
 pystochastic
 release_test
+test_pypi_release
+test_release
 tests

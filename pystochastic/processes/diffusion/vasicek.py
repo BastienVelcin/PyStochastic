@@ -21,10 +21,10 @@ Examples
 import numpy as np
 import scipy
 import plotly.graph_objects as go
-from pystochastic.pyrandom import crandom
+from pystochastic.random import crandom
 from pystochastic.utils import _decompose
 from pystochastic.processes.diffusion.diffusion_process import DiffusionProcess
-
+from pystochastic.random.setseed import *
 
 class Vasicek(DiffusionProcess):
 

@@ -1,4 +1,4 @@
-from . import pyrandom
+from . import random
 from . import processes
 from . import sde
 from . import dist

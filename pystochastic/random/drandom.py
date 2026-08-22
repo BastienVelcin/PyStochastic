@@ -28,7 +28,7 @@ array([12,  4,  6,  4,  8,  8,  3,  6,  2,  7,  2, 12,  3,  3, 22])
 """
 
 import numpy as np
-from pystochastic.pyrandom.crandom import uniform, exponential
+from pystochastic.random.crandom import uniform, exponential
 from math import comb
 
 def duniform(N=2,n=1):
@@ -60,7 +60,7 @@ def duniform(N=2,n=1):
             "The number of samples must be a strictly positive integer."
         )
 
-    return (np.floor(uniform(0, N, n )))
+    return (np.ceil(uniform(0, N, n ))).astype(int)
 
 def bernoulli(p=0.5,n=1):
 

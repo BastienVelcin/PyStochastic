@@ -1,6 +1,6 @@
 from .dist import Distribution, Uniform, Exponential, Normal, Gamma, Beta, Weibull, Frechet, Cauchy, Gumbel, Kumaraswamy, Fisher, Pareto, Rayleigh, DiscreteDistribution, DUniform, Bernoulli, Rademacher, Binomial, Poisson, Hypergeometric, Geometric, NegativeBinomial, YuleSimon
 
-__all__ = ["Distribution",
+__all__ = ["Distribution", "DiscreteDistribution", "ContinuousDistribution"
            "Uniform",
            "Exponential",
            "Normal",
@@ -14,7 +14,6 @@ __all__ = ["Distribution",
            "Fisher",
            "Pareto",
            "Rayleigh",
-           "DiscreteDistribution",
            "DUniform",
            "Bernoulli",
            "Poisson",

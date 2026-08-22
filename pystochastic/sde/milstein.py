@@ -15,7 +15,7 @@ The Milstein class also handles the solution plotting.
 
 Examples
 --------
->> solver = Milstein(drift=lambda x : x, diffusion=lambda x : 0.1*x, x_0=0, t_0=0, t_n=1, n_steps=1000, n_simulations=10) #Milstein SDE with drift x(t) = x and diffusion 0.1*x(t)
+>> solver = Milstein(drift=lambda x : x, diffusion=lambda x : 0.1*x, initial=0, t_0=0, t_n=1, n_steps=1000, n_simulations=10) #Milstein SDE with drift x(t) = x and diffusion 0.1*x(t)
 >>
 >> solver.solve(plot=True) #Plot the evolution of the SDE
 """
@@ -32,7 +32,7 @@ class Milstein:
 
     The Milstein method is a numerical method for solving autonomous stochastic differential equations (ASDEs) of the form
                                         dX_t = drift(X_t)dt + diffusion(X_t)dW_t,
-    where X_t is a random variable, W_t is a Standard Wiener process, drift(X_t,t) is the drift function, and diffusion(X_t,t)
+    where X_t is a random variable, W_t is a Standard Wiener process, drift(X_t) is the drift function, and diffusion(X_t)
     is the diffusion function.
     Note that the differentiation is taken in the sense of Ito.
 
@@ -42,7 +42,7 @@ class Milstein:
         Drift function of the SDE.
     diffusion : function of one argument
         Diffusion function of the SDE.
-    x_0 : float, or list, or np.ndarray
+    initial : float, or list, or np.ndarray
         Initial condition.
     t_0 : float
         Initial time.
@@ -59,7 +59,7 @@ class Milstein:
         Drift function of the SDE.
     diffusion : function
         Diffusion function of the SDE.
-    x_0 : float, list, or np.ndarray
+    initial : float, list, or np.ndarray
         Initial condition.
     t_0 : float
         Initial time.
@@ -76,20 +76,20 @@ class Milstein:
 
     Examples
     --------
-    >> solver = Milstein(drift=lambda x : x, diffusion=lambda x : 0.1*x, x_0=0, t_0=0, t_n=1, n_steps=1000, n_simulations=10)
+    >> solver = Milstein(drift=lambda x : x, diffusion=lambda x : 0.1*x, initial=0, t_0=0, t_n=1, n_steps=1000, n_simulations=10)
     >> solver.solve(plot=True)
 
     """
 
     def __init__(self,
                  drift=default_drift,diffusion=default_diffusion,
-                 x_0=0,
+                 initial=0,
                  t_0=0,
                  t_n=1,
                  n_steps=1000,
                  n_simulations=100):
 
-        if np.size(x_0) != 1:
+        if np.size(initial) != 1:
             raise NotImplementedError(
                 "Milstein is currently implemented only for autonomous one-dimensional SDEs."
             )
@@ -98,10 +98,10 @@ class Milstein:
                 "The final time must be strictly greater than the initial time."
             )
 
-        x_0 = np.atleast_1d(x_0)
+        initial = np.atleast_1d(initial)
         self.drift = drift
         self.diffusion = diffusion
-        self.x_0 = x_0
+        self.initial = initial
         self.t_0 = t_0
         self.t_n = t_n
         self.n_steps = n_steps
@@ -153,7 +153,7 @@ class Milstein:
         Y = np.zeros((self.n_simulations,self.n_steps+1,1))
 
         # Fixing the initial condition on every simulation.
-        Y[:,0,:] = self.x_0
+        Y[:,0,:] = self.initial
 
         fig = go.Figure()
 

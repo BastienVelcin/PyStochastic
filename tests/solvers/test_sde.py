@@ -11,7 +11,7 @@ def test_euler_maruyama_deterministic_equation():
     solver = EulerMaruyama(
         drift=lambda x, t: np.ones_like(x),
         diffusion=lambda x, t: np.zeros((1, 1)),
-        x_0=0,
+        initial=0,
         t_0=0,
         t_n=1,
         n_steps=10,
@@ -29,7 +29,7 @@ def test_euler_maruyama_zero_drift_zero_diffusion():
     solver = EulerMaruyama(
         drift=lambda x, t: np.zeros_like(x),
         diffusion=lambda x, t: np.zeros((1, 1)),
-        x_0=3,
+        initial=3,
         t_0=0,
         t_n=1,
         n_steps=20,
@@ -45,7 +45,7 @@ def test_euler_maruyama_multidimensional_deterministic():
     solver = EulerMaruyama(
         drift=lambda x, t: np.array([1.0, -2.0]),
         diffusion=lambda x, t: np.zeros((2, 2)),
-        x_0=[0, 1],
+        initial=[0, 1],
         t_0=0,
         t_n=1,
         n_steps=10,
@@ -67,7 +67,7 @@ def test_euler_maruyama_plot_rejects_dimension_above_three():
     solver = EulerMaruyama(
         drift=lambda x, t: np.ones(4),
         diffusion=lambda x, t: np.zeros((4, 4)),
-        x_0=[0, 0, 0, 0],
+        initial=[0, 0, 0, 0],
         t_n=1,
         n_steps=5,
         n_simulations=1,
@@ -81,7 +81,7 @@ def test_milstein_derivative():
     solver = Milstein(
         drift=lambda x: x,
         diffusion=lambda x: 2 * x,
-        x_0=1,
+        initial=1,
         t_n=1,
         n_steps=10,
         n_simulations=1,
@@ -96,7 +96,7 @@ def test_milstein_deterministic_equation():
     solver = Milstein(
         drift=lambda x: np.ones_like(x),
         diffusion=lambda x: np.zeros_like(x),
-        x_0=0,
+        initial=0,
         t_0=0,
         t_n=1,
         n_steps=10,
@@ -114,7 +114,7 @@ def test_milstein_rejects_multidimensional_initial_condition():
         Milstein(
             drift=lambda x: x,
             diffusion=lambda x: x,
-            x_0=[0, 0],
+            initial=[0, 0],
         )
 
 

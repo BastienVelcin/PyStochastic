@@ -20,7 +20,7 @@ Examples
 
 import numpy as np
 import plotly.graph_objects as go
-from pystochastic.pyrandom.setseed import *
+from pystochastic.random.setseed import *
 from pystochastic.processes.diffusion.diffusion_process import DiffusionProcess
 
 class CIR(DiffusionProcess):

@@ -74,7 +74,7 @@ import numpy as np
 import scipy
 import plotly.graph_objects as go
 from abc import abstractmethod, ABC
-from pystochastic.pyrandom import crandom, drandom
+from pystochastic.random import crandom, drandom
 from sympy import harmonic
 from mpmath import hyp3f2
 

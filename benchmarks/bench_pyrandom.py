@@ -1,5 +1,5 @@
 """
-Benchmark for pystochastic.pyrandom (crandom + drandom).
+Benchmark for pystochastic.random (crandom + drandom).
 
 Measures generation time for each distribution as a function of the
 number of samples requested. Errors on individual distributions are
@@ -9,8 +9,8 @@ reported but do not stop the benchmark.
 import time
 import numpy as np
 
-from pystochastic.pyrandom import crandom
-from pystochastic.pyrandom import drandom
+from pystochastic.random import crandom
+from pystochastic.random import drandom
 
 
 # ---------------------------------------------------------------------
@@ -33,7 +33,7 @@ def run_group(label, functions, sample_sizes, n_runs=5):
     functions : dict {name: callable(n) -> samples}
     """
     print("=" * 70)
-    print(f"pyrandom benchmark -- {label}")
+    print(f"random benchmark -- {label}")
     print("=" * 70)
     print(f"Runs : {n_runs}")
     print("-" * 70)

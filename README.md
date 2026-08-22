@@ -97,10 +97,10 @@ probability = distribution.pmf(1)
 ## 🎲 Random number generation
 
 PyStochastic provides random number generators for both continuous
-and discrete distributions through the `pyrandom` module.
+and discrete distributions through the `random` module.
 
 ```python
-from pystochastic.pyrandom import crandom
+from pystochastic.random import crandom
 
 samples = crandom.normal(
     mu=0,
@@ -112,7 +112,7 @@ samples = crandom.normal(
 A global seed can also be configured for reproducible simulations.
 
 ```python
-from pystochastic.pyrandom.setseed import seed
+from pystochastic.random.setseed import seed
 
 seed(42)
 ```
@@ -288,7 +288,7 @@ pystochastic/
 │   ├── vasicek.py
 │   └── CIR.py
 │
-├── pyrandom/
+├── random/
 │   ├── crandom.py
 │   ├── drandom.py
 │   └── setseed.py

@@ -31,7 +31,7 @@ Examples
 """
 
 import numpy as np
-from pystochastic.pyrandom import crandom
+from pystochastic.random import crandom
 from pystochastic.utils import is_pos_def
 from pystochastic.processes.process import Process
 

@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from pystochastic.pyrandom import crandom
+from pystochastic.random import crandom
 
 
 @pytest.mark.parametrize(

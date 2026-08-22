@@ -37,7 +37,7 @@ array([0.50638435, 2.45166231, 0.07610754, 6.88851094, 4.02989885,
 
 import numpy as np
 import sys
-from pystochastic.pyrandom.setseed import get_rng, seed
+from pystochastic.random.setseed import get_rng, seed
 
 def uniform(a=0,b=1,n=1):
 

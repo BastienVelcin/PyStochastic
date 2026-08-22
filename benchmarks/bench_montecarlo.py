@@ -5,9 +5,9 @@ Benchmark for pystochastic.montecarlo (MonteCarloEstimator, MonteCarloProcess).
 import time
 import numpy as np
 
-from pystochastic.pyrandom import crandom
+from pystochastic.random import crandom
 from pystochastic.processes.diffusion.vasicek import Vasicek
-from pystochastic.montecarlo.montecarlo import MonteCarloEstimator, MonteCarloProcess
+from pystochastic.montecarlo.montecarlo import MonteCarlo, MonteCarloProcess
 
 
 # ---------------------------------------------------------------------

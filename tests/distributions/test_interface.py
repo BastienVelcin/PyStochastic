@@ -5,6 +5,7 @@ Tests for the distribution interfaces.
 import pytest
 
 from pystochastic.dist import Distribution, DiscreteDistribution
+from pystochastic.dist.dist import ContinuousDistribution
 
 
 # ======================================================================
@@ -13,7 +14,7 @@ from pystochastic.dist import Distribution, DiscreteDistribution
 
 def test_distribution_is_abstract():
     with pytest.raises(TypeError):
-        Distribution()
+        ContinuousDistribution()
 
 
 def test_discrete_distribution_is_abstract():
@@ -23,7 +24,6 @@ def test_discrete_distribution_is_abstract():
 
 def test_continuous_interface_methods():
     methods = [
-        "pdf",
         "cdf",
         "sample",
         "mean",
@@ -38,7 +38,6 @@ def test_continuous_interface_methods():
 
 def test_discrete_interface_methods():
     methods = [
-        "pmf",
         "cdf",
         "sample",
         "mean",

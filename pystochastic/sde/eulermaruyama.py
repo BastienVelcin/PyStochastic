@@ -16,7 +16,7 @@ or parallelization the SDE.
 
 Examples
 --------
->> solver = EulerMaruyama(drift=lambda x,t : x, diffusion=lambda x,t : 0.1*x, x_0=1, t_0=0, t_n=1, n_steps=1000, n_simulations=10)
+>> solver = EulerMaruyama(drift=lambda x,t : x, diffusion=lambda x,t : 0.1*x, initial=1, t_0=0, t_n=1, n_steps=1000, n_simulations=10)
 >> solver.solve(plot=True)
 >>
 >> solver = EulerMaruyama(drift=lambda x,t: -x, diffusion=lambda x,t: 0.3, n_simulations=1000)
@@ -28,17 +28,17 @@ Examples
 
 import numpy as np
 import plotly.graph_objects as go
-from multiprocess import Pool, cpu_count
+from multiprocess import *
 from pystochastic.processes import Brownian
 from pystochastic.utils import default_drift, default_diffusion, _decompose
 
 
-def _is_vectorizable_diffusion(f, x_0, t_0):
+def _is_vectorizable_diffusion(f, initial, t_0):
 
     """
     Is Diagonal Form function
 
-    Tests if f(x_0,t_0) returns a scalar or a vector (diagonal diffusion,
+    Tests if f(initial,t_0) returns a scalar or a vector (diagonal diffusion,
     vectorisable on all simulations at once), or a full (dim,dim) matrix, which requires
     a separate simulation for each step.
 
@@ -46,7 +46,7 @@ def _is_vectorizable_diffusion(f, x_0, t_0):
     ----------
     f : function
         Function on which we want to test the vectorization capacity.
-    x_0 : float, list, or np.ndarray
+    initial : float, list, or np.ndarray
         Point at which we want to test the vectorization capacity.
     t : float
         Time instant at which we want to test the vectorization capacity.
@@ -54,14 +54,14 @@ def _is_vectorizable_diffusion(f, x_0, t_0):
     Returns
     -------
     bool :
-        True if f(x_0,t_0) returns a scalar or a vector, False otherwise.
+        True if f(initial,t_0) returns a scalar or a vector, False otherwise.
     """
 
-    test = np.asarray(f(x_0, t_0))
+    test = np.asarray(f(initial, t_0))
     return test.ndim <= 1
 
 
-def _simulate_vectorized(drift, diffusion, x_0, t, dt, n_steps, dim, dW):
+def _simulate_vectorized(drift, diffusion, initial, t, dt, n_steps, dim, dW):
 
     """
     Simulate Vectorized function.
@@ -75,7 +75,7 @@ def _simulate_vectorized(drift, diffusion, x_0, t, dt, n_steps, dim, dW):
         Drift function of the SDE.
     diffusion : function
         Diffusion function of the SDE.
-    x_0 : float, list, or np.ndarray
+    initial : float, list, or np.ndarray
         Initial condition of the SDE.
     t : np.ndarray
         Time interval on which we want to solve the SDE.
@@ -98,7 +98,7 @@ def _simulate_vectorized(drift, diffusion, x_0, t, dt, n_steps, dim, dW):
     Y = np.zeros((n_simulations, n_steps + 1, dim))
 
     # Fixing the initial condition on every simulation.
-    Y[:, 0, :] = x_0
+    Y[:, 0, :] = initial
 
     for i in range(1, n_steps + 1):
 
@@ -110,7 +110,7 @@ def _simulate_vectorized(drift, diffusion, x_0, t, dt, n_steps, dim, dW):
     return Y
 
 
-def _simulate_sequential(drift, diffusion, x_0, t, dt, n_steps, dim, dW):
+def _simulate_sequential(drift, diffusion, initial, t, dt, n_steps, dim, dW):
 
     """
     Simulate Sequential function.
@@ -124,7 +124,7 @@ def _simulate_sequential(drift, diffusion, x_0, t, dt, n_steps, dim, dW):
         Drift function of the SDE.
     diffusion : function
         Diffusion function of the SDE.
-    x_0 : float, list, or np.ndarray
+    initial : float, list, or np.ndarray
         Initial condition of the SDE.
     t : np.ndarray
         Time interval on which we want to solve the SDE.
@@ -147,7 +147,7 @@ def _simulate_sequential(drift, diffusion, x_0, t, dt, n_steps, dim, dW):
     Y = np.zeros((n_simulations, n_steps + 1, dim))
 
     # Fixing the initial condition on every simulation.
-    Y[:, 0, :] = x_0
+    Y[:, 0, :] = initial
 
     for sim in range(n_simulations):
 
@@ -199,7 +199,7 @@ class EulerMaruyama:
         Drift function of the SDE.
     diffusion : function of two arguments
         Diffusion function of the SDE.
-    x_0 : float, or list, or np.ndarray
+    initial : float, or list, or np.ndarray
         Initial condition.
     t_0 : float
         Initial time.
@@ -216,7 +216,7 @@ class EulerMaruyama:
         Drift function of the SDE.
     diffusion : function
         Diffusion function of the SDE.
-    x_0 : float, or list, or np.ndarray
+    initial : float, or list, or np.ndarray
         Initial condition.
     dim : int
         Dimension of the SDE coefficients.
@@ -235,7 +235,7 @@ class EulerMaruyama:
 
     Examples
     --------
-    >> solver = EulerMaruyama(drift=lambda x,t : x, diffusion=lambda x,t : 0.1*x, x_0=1, t_0=0, t_n=1, n_steps=1000, n_simulations=10)
+    >> solver = EulerMaruyama(drift=lambda x,t : x, diffusion=lambda x,t : 0.1*x, initial=1, t_0=0, t_n=1, n_steps=1000, n_simulations=10)
     >> solver.solve(plot=True)
     >>
     >> solver = EulerMaruyama(drift=lambda x,t: -x, diffusion=lambda x,t: 0.3, n_simulations=1000)
@@ -248,7 +248,7 @@ class EulerMaruyama:
     def __init__(self,
                  drift=default_drift,
                  diffusion=default_diffusion,
-                 x_0=0,
+                 initial=0,
                  t_0=0,
                  t_n=1,
                  n_steps=1000,
@@ -261,12 +261,12 @@ class EulerMaruyama:
 
         self.drift = drift
         self.diffusion = diffusion
-        self.x_0 = np.atleast_1d(x_0)
+        self.initial = np.atleast_1d(initial)
         self.t_0 = t_0
         self.t_n = t_n
         self.n_steps = n_steps
         self.n_simulations = n_simulations
-        self.dim = np.size(x_0)
+        self.dim = np.size(initial)
         self.t = np.linspace(t_0, t_n, n_steps + 1)
         self.dt = (t_n - t_0) / n_steps
 
@@ -300,10 +300,10 @@ class EulerMaruyama:
         dW = W.increments
 
         # We define the list of arguments that will be passed to the simulation functions.
-        args = (self.drift, self.diffusion, self.x_0, self.t, self.dt, self.n_steps, self.dim, dW)
+        args = (self.drift, self.diffusion, self.initial, self.t, self.dt, self.n_steps, self.dim, dW)
 
         #If the diffusion is diagonal, we use the vectorized method. Otherwise, we use the sequential method.
-        if _is_vectorizable_diffusion(self.diffusion, self.x_0, self.t_0):
+        if _is_vectorizable_diffusion(self.diffusion, self.initial, self.t_0):
             Y = _simulate_vectorized(*args)
 
         # SEQUENTIAL METHOD :
@@ -321,7 +321,7 @@ class EulerMaruyama:
             # We split the increments into chunks, and pass each chunk to a worker process.
             chunks = np.array_split(dW, n_workers, axis=0)
 
-            worker_args = [(self.drift, self.diffusion, self.x_0, self.t, self.dt,
+            worker_args = [(self.drift, self.diffusion, self.initial, self.t, self.dt,
                              self.n_steps, self.dim, chunk) for chunk in chunks]
 
             # We launch the simulations in parallel, and wait for the results.

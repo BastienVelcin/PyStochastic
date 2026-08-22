@@ -2,7 +2,7 @@ import numpy as np
 import plotly.graph_objects as go
 
 from pystochastic.processes import *
-from pystochastic.pyrandom.setseed import seed
+from pystochastic.random.setseed import seed
 from pystochastic.montecarlo.montecarlo import MonteCarloProcess
 
 OU = OrnsteinUhlenbeck()
