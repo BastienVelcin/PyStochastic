@@ -1929,7 +1929,7 @@ class Hypergeometric(DiscreteDistribution):
     N : int
         Population size. Must be a strictly positive integer.
     K : int
-        Number of draws. Must be a strictly positive integer such that 0 <= k <= N.
+        Number of draws. Must be a strictly positive integer such that 0 <= K <= N.
     m : int
         Number of success states in the considered population. Must be a strictly positive integer such that 0 <= m <= N.
 
@@ -1972,14 +1972,13 @@ class Hypergeometric(DiscreteDistribution):
             )
 
         self.N = N
-        self.m = m
         self.K = K
-
+        self.m = m
     def pmf(self, k=None):
 
         if k is None:
             print("Probability mass function:")
-            print(f"| comb({self.N},k) * comb({self.N-self.m},{self.m}-k) / {comb(self.N,self.K)} if {max(0,self.m+self.K-self.N)} <= k <= {min(self.m,self.K)}")
+            print(f"| comb({self.K},k) * comb({self.N-self.K},{self.m}-k) / {comb(self.N,self.m)} if {max(0,self.m+self.K-self.N)} <= k <= {min(self.m,self.K)}")
             print(f"| 0 otherwise")
 
         else:
@@ -1990,7 +1989,7 @@ class Hypergeometric(DiscreteDistribution):
                 )
 
             if max(0,self.m+self.K-self.N) <= k <= min(self.m,self.K):
-                return comb(self.N,k) * comb(self.N-self.m,self.m-k) / comb(self.N,self.K)
+                return comb(self.K,k) * comb(self.N-self.K,self.m-k) / comb(self.N,self.m)
             else:
                 return 0
 
@@ -2002,8 +2001,8 @@ class Hypergeometric(DiscreteDistribution):
             print(f"| 0 otherwise")
         else:
             if max(0,self.m+self.K-self.N) <= x:
-                k = np.floor(x)
-                return 1 - comb(self.m,k+1)*comb(self.N-self.m,self.K-1-k) / comb(self.N,self.K) * hyp3f2(1,k+1-self.K,k+1-self.m,k+2,self.N+2-self.K-self.m+k,1)
+                k = np.floor(x).astype(int)
+                return float(1 - comb(self.m,k+1)*comb(self.N-self.m,self.K-1-k) / comb(self.N,self.K) * hyp3f2(1,k+1-self.K,k+1-self.m,k+2,self.N+2-self.K-self.m+k,1))
             else:
                 return 0
 
@@ -2011,7 +2010,7 @@ class Hypergeometric(DiscreteDistribution):
         return drandom.hypergeometric(self.N,self.K,self.m,n)
 
     def mean(self):
-        return self.m * self.N / self.K
+        return self.m * self.K / self.N
 
     def variance(self):
         return self.m * (self.K/self.N) * ((self.N-self.K)/self.N) * ((self.N-self.m)/(self.N-1))
@@ -2115,16 +2114,14 @@ class NegativeBinomial(DiscreteDistribution):
     ----------
     p : float
         Success probability. Must be between 0 (strictly) and 1.
-    k : int
+    n : int
         Target success occurrence parameter. Must be a strictly positive integer.
 
     Attributes
     ----------
     p : float
         Success probability.
-    p : float
-        Failure probability.
-    k : int
+    n : int
         Target success occurrence parameter.
 
     Examples
@@ -2204,12 +2201,12 @@ class YuleSimon(DiscreteDistribution):
     Parameters
     ----------
     rho : float
-        Form parameter. Must be strictly positive.
+        Shape parameter. Must be strictly positive.
 
     Attributes
     ----------
     rho : float
-        Form parameter.
+        Shape parameter.
 
     Examples
     --------
@@ -2261,7 +2258,9 @@ class YuleSimon(DiscreteDistribution):
         return drandom.yule_simon(self.rho,n)
 
     def mean(self):
-        return self.rho/(self.rho-1)
+        if self.rho > 1:
+            return self.rho/(self.rho-1)
+        return None
 
     def variance(self):
         if self.rho > 2:
