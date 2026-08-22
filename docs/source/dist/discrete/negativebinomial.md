@@ -16,7 +16,7 @@ pystochastic.dist.NegativeBinomial(p = 0.5, n = 1)
 Create an instance of the Negative Binomial distribution. A Negative Binomial distribution is a discrete-time distribution which counts the number of failures until a specified number of successes occur for a repetition Bernoulli experiment of parameter $p$. 
 The probability distribution of the Binomial distribution of parameters $p$ and $n$ is given by:
 \begin{equation*}
-\mathbb{P}_NB = \sum_{k=0}^{+\infty} \binom{k+n-1}{k} p^n (1-p)^{k}
+\mathbb{P}_{NB} = \sum_{k=0}^{+\infty} \binom{k+n-1}{k} p^n (1-p)^{k}
 \end{equation*}
 
 

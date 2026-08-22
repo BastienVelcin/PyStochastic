@@ -16,7 +16,7 @@ pystochastic.dist.Hypergeometric(N=2,K=1,m=1)
 Create an instance of the hypergeometric distribution. A hypergeometric distribution is a discrete-time distribution that models the probability of obtaining a $m$ number of successes in a fixed number $K$ draws without replacement from a finite population of size $N$.
 The probability distribution of the hypergeometric distribution of parameters $N$, $K$ and $m$ is given by:
 \begin{equation*}
-\mathbb{P}_HG = \sum_{k=\max(0,m+K-N)}^{\min(m,K)}\frac{\binom{K}{k} \binom{N-K}{m-k}}{\binom{N}{m}}
+\mathbb{P}_{HG} = \sum_{k=\max(0,m+K-N)}^{\min(m,K)}\frac{\binom{K}{k} \binom{N-K}{m-k}}{\binom{N}{m}}
 \end{equation*}
 \end{equation*}
 
