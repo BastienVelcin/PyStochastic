@@ -16,7 +16,7 @@ pystochastic.dist.NegativeBinomial(p = 0.5, n = 1)
 Create an instance of the Negative Binomial distribution. A Negative Binomial distribution is a discrete-time distribution which counts the number of failures until a specified number of successes occur for a repetition Bernoulli experiment of parameter $p$. 
 The probability distribution of the Binomial distribution of parameters $p$ and $n$ is given by:
 \begin{equation*}
-\mathbb{P}_U = \sum_{k=0}^{+\infty} \binom{k+n-1}{k} p^n (1-p)^{k}
+\mathbb{P}_NB = \sum_{k=0}^{+\infty} \binom{k+n-1}{k} p^n (1-p)^{k}
 \end{equation*}
 
 
@@ -37,16 +37,16 @@ The Binomial distribution inherits all methods from the [Discrete-Time Distribut
 
 ```python
 >>> from pystochastic.dist.dist import NegativeBinomial
->>> B = NegativeBinomial(0.3,7)
->>> B.sample(11)
+>>> NB = NegativeBinomial(0.3,7)
+>>> NB.sample(11)
 array([20, 29, 21, 26, 12, 21, 18, 14, 19, 21, 25])
->>> B.pmf(12)
+>>> NB.pmf(12)
 0.05619488967958085
->>> B.cdf(30)
+>>> NB.cdf(30)
 np.float64(0.9560328332450693)
->>> B.variance()
+>>> NB.variance()
 54.44444444444444
->>> B.info()
+>>> NB.info()
 Distribution : NegativeBinomial
 Parameters : {'p': 0.3, 'q': 0.7, 'n': 7}
 Probability mass function:

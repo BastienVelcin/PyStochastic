@@ -16,7 +16,7 @@ pystochastic.dist.Geometric(p = 0.5)
 Create an instance of the geometric distribution. A geometric distribution is a discrete-time distribution that counts the number of repetitions of a Bernoulli experiment needed to get a success.
 The probability distribution of the geometric distribution of parameter $p$ is given by:
 \begin{equation*}
-\mathbb{P}_U = p\sum_{k=1}^{+\infty} (1-p)^{k-1}
+\mathbb{P}_G = p\sum_{k=1}^{+\infty} (1-p)^{k-1}
 \end{equation*}
 
 ### Attributes

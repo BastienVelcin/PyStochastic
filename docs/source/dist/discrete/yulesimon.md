@@ -16,7 +16,7 @@ pystochastic.dist.YuleSimon(p = 0.5)
 Create an instance of the Yule-Simon distribution. A Yule-Simon distribution is a discrete-time distribution that models preferential growth phenomena.
 The probability distribution of the Yule-Simon distribution of parameter $\rho$ is given by:
 \begin{equation*}
-\mathbb{P}_U = \sum_{k=1}^{+\infty} \rho B(k,\rho + 1)
+\mathbb{P}_YS = \sum_{k=1}^{+\infty} \rho B(k,\rho + 1)
 \end{equation*}
 
 ### Attributes
@@ -31,16 +31,16 @@ The geometric distribution inherits all methods from the [Discrete-Time Distribu
 
 ```python
 >>> from pystochastic.dist.dist import YuleSimon
->>> Y = YuleSimon(0.5)
->>> Y.sample(11)
+>>> YS = YuleSimon(0.5)
+>>> YS.sample(11)
 array([ 61,   6, 471,   6,   4,  18,  39,   2,  27,   2,   2])
->>> Y.pmf(12)
+>>> YS.pmf(12)
 np.float64(0.010340389632353555)
->>> Y.cdf(60)
+>>> YS.cdf(60)
 np.float64(0.8862975138214279)
->>> Y.variance()
+>>> YS.variance()
 None
->>> Y.info()
+>>> YS.info()
 Distribution : YuleSimon
 Parameters : {'rho': 0.5}
 Probability mass function:

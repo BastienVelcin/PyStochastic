@@ -16,7 +16,7 @@ pystochastic.dist.Bernoulli(p = 0.5)
 Create an instance of the Bernoulli distribution. A Bernoulli distribution is a discrete-time distribution which represents an experience with two issues: a success and a failure.
 The probability distribution of the Bernouilli distribution of parameter $p$ is given by:
 \begin{equation*}
-\mathbb{P}_U = (1-p)\delta_0 + p\delta_1
+\mathbb{P}_B = (1-p)\delta_0 + p\delta_1
 \end{equation*}
 
 ### Attributes

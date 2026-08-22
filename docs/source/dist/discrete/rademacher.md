@@ -16,7 +16,7 @@ pystochastic.dist.Rademacher(p = 0.5)
 Create an instance of the Rademacher distribution. A Rademacher distribution is a discrete-time distribution which represents an experience with a gain and a loss.
 The probability distribution of the Rademacher distribution of parameter $p$ is given by:
 \begin{equation*}
-\mathbb{P}_U = (1-p)\delta_{-1} + p\delta_1
+\mathbb{P}_R = (1-p)\delta_{-1} + p\delta_1
 \end{equation*}
 
 > [!NOTE]
