@@ -6,7 +6,7 @@ import time
 import numpy as np
 
 from pystochastic.pyrandom import crandom
-from pystochastic.processes.vasicek import Vasicek
+from pystochastic.processes.diffusion.vasicek import Vasicek
 from pystochastic.montecarlo.montecarlo import MonteCarloEstimator, MonteCarloProcess
 
 

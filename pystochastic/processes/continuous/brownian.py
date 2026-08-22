@@ -23,7 +23,7 @@ as well as an external trajectory simulation function.
 
 Examples
 --------
->> W = Brownian(var=np.eye(2),dim=2,t_0=0,t_n=1,n_steps=1000) #Brownian motion with covariance matrix np.eye(2)
+>> W = Brownian(var=np.eye(2),dim=2,t_0=0,t_n=1,steps=1000) #Brownian motion with covariance matrix np.eye(2)
 >>
 >> W.simulate() #Simulate the Brownian motion path
 >>
@@ -31,11 +31,11 @@ Examples
 """
 
 import numpy as np
-import plotly.graph_objects as go
 from pystochastic.pyrandom import crandom
 from pystochastic.utils import is_pos_def
+from pystochastic.processes.process import Process
 
-class Brownian:
+class Brownian(Process):
 
     """
     Brownian motion class
@@ -58,7 +58,7 @@ class Brownian:
         Initial time.
     t_n : float
         Final time. Must be strictly greater than t_0.
-    n_steps : int
+    steps : int
         Number of time steps. Must be a strictly positive integer.
 
     Attributes
@@ -71,7 +71,7 @@ class Brownian:
         Initial time.
     t_n : float
         Final time.
-    n_steps : int
+    steps : int
         Number of time steps.
     sim : np.ndarray
         Simulation of a Brownian motion and its increments.
@@ -84,7 +84,7 @@ class Brownian:
 
     Examples
     --------
-    >> W = Brownian(var=np.eye(2),t_0=0,t_n=1,n_steps=1000)
+    >> W = Brownian(var=np.eye(2),t_0=0,t_n=1,steps=1000)
     >> W.simulate()
     >> W.plot()
     """
@@ -93,7 +93,11 @@ class Brownian:
                  var=1,
                  t_0=0,
                  t_n=1,
-                 n_steps=1000):
+                 steps=1000):
+
+        super().__init__(t_0=t_0,
+                         t_n=t_n,
+                         steps=steps)
 
         self.var = np.atleast_2d(var)
 
@@ -102,26 +106,9 @@ class Brownian:
                 "The covariance matrix is not positive-definite."
             )
 
-        if not t_0 < t_n:
-            raise ValueError(
-                "The final time must be strictly greater than the initial time."
-            )
-
-        if not is_pos_def(self.var):
-            raise ValueError(
-                "The covariance matrix is not positive-definite."
-            )
-
         self.dim = np.shape(self.var)[0]
-        self.t_0 = t_0
-        self.t_n = t_n
-        self.n_steps = n_steps
         self.sim = None
-        self.n_simulations = None
-        self.path = None
         self.increments =None
-        self.t = np.linspace(self.t_0,self.t_n,self.n_steps+1)
-
 
     def simulate(self,n_simulations=1,plot=False):
 
@@ -140,7 +127,7 @@ class Brownian:
         The function only returns the path and not the increments. The increments can be accessed through the 'increments' attribute.
         """
 
-        self.sim = brownian_motion(self.var, self.t_0,self.t_n,self.n_steps, n_simulations)
+        self.sim = brownian_motion(self.var, self.t_0,self.t_n,self.steps, n_simulations)
         self.path = self.sim[0]
         self.increments = self.sim[1]
 
@@ -149,170 +136,6 @@ class Brownian:
         if plot:
             self.plot()
         return self.path
-
-    def plot(self):
-
-        """
-        Plot method.
-
-        Plot the simulated path of the Geometric Brownian Motion. The path can be plotted only in 1D, 2D or 3D.
-        """
-
-        if self.sim == None:
-            raise ValueError(
-                "The path has not been simulated yet. Please run the simulate method first."
-            )
-
-        if self.dim > 3:
-            raise ValueError(
-                "The path can be plotted only for 1D, 2D and 3D."
-            )
-
-        if self.path is None:
-            raise ValueError(
-                "The path has not been simulated yet. Please run the simulate method first."
-            )
-
-        fig = go.Figure()
-
-        if self.dim == 1:
-            for sim in range(self.n_simulations):
-                fig.add_trace(go.Scatter(x=self.t,
-                                         y=self.path[sim,:, 0],
-                                         mode="lines",
-                                         line=dict(width=2)))
-
-        elif self.dim == 2:
-            for sim in range(self.n_simulations):
-                fig.add_trace(go.Scatter(x=self.path[sim,:, 0],
-                                         y=self.path[sim, :, 1],
-                                         mode="lines",
-                                         line=dict(width=2)))
-
-        else:
-            for sim in range(self.n_simulations):
-                fig.add_trace(go.Scatter3d(x=self.path[sim,:, 0],
-                                           y=self.path[sim,:, 1],
-                                           z=self.path[sim,:, 2],
-                                           mode="lines",
-                                           line=dict(width=2)))
-
-        fig.show()
-
-
-    def final_position(self):
-
-        """
-        Final position method
-
-        The function returns the state of the Brownian motion at the final time t_n.
-
-        Returns
-        -------
-        float or np.ndarray
-            State of the Brownian motion at the final time t_n.
-        """
-
-        if self.sim == None:
-            raise ValueError(
-                "The path has not been simulated yet. Please run the simulate method first."
-            )
-
-        return self.path[:,-1]
-
-    def max(self):
-
-        """
-        Max method
-
-        The max method returns the maximum value of the Brownian motion, the time index at which the maximum value
-        occurs, and the corresponding time.
-
-        Returns
-        -------
-        tuple
-            Value of the maximum value, time index at which the maximum occurs, and corresponding time.
-
-        Notes
-        -----
-        This method can only be used in 1D since the notion of maximum value is not defined in higher dimensions.
-        """
-
-        if self.sim == None:
-            raise ValueError(
-                "The path has not been simulated yet. Please run the simulate method first."
-            )
-
-        if self.dim != 1:
-            raise ValueError(
-                "The maximum value can only be computed in 1D. Please refer to the max_norm function."
-            )
-
-        argmax = np.argmax(self.path, axis=1)
-
-        # RETURN FORM: (max_value, time_index, time)
-        return np.max(self.path, axis=1),argmax, self.t[argmax]
-
-    def min(self):
-
-        """
-        Min method
-
-        The min method returns the minimum value of the Brownian motion, the time index at which the minimum value
-        occurs, and the corresponding time.
-
-        Returns
-        -------
-        tuple
-            Value of the minimum value, time index at which the minimum occurs, and corresponding time.
-
-        Notes
-        -----
-        This method can only be used in 1D since the notion of minimum value is not defined in higher dimensions.
-        """
-
-        if self.sim == None:
-            raise ValueError(
-                "The path has not been simulated yet. Please run the simulate method first."
-            )
-
-        if self.dim != 1:
-            raise ValueError(
-                "The minimum value can only be computed in 1D."
-            )
-
-        argmin = np.argmin(self.path, axis=1)
-
-        # RETURN FORM: (max_value, time_index, time)
-        return np.min(self.path, axis=1), argmin, self.t[argmin]
-
-    def max_norm(self):
-
-        """
-        Max norm method
-
-        The max norm method returns the maximum of the norm value of the Brownian motion, the time index at which the maximum norm value
-        occurs, and the corresponding time.
-
-        Returns
-        -------
-        tuple
-            Value of the maximum norm value, time index at which the maximum norm occurs, and corresponding time.
-
-        Notes
-        -----
-        The norm used in this function is the Euclidean norm.
-        """
-
-        if self.sim == None:
-            raise ValueError(
-                "The path has not been simulated yet. Please run the simulate method first."
-            )
-
-        norms = np.sum(self.path**2, axis=2)
-        arg_max = np.argmax(norms, axis=1)
-        values = (self.path[np.arange(0,self.n_simulations),arg_max,:])
-        return values, arg_max, self.t[arg_max]
 
     def mean(self,t):
 
@@ -430,7 +253,7 @@ class Brownian:
         return np.array([self.covariance(t,i,i) for i in range(self.dim)])
 
 
-def brownian_motion(var=1, t_0 = 0, t_n = 1, n_steps = 1000,n_simulations=1):
+def brownian_motion(var=1, t_0 = 0, t_n = 1, steps = 1000,n_simulations=1):
 
     """
     Brownian motion function.
@@ -446,15 +269,15 @@ def brownian_motion(var=1, t_0 = 0, t_n = 1, n_steps = 1000,n_simulations=1):
     var = np.atleast_2d(var)
     d = np.shape(var)[0]
 
-    W = np.zeros((n_simulations,n_steps+1, d))
-    dW = np.zeros((n_simulations, n_steps, d))
+    W = np.zeros((n_simulations,steps+1, d))
+    dW = np.zeros((n_simulations, steps, d))
 
     # Computation of the step length and Cholesky decomposition
-    h = (t_n - t_0) / n_steps
+    h = (t_n - t_0) / steps
     L = np.linalg.cholesky(var)  # The Cholesky decomposition of the covariance matrix is analogous to the square root for matrices.
 
-    N = crandom.normal(0,1,n_simulations*n_steps*d)
-    Z = np.reshape(N,(n_simulations,n_steps,d))
+    N = crandom.normal(0,1,n_simulations*steps*d)
+    Z = np.reshape(N,(n_simulations,steps,d))
     dW[:,:] = Z @ L.T * np.sqrt(h)
 
     W[:, 1:, :] = np.cumsum(dW, axis=1)

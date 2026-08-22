@@ -10,12 +10,12 @@ time steps, for each available method ("exact", "euler-maruyama",
 import time
 import numpy as np
 
-from pystochastic.processes.vasicek import Vasicek
-from pystochastic.processes.CIR import CIR
-from pystochastic.processes.OrnsteinUhlenbeck import OrnsteinUhlenbeck
-from pystochastic.processes.GeometricBrownianMotion import GeometricBrownianMotion
-from pystochastic.processes.poisson import Poisson
-from pystochastic.processes.brownian import Brownian
+from pystochastic.processes.diffusion.vasicek import Vasicek
+from pystochastic.processes.diffusion.cir import CIR
+from pystochastic.processes.diffusion.ornstein_uhlenbeck import OrnsteinUhlenbeck
+from pystochastic.processes.diffusion.geometric_brownian_motion import GeometricBrownianMotion
+from pystochastic.processes.jump.poisson import Poisson
+from pystochastic.processes.continuous.brownian import Brownian
 
 
 # ---------------------------------------------------------------------

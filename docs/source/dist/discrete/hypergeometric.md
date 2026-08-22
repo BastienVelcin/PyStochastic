@@ -18,7 +18,6 @@ The probability distribution of the hypergeometric distribution of parameters $N
 \begin{equation*}
 \mathbb{P}_{HG} = \sum_{k=\max(0,m+K-N)}^{\min(m,K)}\frac{\binom{K}{k} \binom{N-K}{m-k}}{\binom{N}{m}}
 \end{equation*}
-\end{equation*}
 
 ### Attributes
 

@@ -6,7 +6,7 @@ from scipy import stats
 
 from pystochastic.montecarlo.montecarlo import MonteCarlo, MonteCarloProcess
 from pystochastic.pyrandom import crandom
-from pystochastic.processes.vasicek import Vasicek
+from pystochastic.processes.diffusion.vasicek import Vasicek
 
 
 # ======================================================================

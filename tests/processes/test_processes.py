@@ -13,7 +13,7 @@ from pystochastic.processes import (
 
 class TestBrownian:
     def test_scalar_initialization(self):
-        W = Brownian(var=1, t_n=1, n_steps=50)
+        W = Brownian(var=1, t_n=1, steps=50)
         assert W.dim == 1
         assert W.var.shape == (1, 1)
         assert W.t.shape == (51,)
@@ -21,7 +21,7 @@ class TestBrownian:
         assert W.increments is None
 
     def test_multidimensional_initialization(self):
-        W = Brownian(var=np.eye(2), t_n=1, n_steps=20)
+        W = Brownian(var=np.eye(2), t_n=1, steps=20)
         assert W.dim == 2
         assert W.var.shape == (2, 2)
 
@@ -35,25 +35,25 @@ class TestBrownian:
 
     @pytest.mark.parametrize("n_simulations", [1, 5, 20])
     def test_simulation_shape(self, n_simulations):
-        W = Brownian(t_n=1, n_steps=50)
+        W = Brownian(t_n=1, steps=50)
         path = W.simulate(n_simulations)
         assert path.shape == (n_simulations, 51, 1)
         assert W.increments.shape == (n_simulations, 50, 1)
 
     def test_multidimensional_shape(self):
-        W = Brownian(var=np.eye(2), t_n=1, n_steps=50)
+        W = Brownian(var=np.eye(2), t_n=1, steps=50)
         path = W.simulate(8)
         assert path.shape == (8, 51, 2)
         assert W.increments.shape == (8, 50, 2)
 
     def test_initial_value_and_increments(self):
-        W = Brownian(t_n=1, n_steps=50)
+        W = Brownian(t_n=1, steps=50)
         path = W.simulate(10)
         assert np.allclose(path[:, 0, :], 0)
         assert np.allclose(np.diff(path, axis=1), W.increments)
 
     def test_final_position(self):
-        W = Brownian(t_n=1, n_steps=50)
+        W = Brownian(t_n=1, steps=50)
         path = W.simulate(10)
         assert np.allclose(W.final_position(), path[:, -1, :])
 
@@ -70,25 +70,25 @@ class TestBrownian:
 
 class TestPoisson:
     def test_initialization(self):
-        P = Poisson(intensity=2, t_n=1, n_steps=50)
+        P = Poisson(intensity=2, t_n=1, steps=50)
         assert P.dim == 1
         assert P.t.shape == (51,)
         assert P.path is None
 
     def test_shape(self):
-        P = Poisson(intensity=2, t_n=1, n_steps=50)
+        P = Poisson(intensity=2, t_n=1, steps=50)
         path = P.simulate(10)
         assert path.shape == (10, 51)
 
     def test_paths_are_non_decreasing_and_integer(self):
-        P = Poisson(intensity=2, t_n=1, n_steps=50)
+        P = Poisson(intensity=2, t_n=1, steps=50)
         path = P.simulate(100)
         assert np.all(np.diff(path, axis=1) >= 0)
         assert np.all(path == np.floor(path))
         assert np.all(path[:, 0] == 0)
 
     def test_mean(self):
-        P = Poisson(intensity=2, t_n=2, n_steps=20)
+        P = Poisson(intensity=2, t_n=2, steps=20)
         path = P.simulate(5000)
         assert np.mean(path[:, -1]) == pytest.approx(4, abs=0.15)
 
@@ -99,7 +99,7 @@ class TestPoisson:
 
 class TestGeometricBrownianMotion:
     def test_scalar_representation(self):
-        S = GeometricBrownianMotion(mu=.1, sigma=.2, S_0=1, n_steps=20)
+        S = GeometricBrownianMotion(mu=.1, sigma=.2, S_0=1, steps=20)
         assert S.dim == 1
         assert S.mu.shape == (1,)
         assert S.sigma.shape == (1,)
@@ -108,7 +108,7 @@ class TestGeometricBrownianMotion:
 
     def test_vector_representation(self):
         S = GeometricBrownianMotion(
-            mu=[.1, .2], sigma=[.2, .3], S_0=[1, 2], n_steps=20
+            mu=[.1, .2], sigma=[.2, .3], S_0=[1, 2], steps=20
         )
         assert S.dim == 2
         assert S.sigma.shape == (2,)
@@ -116,7 +116,7 @@ class TestGeometricBrownianMotion:
 
     def test_diagonal_matrix_representation(self):
         S = GeometricBrownianMotion(
-            mu=[.1, .2], sigma=np.diag([.2, .3]), S_0=[1, 2], n_steps=20
+            mu=[.1, .2], sigma=np.diag([.2, .3]), S_0=[1, 2], steps=20
         )
         assert S.sigma.shape == (2,)
         assert S._diagonal
@@ -124,7 +124,7 @@ class TestGeometricBrownianMotion:
     def test_full_matrix_representation(self):
         sigma = np.array([[.2, .1], [.05, .3]])
         S = GeometricBrownianMotion(
-            mu=[.1, .2], sigma=sigma, S_0=[1, 2], n_steps=20
+            mu=[.1, .2], sigma=sigma, S_0=[1, 2], steps=20
         )
         assert S.sigma.shape == (2, 2)
         assert not S._diagonal
@@ -135,19 +135,19 @@ class TestGeometricBrownianMotion:
 
     @pytest.mark.parametrize("method", ["euler-maruyama", "milstein"])
     def test_scalar_methods_shape(self, method):
-        S = GeometricBrownianMotion(mu=.1, sigma=.2, S_0=1, n_steps=30)
+        S = GeometricBrownianMotion(mu=.1, sigma=.2, S_0=1, steps=30)
         path = S.simulate(10, method)
         assert path.shape == (10, 31, 1)
 
     def test_exact_scalar_shape_and_positivity(self):
-        S = GeometricBrownianMotion(mu=.1, sigma=.2, S_0=1, n_steps=30)
+        S = GeometricBrownianMotion(mu=.1, sigma=.2, S_0=1, steps=30)
         path = S.simulate(20, "exact")
         assert path.shape == (20, 31, 1)
         assert np.all(path > 0)
 
     def test_multidimensional_em(self):
         S = GeometricBrownianMotion(
-            mu=[.1, .2], sigma=[.2, .3], S_0=[1, 2], n_steps=30
+            mu=[.1, .2], sigma=[.2, .3], S_0=[1, 2], steps=30
         )
         path = S.simulate(10, "euler-maruyama")
         assert path.shape == (10, 31, 2)
@@ -157,7 +157,7 @@ class TestGeometricBrownianMotion:
             mu=[.1, .2],
             sigma=np.array([[.2, .1], [.05, .3]]),
             S_0=[1, 2],
-            n_steps=30
+            steps=30
         )
         assert S.diffusion(np.array([2., 3.])).shape == (2,)
         path = S.simulate(5, "euler-maruyama")
@@ -182,7 +182,7 @@ class TestGeometricBrownianMotion:
 
 class TestOrnsteinUhlenbeck:
     def test_scalar_representation(self):
-        R = OrnsteinUhlenbeck(mu=1, sigma=.5, theta=2, r_0=0, n_steps=20)
+        R = OrnsteinUhlenbeck(mu=1, sigma=.5, theta=2, r_0=0, steps=20)
         assert R.dim == 1
         assert R.sigma.shape == (1,)
         assert R.theta.shape == (1,)
@@ -225,14 +225,14 @@ class TestOrnsteinUhlenbeck:
     @pytest.mark.parametrize("method", ["euler-maruyama", "milstein"])
     def test_scalar_methods_shape(self, method):
         R = OrnsteinUhlenbeck(
-            mu=1, sigma=.5, theta=2, r_0=0, n_steps=30
+            mu=1, sigma=.5, theta=2, r_0=0, steps=30
         )
         path = R.simulate(10, method)
         assert path.shape == (10, 31, 1)
 
     def test_exact_scalar_shape(self):
         R = OrnsteinUhlenbeck(
-            mu=1, sigma=.5, theta=2, r_0=0, n_steps=30
+            mu=1, sigma=.5, theta=2, r_0=0, steps=30
         )
         path = R.simulate(10, "exact")
         assert path.shape == (10, 31, 1)
@@ -240,7 +240,7 @@ class TestOrnsteinUhlenbeck:
     def test_multidimensional_em(self):
         R = OrnsteinUhlenbeck(
             mu=[1, 2], sigma=[.5, .7], theta=[2, 3],
-            r_0=[0, 1], n_steps=30
+            r_0=[0, 1], steps=30
         )
         path = R.simulate(10, "euler-maruyama")
         assert path.shape == (10, 31, 2)
@@ -250,7 +250,7 @@ class TestOrnsteinUhlenbeck:
             mu=[1, 2],
             sigma=np.array([[.5, .1], [.2, .7]]),
             theta=np.array([[2., .5], [.2, 3.]]),
-            r_0=[0, 1], n_steps=30
+            r_0=[0, 1], steps=30
         )
         path = R.simulate(5, "euler-maruyama")
         assert path.shape == (5, 31, 2)
@@ -273,7 +273,7 @@ class TestOrnsteinUhlenbeck:
     def test_exact_is_1d_only(self):
         R = OrnsteinUhlenbeck(
             mu=[1, 2], sigma=np.eye(2), theta=np.eye(2),
-            r_0=[0, 1], n_steps=20
+            r_0=[0, 1], steps=20
         )
         with pytest.raises(ValueError):
             R.simulate(5, "exact")
@@ -291,7 +291,7 @@ class TestVasicek:
     def test_scalar_representation(self):
         R = Vasicek(
             reversion_speed=1, mu=.05, volatility=.1,
-            r_0=.03, n_steps=20
+            r_0=.03, steps=20
         )
         assert R.dim == 1
         assert R.reversion_speed.shape == (1,)
@@ -338,7 +338,7 @@ class TestVasicek:
     def test_scalar_methods_shape(self, method):
         R = Vasicek(
             reversion_speed=1, mu=.05, volatility=.1,
-            r_0=.03, n_steps=30
+            r_0=.03, steps=30
         )
         path = R.simulate(10, method)
         assert path.shape == (10, 31, 1)
@@ -346,7 +346,7 @@ class TestVasicek:
     def test_exact_scalar_shape(self):
         R = Vasicek(
             reversion_speed=1, mu=.05, volatility=.1,
-            r_0=.03, n_steps=30
+            r_0=.03, steps=30
         )
         path = R.simulate(10, "exact")
         assert path.shape == (10, 31, 1)
@@ -354,7 +354,7 @@ class TestVasicek:
     def test_multidimensional_em(self):
         R = Vasicek(
             reversion_speed=[1, 2], mu=[.05, .1],
-            volatility=[.1, .2], r_0=[.03, .04], n_steps=30
+            volatility=[.1, .2], r_0=[.03, .04], steps=30
         )
         path = R.simulate(10, "euler-maruyama")
         assert path.shape == (10, 31, 2)
@@ -364,7 +364,7 @@ class TestVasicek:
             reversion_speed=np.array([[1., .2], [.1, 2.]]),
             mu=[.05, .1],
             volatility=np.array([[.1, .02], [.03, .2]]),
-            r_0=[.03, .04], n_steps=30
+            r_0=[.03, .04], steps=30
         )
         path = R.simulate(5, "euler-maruyama")
         assert path.shape == (5, 31, 2)
@@ -389,7 +389,7 @@ class TestVasicek:
     def test_exact_is_1d_only(self):
         R = Vasicek(
             reversion_speed=[1, 2], mu=[.05, .1],
-            volatility=[.1, .2], r_0=[.03, .04], n_steps=20
+            volatility=[.1, .2], r_0=[.03, .04], steps=20
         )
         with pytest.raises(ValueError):
             R.simulate(5, "exact")
@@ -405,7 +405,7 @@ class TestVasicek:
 
 class TestCIR:
     def test_initialization(self):
-        R = CIR(a=1, b=.05, sigma=.1, r_0=.03, n_steps=50)
+        R = CIR(a=1, b=.05, sigma=.1, r_0=.03, steps=50)
         assert R.dim == 1
         assert R.t.shape == (51,)
         assert R.path is None
@@ -417,17 +417,17 @@ class TestCIR:
 
     @pytest.mark.parametrize("method", ["exact", "euler-maruyama", "milstein"])
     def test_simulation_shape(self, method):
-        R = CIR(a=1, b=.05, sigma=.1, r_0=.03, n_steps=30)
+        R = CIR(a=1, b=.05, sigma=.1, r_0=.03, steps=30)
         path = R.simulate(10, method)
         assert path.shape == (10, 31, 1)
 
     def test_exact_non_negative(self):
-        R = CIR(a=1, b=.05, sigma=.1, r_0=.03, n_steps=50)
+        R = CIR(a=1, b=.05, sigma=.1, r_0=.03, steps=50)
         path = R.simulate(100, "exact")
         assert np.all(path >= 0)
 
     def test_feller_condition(self):
-        R = CIR(a=1, b=.01, sigma=1, r_0=.03, n_steps=20)
+        R = CIR(a=1, b=.01, sigma=1, r_0=.03, steps=20)
         with pytest.raises(ValueError):
             R.simulate(method="euler-maruyama")
         with pytest.raises(ValueError):

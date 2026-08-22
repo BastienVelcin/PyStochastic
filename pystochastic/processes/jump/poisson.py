@@ -15,7 +15,7 @@ This module provides a general class "CIR", with the following built-in methods:
 
 Examples
 --------
->> P = Poisson(intensity=2,t_0=0, t_n=1, n_steps=1000) #Poisson process with intensity 2
+>> P = Poisson(intensity=2,t_0=0, t_n=1, steps=1000) #Poisson process with intensity 2
 >>
 >> P.simulate() #Simulate the Poisson process path
 >>
@@ -26,7 +26,7 @@ import numpy as np
 import plotly.graph_objects as go
 from pystochastic.pyrandom import crandom, drandom
 
-class Poisson():
+class Poisson:
 
     """
     Poisson class
@@ -47,7 +47,7 @@ class Poisson():
         Initial time.
     t_n : float
         Final time. Must be strictly greater than t_0.
-    n_steps : int
+    steps : int
         Number of time steps. Must be a strictly positive integer.
 
     Attributes
@@ -58,7 +58,7 @@ class Poisson():
         Initial time.
     t_n : float
         Final time.
-    n_steps : int
+    steps : int
         Number of time steps.
     n_simulations : None, or int
         Number of simulations.
@@ -73,7 +73,7 @@ class Poisson():
 
     Examples
     --------
-    >> P = Poisson(intensity=2,t_0=0, t_n=1, n_steps=1000)
+    >> P = Poisson(intensity=2,t_0=0, t_n=1, steps=1000)
     >> P.simulate()
     >> P.plot()
     """
@@ -82,16 +82,16 @@ class Poisson():
                  intensity=1,
                  t_0=0,
                  t_n=10,
-                 n_steps=1000):
+                 steps=1000):
 
         self.intensity = intensity
         self.t_0 = t_0
         self.t_n = t_n
-        self.n_steps = n_steps
+        self.steps = steps
         self.n_simulations = None
         self.dim = 1
-        self.t = np.linspace(t_0,t_n,n_steps+1)
-        self.dt = (t_n-t_0)/n_steps
+        self.t = np.linspace(t_0,t_n,steps+1)
+        self.dt = (t_n-t_0)/steps
         self.path = None
 
 
@@ -110,13 +110,13 @@ class Poisson():
         Returns
         -------
         np.ndarray
-            Path of the simulated Poisson process of the form ``(n_simulations, n_steps + 1)``.
+            Path of the simulated Poisson process of the form ``(n_simulations, steps + 1)``.
         """
 
-        self.path = np.zeros((n_simulations, self.n_steps + 1))
+        self.path = np.zeros((n_simulations, self.steps + 1))
 
         # The increments of a Poisson process follows : N_t_{i+1} - N_t_i ~ Poisson(intensity*dt)
-        increments = drandom.poisson(self.intensity * self.dt, n_simulations* self.n_steps).reshape((n_simulations, self.n_steps))
+        increments = drandom.poisson(self.intensity * self.dt, n_simulations* self.steps).reshape((n_simulations, self.steps))
 
         # We compute N_t with cumsum
 

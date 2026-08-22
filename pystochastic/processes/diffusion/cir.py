@@ -17,7 +17,7 @@ This module provides a general class "CIR", with the following built-in methods:
 
 Examples
 --------
->> R = CIR(a=2,b=3,sigma=1,r_0=0,t_0=0,t_n=1,n_steps=1000) #Cox-Ingersoll-Ross process with speed 2, mean 3 and volatility 1 and starting point 0.
+>> R = CIR(a=2,b=3,sigma=1,r_0=0,t_0=0,t_n=1,steps=1000) #Cox-Ingersoll-Ross process with speed 2, mean 3 and volatility 1 and starting point 0.
 >>
 >> R.simulate() #Simulate the CIR process path
 >>
@@ -27,7 +27,9 @@ Examples
 import numpy as np
 import plotly.graph_objects as go
 from pystochastic.pyrandom.setseed import *
-class CIR:
+from pystochastic.processes.diffusion.diffusion_process import DiffusionProcess
+
+class CIR(DiffusionProcess):
 
     """
     CIR class
@@ -51,7 +53,7 @@ class CIR:
         Initial time.
     t_n : float
         Final time. Must be strictly greater than t_0.
-    n_steps : int
+    steps : int
         Number of time steps. Must be a strictly positive integer.
 
     Attributes
@@ -68,7 +70,7 @@ class CIR:
         Initial time.
     t_n : float
         Final time.
-    n_steps : int
+    steps : int
         Number of time steps.
     n_simulations : None, or int
         Number of simulations.
@@ -89,7 +91,7 @@ class CIR:
 
     Examples
     --------
-    >> R = CIR(a=2,b=3,sigma=1,r_0=0,t_0=0,t_n=1,n_steps=1000)
+    >> R = CIR(a=2,b=3,sigma=1,r_0=0,t_0=0,t_n=1,steps=1000)
     >> R.simulate()
     >> R.plot()
     """
@@ -101,7 +103,11 @@ class CIR:
                  r_0=0,
                  t_0=0,
                  t_n=1,
-                 n_steps=1000):
+                 steps=1000):
+
+        super().__init__(t_0=t_0,
+                         t_n=t_n,
+                         steps=steps)
 
         self.a = a
         self.b = b
@@ -113,15 +119,7 @@ class CIR:
                 "The model parameters must satisfy a > 0, b >= 0, sigma > 0 and r_0 >= 0."
             )
 
-        self.t_0 = t_0
-        self.t_n = t_n
-        self.n_steps = n_steps
-        self.n_simulations = None
-        self.t = np.linspace(t_0, t_n, n_steps + 1)
-        self.dt = (t_n - t_0) / n_steps
-        self.path = None
         self.dim = 1
-
         self.nu = (4*self.a*self.b)/(self.sigma**2)
         self.factor = (4*self.a*np.exp(-self.a * self.dt))/((self.sigma**2)*(1-np.exp(-self.a * self.dt)))
         self.c = ((self.sigma**2)*(1-np.exp(-self.a * self.dt)))/(4*self.a)
@@ -151,7 +149,7 @@ class CIR:
         Returns
         -------
         np.ndarray
-            Path of the simulated Cox-Ingersoll-Ross process of the form ``(n_simulations, n_steps + 1, dim)``.
+            Path of the simulated Cox-Ingersoll-Ross process of the form ``(n_simulations, steps + 1, dim)``.
         """
 
         if method == "euler-maruyama":
@@ -166,7 +164,7 @@ class CIR:
                                       self.r_0,
                                       self.t_0,
                                       self.t_n,
-                                      self.n_steps,
+                                      self.steps,
                                       n_simulations).solve(plot=plot)
 
         elif method == "milstein":
@@ -181,12 +179,12 @@ class CIR:
                                       self.r_0,
                                       self.t_0,
                                       self.t_n,
-                                      self.n_steps,
+                                      self.steps,
                                       n_simulations).solve(plot=plot)
         elif method == "exact":
-            self.path = np.zeros((n_simulations,self.n_steps+1, 1))
+            self.path = np.zeros((n_simulations,self.steps+1, 1))
             self.path[:,0] = self.r_0
-            for i in range(1,self.n_steps+1):
+            for i in range(1,self.steps+1):
                 rng = get_rng()
                 # The induction formula is given by R_{t+1} = c*Z, where Z ~ NCX2(df=nu, nc=R_t * factor)
                 Y = rng.noncentral_chisquare(df=self.nu, nonc=self.path[:,i-1] * self.factor)
@@ -201,28 +199,6 @@ class CIR:
         self.n_simulations = n_simulations
 
         return self.path
-
-    def plot(self):
-
-        """
-        Plot method.
-
-        Plot the simulated path of the Cox-Ingersoll-Ross process.
-        """
-
-        if self.path is None:
-            raise ValueError(
-                "The path has not been simulated yet. Please run the simulate method first."
-            )
-
-        fig = go.Figure()
-
-        for sim in range(self.n_simulations):
-            fig.add_trace(go.Scatter(x=self.t,
-                                     y=self.path[sim,:,0],
-                                     mode="lines",
-                                     line=dict(width=2)))
-        fig.show()
 
     def mean(self,t):
 
@@ -282,3 +258,9 @@ class CIR:
             )
 
         return self.r_0 * (self.sigma**2 / self.a) * (np.exp(-self.a*t)-np.exp(-2 * self.a * t)) + (self.b * self.sigma**2)/(2*self.a) * (1-np.exp(-self.a*t))**2
+
+    def covariance_matrix(self,t):
+        return self.variance(t)
+
+    def covariance(self,t,i,j):
+        return self.variance(t)

@@ -19,7 +19,7 @@ This module provides a general class "Vasieck", with the following built-in meth
 
 Examples
 --------
->> R = Vasieck(reversion_speed=2,mean=3,volatility=1,r_0=0,t_0=0,t_n=1,n_steps=1000) #Vasieck process with speed 2, mean 3 and volatility 1 and starting point 0.
+>> R = Vasieck(reversion_speed=2,mean=3,volatility=1,r_0=0,t_0=0,t_n=1,steps=1000) #Vasieck process with speed 2, mean 3 and volatility 1 and starting point 0.
 >>
 >> R.simulate() #Simulate the Vasieck process path
 >>
@@ -31,8 +31,10 @@ import scipy
 import plotly.graph_objects as go
 from pystochastic.pyrandom import crandom
 from pystochastic.utils import _decompose
+from pystochastic.processes.diffusion.diffusion_process import DiffusionProcess
 
-class Vasicek():
+
+class Vasicek(DiffusionProcess):
 
     """
     Vasicek class
@@ -56,7 +58,7 @@ class Vasicek():
         Initial time.
     t_n : float
         Final time. Must be strictly greater than t_0.
-    n_steps : int
+    steps : int
         Number of time steps. Must be a strictly positive integer.
 
     Attributes
@@ -73,7 +75,7 @@ class Vasicek():
         Initial time.
     t_n : float
         Final time.
-    n_steps : int
+    steps : int
         Number of time steps.
     n_simulations : None, or int
         Number of simulations.
@@ -90,7 +92,7 @@ class Vasicek():
 
     Examples
     --------
-    >> R = Vasieck(reversion_speed=2,mean=3,volatility=1,r_0=0,t_0=0,t_n=1,n_steps=1000)
+    >> R = Vasieck(reversion_speed=2,mean=3,volatility=1,r_0=0,t_0=0,t_n=1,steps=1000)
     >> R.simulate()
     >> R.plot()
     """
@@ -102,8 +104,12 @@ class Vasicek():
                  r_0=0,
                  t_0=0,
                  t_n=1,
-                 n_steps=1000,
+                 steps=1000,
                  n_simulations=1):
+
+        super().__init__(t_0=t_0,
+                         t_n=t_n,
+                         steps=steps)
 
         self.mu = np.atleast_1d(mu)
 
@@ -145,13 +151,7 @@ class Vasicek():
                 "The sigma and theta parameters should be greater than 0."
             )
 
-        self.t_0 = t_0
-        self.t_n = t_n
-        self.n_steps = n_steps
-        self.n_simulations = None
-        self.t = np.linspace(t_0,t_n,n_steps+1)
-        self.dt = (t_n-t_0)/n_steps
-        self.path = None
+
 
     def drift(self,x,t=None):
 
@@ -222,7 +222,7 @@ class Vasicek():
         Returns
         -------
         np.ndarray
-            Path of the simulated Vasicek process of the form ``(n_simulations, n_steps + 1, dim)``.
+            Path of the simulated Vasicek process of the form ``(n_simulations, steps + 1, dim)``.
         """
 
         if method == "euler-maruyama":
@@ -232,7 +232,7 @@ class Vasicek():
                                       self.r_0,
                                       self.t_0,
                                       self.t_n,
-                                      self.n_steps,
+                                      self.steps,
                                       n_simulations).solve(plot=plot,
                                                            parallel=parallel,
                                                            n_workers=n_workers)
@@ -247,7 +247,7 @@ class Vasicek():
                                  self.r_0,
                                  self.t_0,
                                  self.t_n,
-                                 self.n_steps,
+                                 self.steps,
                                  n_simulations).solve(plot=plot)
         elif method == "exact":
             if self.dim > 1:
@@ -255,12 +255,12 @@ class Vasicek():
                     "The exact method is only implemented for 1D processes."
                 )
 
-            self.path = np.zeros((n_simulations, self.n_steps+1, 1))
+            self.path = np.zeros((n_simulations, self.steps+1, 1))
             self.path[:,0] = self.r_0
 
-            Z = crandom.normal(0, 1, self.n_steps * n_simulations).reshape((n_simulations, self.n_steps))
+            Z = crandom.normal(0, 1, self.steps * n_simulations).reshape((n_simulations, self.steps))
 
-            for i in range(1,self.n_steps+1):
+            for i in range(1,self.steps+1):
                 #  The induction formula is given by R_t = (mean + R_{t-1} - mean) * exp(-reversion_speed * dt) + volatility * sqrt(1 - exp(-2 * reversion_speed * dt)) / (2 * theta)) * Z[i-1])
                 self.path[:,i,0] = (self.mu+ (self.path[:,i-1,0] - self.mu) * np.exp(-self.reversion_speed * self.dt) + self.volatility * np.sqrt((1 - np.exp(-2 * self.reversion_speed * self.dt)) / (2 * self.reversion_speed)) * Z[:,i-1])
 
@@ -276,49 +276,6 @@ class Vasicek():
         self.n_simulations = n_simulations
 
         return self.path
-
-    def plot(self):
-
-        """
-        Plot method.
-
-        Plot the simulated path of the Vasieck process. The path can be plotted only in 1D, 2D or 3D.
-        """
-
-        if self.dim > 3:
-            raise ValueError(
-                "The path can be plotted only for 1D, 2D and 3D."
-            )
-
-        if self.path is None:
-            raise ValueError(
-                "The path has not been simulated yet. Please run the simulate method first."
-            )
-
-        fig = go.Figure()
-
-        if self.dim == 1:
-            for sim in range(self.n_simulations):
-                fig.add_trace(go.Scatter(x=self.t,
-                                         y=self.path[sim,:, 0],
-                                         mode="lines",
-                                         line=dict(width=2)))
-
-        elif self.dim == 2:
-            for sim in range(self.n_simulations):
-                fig.add_trace(go.Scatter(x=self.path[sim,:, 0],
-                                         y=self.path[sim,:, 1],
-                                         mode="lines",
-                                         line=dict(width=2)))
-
-        else:
-            for sim in range(self.n_simulations):
-                fig.add_trace(go.Scatter3d(x=self.path[sim,:, 0],
-                                           y=self.path[sim,:, 1],
-                                           z=self.path[sim,:, 2],
-                                           mode="lines",
-                                           line=dict(width=2)))
-        fig.show()
 
     def mean(self,t):
 

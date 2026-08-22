@@ -81,27 +81,6 @@ from mpmath import hyp3f2
 class Distribution(ABC):
 
     @abstractmethod
-    def pdf(self, x=None):
-
-        """
-        Probability Density Function method.
-
-        Print or evaluate the probability density function at a point x.
-
-        Parameters
-        ----------
-        x : float
-            Point at which to evaluate the the probability density function.
-
-        Returns
-        -------
-        float
-            Image of x by the probability density function.
-        """
-
-        pass
-
-    @abstractmethod
     def cdf(self, x=None):
 
         """
@@ -209,30 +188,6 @@ class Distribution(ABC):
 
         pass
 
-    def plot_pdf(self):
-
-        """
-        Plot PDF method.
-
-        Plot the graph of the probability density function.
-        """
-
-        supp = self.support()
-        mu = self.mean() if callable(self.mean) else 0
-        sd = np.sqrt(self.variance()) if (callable(self.variance) or self.variance is not None) else 1
-
-        lo_bound = supp[0] if supp[0] > -np.inf else mu - 8 * sd
-        up_bound = supp[1] if supp[1] < np.inf else mu + 8 * sd
-
-        supp_length = up_bound - lo_bound
-
-        x_axis = np.linspace(lo_bound, up_bound, int(1000 * supp_length))
-        y_axis = [self.pdf(x) for x in x_axis]
-
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=x_axis, y=y_axis, mode="lines", name="PDF", line=dict(width=2)))
-        fig.update_layout(title="Probability Density Function",xaxis_title="x",yaxis_title="f(x)")
-        fig.show()
 
     def plot_cdf(self):
 
@@ -274,7 +229,54 @@ class Distribution(ABC):
         print(f"Variance : {self.variance()}")
         print(f"Entropy : {self.entropy()}")
 
-class Uniform(Distribution):
+class ContinuousDistribution(Distribution, ABC):
+
+    @abstractmethod
+    def pdf(self, x=None):
+        """
+        Probability Density Function method.
+
+        Print or evaluate the probability density function at a point x.
+
+        Parameters
+        ----------
+        x : float
+            Point at which to evaluate the the probability density function.
+
+        Returns
+        -------
+        float
+            Image of x by the probability density function.
+        """
+
+        pass
+
+    def plot_pdf(self):
+
+        """
+        Plot PDF method.
+
+        Plot the graph of the probability density function.
+        """
+
+        supp = self.support()
+        mu = self.mean() if callable(self.mean) else 0
+        sd = np.sqrt(self.variance()) if (callable(self.variance) or self.variance is not None) else 1
+
+        lo_bound = supp[0] if supp[0] > -np.inf else mu - 8 * sd
+        up_bound = supp[1] if supp[1] < np.inf else mu + 8 * sd
+
+        supp_length = up_bound - lo_bound
+
+        x_axis = np.linspace(lo_bound, up_bound, int(1000 * supp_length))
+        y_axis = [self.pdf(x) for x in x_axis]
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=x_axis, y=y_axis, mode="lines", name="PDF", line=dict(width=2)))
+        fig.update_layout(title="Probability Density Function",xaxis_title="x",yaxis_title="f(x)")
+        fig.show()
+
+class Uniform(ContinuousDistribution):
 
     """
     Continuous-Time Uniform probability distribution.
@@ -358,7 +360,7 @@ class Uniform(Distribution):
     def support(self):
         return (self.lobound, self.upbound)
 
-class Exponential(Distribution):
+class Exponential(ContinuousDistribution):
 
     """
     Exponential probability distribution.
@@ -430,7 +432,7 @@ class Exponential(Distribution):
     def support(self):
         return (0, np.inf)
 
-class Normal(Distribution):
+class Normal(ContinuousDistribution):
 
     """
     Normal probability distribution.
@@ -498,7 +500,7 @@ class Normal(Distribution):
     def support(self):
         return (-np.inf ,np.inf)
 
-class Gamma(Distribution):
+class Gamma(ContinuousDistribution):
 
     """
     Gamma probability distribution.
@@ -576,7 +578,7 @@ class Gamma(Distribution):
     def support(self):
         return (0,np.inf)
 
-class Beta(Distribution):
+class Beta(ContinuousDistribution):
 
     """
     Beta probability distribution.
@@ -657,7 +659,7 @@ class Beta(Distribution):
     def support(self):
         return (0,1)
 
-class Weibull(Distribution):
+class Weibull(ContinuousDistribution):
 
     """
     Weibull probability distribution.
@@ -733,7 +735,7 @@ class Weibull(Distribution):
     def support(self):
         return (0, np.inf)
 
-class Frechet(Distribution):
+class Frechet(ContinuousDistribution):
 
     """
     Fréchet probability distribution.
@@ -820,7 +822,7 @@ class Frechet(Distribution):
     def support(self):
         return (self.m, np.inf)
 
-class Cauchy(Distribution):
+class Cauchy(ContinuousDistribution):
 
     """
     Cauchy probability distribution.
@@ -887,7 +889,7 @@ class Cauchy(Distribution):
     def support(self):
         return (-np.inf, np.inf)
 
-class Gumbel(Distribution):
+class Gumbel(ContinuousDistribution):
 
     """
     Gumbel probability distribution.
@@ -955,7 +957,7 @@ class Gumbel(Distribution):
         return (-np.inf, np.inf)
 
 
-class Kumaraswamy(Distribution):
+class Kumaraswamy(ContinuousDistribution):
 
     """
     Kumaraswamy probability distribution.
@@ -1037,7 +1039,7 @@ class Kumaraswamy(Distribution):
     def support(self):
         return (0,1)
 
-class Fisher(Distribution):
+class Fisher(ContinuousDistribution):
 
     """
     Fisher probability distribution.
@@ -1117,7 +1119,7 @@ class Fisher(Distribution):
     def support(self):
         return (0,np.inf)
 
-class Pareto(Distribution):
+class Pareto(ContinuousDistribution):
 
     """
     Pareto probability distribution.
@@ -1198,7 +1200,7 @@ class Pareto(Distribution):
     def support(self):
         return (self.x_m, np.inf)
 
-class Rayleigh(Distribution):
+class Rayleigh(ContinuousDistribution):
 
     """
     Rayleigh probability distribution.
@@ -1266,7 +1268,7 @@ class Rayleigh(Distribution):
         return (0, np.inf)
 
 
-class DiscreteDistribution(ABC):
+class DiscreteDistribution(Distribution, ABC):
 
     @abstractmethod
     def pmf(self, x=None):
@@ -1285,114 +1287,6 @@ class DiscreteDistribution(ABC):
         -------
         float
             Image of x by the probability mass function.
-        """
-
-        pass
-
-    @abstractmethod
-    def cdf(self, x=None):
-
-        """
-        Cumulative Distribution function method.
-
-        Print or evaluate the cumulative distribution function at a point x.
-        The cumulative distribution function is defined by
-                            F(x) = P(X <= x).
-
-        Parameters
-        ----------
-        x : float
-            Point at which to evaluate the cumulative distribution function.
-
-        Returns
-        -------
-        float
-            Image of x by the cumulative distribution function.
-        """
-
-        pass
-
-    @abstractmethod
-    def sample(self,n=1):
-
-        """
-        Sampling method.
-
-        Sample n points from the effective distribution.
-
-        Parameters
-        ----------
-        n : int
-            Number of samples. Must be a strictly positive integer.
-
-        Returns
-        -------
-        np.ndarray
-            n samples of the effective distribution.
-        """
-
-        pass
-
-    @abstractmethod
-    def mean(self):
-
-        """
-        Mean method.
-
-        Return the mean of the effective distribution.
-
-        Returns
-        -------
-        float
-            Mean of the effective distribution.
-        """
-
-        pass
-
-    @abstractmethod
-    def variance(self):
-
-        """
-        Variance method.
-
-        Return the variance of the effective distribution.
-
-        Returns
-        -------
-        float
-            Variance of the effective distribution.
-        """
-
-        pass
-
-    @abstractmethod
-    def entropy(self):
-
-        """
-        Entropy method.
-
-        Return the Shannon Entropy of the effective distribution.
-
-        Returns
-        -------
-        float
-            Shannon Entropy of the effective distribution.
-        """
-
-        pass
-
-    @abstractmethod
-    def support(self):
-        """
-        Support method.
-
-        Return the support of the effective distribution.
-        The support of a distribution is the set of real numbers where the probability density function is nonzero.
-
-        Returns
-        -------
-        tuple
-            (lower bound, upper bound) of the support.
         """
 
         pass
@@ -1455,53 +1349,6 @@ class DiscreteDistribution(ABC):
         )
 
         fig.show()
-
-    def plot_cdf(self):
-
-        """
-        Plot CDF method.
-
-        Plot the graph of the cumulative distribution function.
-        """
-
-        supp = self.support()
-        if type(supp) != set:
-            lo_bound = -0.5
-            up_bound = 20
-        else:
-
-            lo_bound = min(supp)-0.5
-            up_bound = max(supp)+0.5
-
-        mu = self.mean() if callable(self.mean) else 0
-        sd = np.sqrt(self.variance()) if callable(self.variance) else 1
-
-
-        supp_length = up_bound - lo_bound
-        n_points = 1000
-        x_axis = np.linspace(lo_bound, up_bound, n_points)
-        y_axis = [self.cdf(x) for x in x_axis]
-
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=x_axis, y=y_axis, mode="lines", name="CDF", line=dict(width=2,shape="hv")))
-        fig.update_layout(title="Cumulative Distribution Function", xaxis_title="x", yaxis_title="f(x)")
-        fig.show()
-
-    def info(self):
-        """
-        Info method.
-
-        Print a recap of the effective distribution.
-        """
-        print(f"Distribution : {self.__class__.__name__}")
-        print(f"Parameters : {self.__dict__}")
-        print(f"{self.pmf()}")
-        print(f"{self.cdf()}")
-        print(f"Support : {self.support()}")
-        print(f"Mean : {self.mean()}")
-        print(f"Variance : {self.variance()}")
-        print(f"Entropy : {self.entropy()}")
-
 
 class DUniform(DiscreteDistribution):
 
