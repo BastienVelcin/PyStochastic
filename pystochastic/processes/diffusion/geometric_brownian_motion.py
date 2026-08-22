@@ -102,7 +102,7 @@ class GeometricBrownianMotion(DiffusionProcess):
         if self.volatility.ndim == 1:
             self.volatility = np.diag(self.volatility)
 
-        if initial == None:
+        if initial is None:
             initial = np.ones(np.size(mu))
 
         self.initial = np.atleast_1d(initial)

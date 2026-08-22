@@ -16,13 +16,13 @@ or parallelization the SDE.
 
 Examples
 --------
->> solver = EulerMaruyama(mu=lambda x,t : x, sigma=lambda x,t : 0.1*x, x_0=1, t_0=0, t_n=1, n_steps=1000, n_simulations=10)
+>> solver = EulerMaruyama(drift=lambda x,t : x, diffusion=lambda x,t : 0.1*x, x_0=1, t_0=0, t_n=1, n_steps=1000, n_simulations=10)
 >> solver.solve(plot=True)
 >>
->> solver = EulerMaruyama(mu=lambda x,t: -x, sigma=lambda x,t: 0.3, n_simulations=1000)
+>> solver = EulerMaruyama(drift=lambda x,t: -x, diffusion=lambda x,t: 0.3, n_simulations=1000)
 >> Y = solver.solve(plot=False)
 >>
->> solver = EulerMaruyama(mu=lambda x,t: -x, sigma=lambda x,t: np.array([[0.3]]))
+>> solver = EulerMaruyama(drift=lambda x,t: -x, diffusion=lambda x,t: np.array([[0.3]]))
 >> Y = solver.solve(plot=False, parallel=True)
 """
 
@@ -61,19 +61,19 @@ def _is_vectorizable_diffusion(f, x_0, t_0):
     return test.ndim <= 1
 
 
-def _simulate_vectorized(mu, sigma, x_0, t, dt, n_steps, dim, dW):
+def _simulate_vectorized(drift, diffusion, x_0, t, dt, n_steps, dim, dW):
 
     """
     Simulate Vectorized function.
 
-    If the diffusion is diagonal (sigma returns a scalar or a vector), all simulations are
+    If the diffusion is diagonal (diffusion returns a scalar or a vector), all simulations are
     treated together at each time step, via numpy vectorization.
 
     Parameters
     ----------
-    mu : function
+    drift : function
         Drift function of the SDE.
-    sigma : function
+    diffusion : function
         Diffusion function of the SDE.
     x_0 : float, list, or np.ndarray
         Initial condition of the SDE.
@@ -105,12 +105,12 @@ def _simulate_vectorized(mu, sigma, x_0, t, dt, n_steps, dim, dW):
         y_prev = Y[:, i - 1, :]
         t_prev = t[i - 1]
 
-        Y[:, i, :] = y_prev + mu(y_prev, t_prev) * dt + sigma(y_prev, t_prev) * dW[:, i - 1, :]
+        Y[:, i, :] = y_prev + drift(y_prev, t_prev) * dt + diffusion(y_prev, t_prev) * dW[:, i - 1, :]
 
     return Y
 
 
-def _simulate_sequential(mu, sigma, x_0, t, dt, n_steps, dim, dW):
+def _simulate_sequential(drift, diffusion, x_0, t, dt, n_steps, dim, dW):
 
     """
     Simulate Sequential function.
@@ -120,9 +120,9 @@ def _simulate_sequential(mu, sigma, x_0, t, dt, n_steps, dim, dW):
 
     Parameters
     ----------
-    mu : function
+    drift : function
         Drift function of the SDE.
-    sigma : function
+    diffusion : function
         Diffusion function of the SDE.
     x_0 : float, list, or np.ndarray
         Initial condition of the SDE.
@@ -159,8 +159,8 @@ def _simulate_sequential(mu, sigma, x_0, t, dt, n_steps, dim, dW):
             x_prev = Y_sim[i - 1]
             t_prev = t[i - 1]
 
-            # The Euler-Maruyama induction formula is given by : Y_{t_{i+1}}  = Y_{t_i} + mu(Y_{t_i},t_i)*dt + sigma(Y_{t_i},t_i)*dW_{t_i}
-            Y_sim[i] = x_prev + mu(x_prev, t_prev) * dt + sigma(x_prev, t_prev) @ dW_sim[i - 1]
+            # The Euler-Maruyama induction formula is given by : Y_{t_{i+1}}  = Y_{t_i} + drift(Y_{t_i},t_i)*dt + diffusion(Y_{t_i},t_i)*dW_{t_i}
+            Y_sim[i] = x_prev + drift(x_prev, t_prev) * dt + diffusion(x_prev, t_prev) @ dW_sim[i - 1]
     return Y
 
 
@@ -175,29 +175,29 @@ class EulerMaruyama:
     Euler-Maruyama method for SDEs.
 
     The Euler-Maruyama method is a numerical method for solving stochastic differential equations (SDEs) of the form
-                                        dX_t = mu(X_t,t)dt + sigma(X_t,t)dW_t,
-    where X_t is a random variable, W_t is a Standard Wiener process, mu(X_t,t) is the drift function, and sigma(X_t,t)
+                                        dX_t = drift(X_t,t)dt + diffusion(X_t,t)dW_t,
+    where X_t is a random variable, W_t is a Standard Wiener process, drift(X_t,t) is the drift function, and diffusion(X_t,t)
     is the diffusion function.
     Note that the differentiation is taken in the sense of Ito.
 
     Two internal simulation strategies, chosen automatically at solve() time:
-      - "vectorized" : used when sigma(x,t) returns a scalar or a vector (diagonal
+      - "vectorized" : used when diffusion(x,t) returns a scalar or a vector (diagonal
         diffusion, independent noise per dimension). All simulations are advanced
         together at each time step -- by far the fastest option (no dependency on
         the number of CPU cores).
 
       - "sequential" (optionally parallelized via multiprocess across simulations):
-        used when sigma(x,t) returns a full (dim,dim) matrix (correlated noise
+        used when diffusion(x,t) returns a full (dim,dim) matrix (correlated noise
         across dimensions), which cannot be vectorized across simulations without
-        changing the calling convention of sigma.
+        changing the calling convention of diffusion.
 
     Notice that the parallelization is usefull only for large values of number of simulations.
 
     Parameters
     ----------
-    mu : function of two arguments
+    drift : function of two arguments
         Drift function of the SDE.
-    sigma : function of two arguments
+    diffusion : function of two arguments
         Diffusion function of the SDE.
     x_0 : float, or list, or np.ndarray
         Initial condition.
@@ -212,9 +212,9 @@ class EulerMaruyama:
 
     Attributes
     ----------
-    mu : function
+    drift : function
         Drift function of the SDE.
-    sigma : function
+    diffusion : function
         Diffusion function of the SDE.
     x_0 : float, or list, or np.ndarray
         Initial condition.
@@ -235,19 +235,19 @@ class EulerMaruyama:
 
     Examples
     --------
-    >> solver = EulerMaruyama(mu=lambda x,t : x, sigma=lambda x,t : 0.1*x, x_0=1, t_0=0, t_n=1, n_steps=1000, n_simulations=10)
+    >> solver = EulerMaruyama(drift=lambda x,t : x, diffusion=lambda x,t : 0.1*x, x_0=1, t_0=0, t_n=1, n_steps=1000, n_simulations=10)
     >> solver.solve(plot=True)
     >>
-    >> solver = EulerMaruyama(mu=lambda x,t: -x, sigma=lambda x,t: 0.3, n_simulations=1000)
+    >> solver = EulerMaruyama(drift=lambda x,t: -x, diffusion=lambda x,t: 0.3, n_simulations=1000)
     >> Y = solver.solve(plot=False)
     >>
-    >> solver = EulerMaruyama(mu=lambda x,t: -x, sigma=lambda x,t: np.array([[0.3]]))
+    >> solver = EulerMaruyama(drift=lambda x,t: -x, diffusion=lambda x,t: np.array([[0.3]]))
     >> Y = solver.solve(plot=False, parallel=True)
     """
 
     def __init__(self,
-                 mu=default_drift,
-                 sigma=default_diffusion,
+                 drift=default_drift,
+                 diffusion=default_diffusion,
                  x_0=0,
                  t_0=0,
                  t_n=1,
@@ -259,8 +259,8 @@ class EulerMaruyama:
                 "The final time must be strictly greater than the initial time."
             )
 
-        self.mu = mu
-        self.sigma = sigma
+        self.drift = drift
+        self.diffusion = diffusion
         self.x_0 = np.atleast_1d(x_0)
         self.t_0 = t_0
         self.t_n = t_n
@@ -282,7 +282,7 @@ class EulerMaruyama:
         plot : bool
             Specifies whether to plot the evolution of the SDE (only in 1D, 2D and 3D).
         parallel : bool
-            Only relevant when sigma(x,t) returns a full (dim,dim) matrix (non-diagonal
+            Only relevant when diffusion(x,t) returns a full (dim,dim) matrix (non-diagonal
             diffusion). Ignored when the diffusion is diagonal: the vectorized path is already
             faster than any parallelization could offer.
         n_workers : int
@@ -300,10 +300,10 @@ class EulerMaruyama:
         dW = W.increments
 
         # We define the list of arguments that will be passed to the simulation functions.
-        args = (self.mu, self.sigma, self.x_0, self.t, self.dt, self.n_steps, self.dim, dW)
+        args = (self.drift, self.diffusion, self.x_0, self.t, self.dt, self.n_steps, self.dim, dW)
 
         #If the diffusion is diagonal, we use the vectorized method. Otherwise, we use the sequential method.
-        if _is_vectorizable_diffusion(self.sigma, self.x_0, self.t_0):
+        if _is_vectorizable_diffusion(self.diffusion, self.x_0, self.t_0):
             Y = _simulate_vectorized(*args)
 
         # SEQUENTIAL METHOD :
@@ -321,7 +321,7 @@ class EulerMaruyama:
             # We split the increments into chunks, and pass each chunk to a worker process.
             chunks = np.array_split(dW, n_workers, axis=0)
 
-            worker_args = [(self.mu, self.sigma, self.x_0, self.t, self.dt,
+            worker_args = [(self.drift, self.diffusion, self.x_0, self.t, self.dt,
                              self.n_steps, self.dim, chunk) for chunk in chunks]
 
             # We launch the simulations in parallel, and wait for the results.

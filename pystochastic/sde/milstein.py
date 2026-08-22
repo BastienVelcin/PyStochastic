@@ -15,7 +15,7 @@ The Milstein class also handles the solution plotting.
 
 Examples
 --------
->> solver = Milstein(mu=lambda x : x, sigma=lambda x : 0.1*x, x_0=0, t_0=0, t_n=1, n_steps=1000, n_simulations=10) #Milstein SDE with drift x(t) = x and diffusion 0.1*x(t)
+>> solver = Milstein(drift=lambda x : x, diffusion=lambda x : 0.1*x, x_0=0, t_0=0, t_n=1, n_steps=1000, n_simulations=10) #Milstein SDE with drift x(t) = x and diffusion 0.1*x(t)
 >>
 >> solver.solve(plot=True) #Plot the evolution of the SDE
 """
@@ -31,16 +31,16 @@ class Milstein:
     Milstein method for SDEs.
 
     The Milstein method is a numerical method for solving autonomous stochastic differential equations (ASDEs) of the form
-                                        dX_t = mu(X_t)dt + sigma(X_t)dW_t,
-    where X_t is a random variable, W_t is a Standard Wiener process, mu(X_t,t) is the drift function, and sigma(X_t,t)
+                                        dX_t = drift(X_t)dt + diffusion(X_t)dW_t,
+    where X_t is a random variable, W_t is a Standard Wiener process, drift(X_t,t) is the drift function, and diffusion(X_t,t)
     is the diffusion function.
     Note that the differentiation is taken in the sense of Ito.
 
     Parameters
     ----------
-    mu : function of one argument
+    drift : function of one argument
         Drift function of the SDE.
-    sigma : function of one argument
+    diffusion : function of one argument
         Diffusion function of the SDE.
     x_0 : float, or list, or np.ndarray
         Initial condition.
@@ -55,9 +55,9 @@ class Milstein:
 
     Attributes
     ----------
-    mu : function
+    drift : function
         Drift function of the SDE.
-    sigma : function
+    diffusion : function
         Diffusion function of the SDE.
     x_0 : float, list, or np.ndarray
         Initial condition.
@@ -76,13 +76,13 @@ class Milstein:
 
     Examples
     --------
-    >> solver = Milstein(mu=lambda x : x, sigma=lambda x : 0.1*x, x_0=0, t_0=0, t_n=1, n_steps=1000, n_simulations=10)
+    >> solver = Milstein(drift=lambda x : x, diffusion=lambda x : 0.1*x, x_0=0, t_0=0, t_n=1, n_steps=1000, n_simulations=10)
     >> solver.solve(plot=True)
 
     """
 
     def __init__(self,
-                 mu=default_drift,sigma=default_diffusion,
+                 drift=default_drift,diffusion=default_diffusion,
                  x_0=0,
                  t_0=0,
                  t_n=1,
@@ -99,8 +99,8 @@ class Milstein:
             )
 
         x_0 = np.atleast_1d(x_0)
-        self.mu = mu
-        self.sigma = sigma
+        self.drift = drift
+        self.diffusion = diffusion
         self.x_0 = x_0
         self.t_0 = t_0
         self.t_n = t_n
@@ -120,7 +120,7 @@ class Milstein:
         Parameters
         ----------
         eps : float
-            Specifies the gap between sigma(x) and sigma(x+eps).
+            Specifies the gap between diffusion(x) and diffusion(x+eps).
 
         Returns
         -------
@@ -129,7 +129,7 @@ class Milstein:
         """
 
         # Rate of change of the diffusion function at x, with a small gap eps.
-        return (self.sigma(x + eps)- self.sigma(x - eps)) / (2 * eps)
+        return (self.diffusion(x + eps)- self.diffusion(x - eps)) / (2 * eps)
 
     def solve(self, plot=True):
 
@@ -163,7 +163,7 @@ class Milstein:
 
         for i in range(1,self.n_steps+1):
             # Milstein induction formula.
-            Y[:,i,:] = Y[:,i-1,:] + self.mu(Y[:,i-1,:])*self.dt + self.sigma(Y[:,i-1,:]) * dW[:,i-1,:] + (1/2)*self.sigma(Y[:,i-1,:])*self.approx_derivative_diffusion(Y[:,i-1,:])*(dW[:,i-1,:]**2-self.dt)
+            Y[:,i,:] = Y[:,i-1,:] + self.drift(Y[:,i-1,:])*self.dt + self.diffusion(Y[:,i-1,:]) * dW[:,i-1,:] + (1/2)*self.diffusion(Y[:,i-1,:])*self.approx_derivative_diffusion(Y[:,i-1,:])*(dW[:,i-1,:]**2-self.dt)
 
         # Plotting is allowed only if the user has specified the plot parameter to True.
 
