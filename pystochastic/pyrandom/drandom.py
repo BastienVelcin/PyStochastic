@@ -60,7 +60,7 @@ def duniform(N=2,n=1):
             "The number of samples must be a strictly positive integer."
         )
 
-    return (np.floor(uniform(0, N, n )))
+    return (np.ceil(uniform(0, N, n ),dtype=int))
 
 def bernoulli(p=0.5,n=1):
 
