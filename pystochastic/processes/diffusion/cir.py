@@ -19,7 +19,6 @@ Examples
 """
 
 import numpy as np
-import plotly.graph_objects as go
 from pystochastic.random.setseed import *
 from pystochastic.processes.diffusion.diffusion_process import DiffusionProcess
 
@@ -118,25 +117,27 @@ class CIR(DiffusionProcess):
         self.factor = (4*self.speed*np.exp(-self.speed * self.dt))/((self.volatility**2)*(1-np.exp(-self.speed * self.dt)))
         self.c = ((self.volatility**2)*(1-np.exp(-self.speed * self.dt)))/(4*self.speed)
 
+    @property
+    def feller_condition(self):
+        return 2 * self.a * self.b >= self.sigma ** 2
+
     def drift(self,x,t=None):
         return self.speed * (self.mean-x)
 
     def diffusion(self,x,t=None):
         return self.volatility * np.sqrt(np.maximum(x,0))
 
-    def simulate(self, n_simulations=1,method="exact",plot=False):
+    def _simulate_exact(self, n_simulations=1,plot=False):
 
         """
         Simulate method.
 
-        Simulate a Cox-Ingersoll-Ross process path using both the Euler-Maruyama method and exact solution.
+        Simulate a Cox-Ingersoll-Ross process path using both the exact solution.
 
         Parameters
         ----------
         n_simulations : int, default=1
             Number of trajectories to simulate.
-        method : {"exact", "euler-maruyama", "milstein"}, default="exact"
-            Simulation method to use.
         plot : bool
             Specify if the path should be plotted.
 
@@ -146,52 +147,17 @@ class CIR(DiffusionProcess):
             Path of the simulated Cox-Ingersoll-Ross process of the form ``(n_simulations, steps + 1, dim)``.
         """
 
-        if method == "euler-maruyama":
-            from pystochastic.sde import EulerMaruyama
-            if (2 * self.speed * self.mean < self.volatility ** 2):
-                raise ValueError(
-                    "The model parameters are inconsistent with the model. Please choose a, b and volatility such that 2*a*b >= volatility^2"
-                )
+        self.path = np.zeros((n_simulations,self.steps+1, 1))
+        self.path[:,0] = self.initial
+        for i in range(1,self.steps+1):
+            rng = get_rng()
+            # The induction formula is given by R_{t+1} = c*Z, where Z ~ NCX2(df=nu, nc=R_t * factor)
+            Y = rng.noncentral_chisquare(df=self.nu, nonc=self.path[:,i-1] * self.factor)
+            self.path[:,i] = self.c*Y
 
-            self.path = EulerMaruyama(self.drift,
-                                      self.diffusion,
-                                      self.initial,
-                                      self.t_0,
-                                      self.t_n,
-                                      self.steps,
-                                      n_simulations).solve(plot=plot)
-
-        elif method == "milstein":
-            from pystochastic.sde import Milstein
-            if (2 * self.speed * self.mean < self.volatility ** 2):
-                raise ValueError(
-                    "The model parameters are inconsistent with the model. Please choose a, b and volatility such that 2*a*b >= volatility^2"
-                )
-
-            self.path = Milstein(self.drift,
-                                      self.diffusion,
-                                      self.initial,
-                                      self.t_0,
-                                      self.t_n,
-                                      self.steps,
-                                      n_simulations).solve(plot=plot)
-        elif method == "exact":
-            self.path = np.zeros((n_simulations,self.steps+1, 1))
-            self.path[:,0] = self.initial
-            for i in range(1,self.steps+1):
-                rng = get_rng()
-                # The induction formula is given by R_{t+1} = c*Z, where Z ~ NCX2(df=nu, nc=R_t * factor)
-                Y = rng.noncentral_chisquare(df=self.nu, nonc=self.path[:,i-1] * self.factor)
-                self.path[:,i] = self.c*Y
-
-        else:
-            raise ValueError(
-                "The method must be either 'euler-maruyama', 'milstein' or 'exact'."
-            )
-
-        # When the first simulation is launched, we define the global number of simulations
-        self.n_simulations = n_simulations
-
+        if plot:
+            self.n_simulations = n_simulations
+            self.plot()
         return self.path
 
     def expectation(self,t):

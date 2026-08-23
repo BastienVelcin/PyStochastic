@@ -1,6 +1,6 @@
 """
 ============================================================
-Module DRANDOM
+Module DISCRETE RANDOM
 ============================================================
 
 Description
@@ -16,7 +16,7 @@ The following distributions are implemented :
     - Negative Binomial
     - Yule-Simon
 
-These functions are directly linked to the dist.py classes.
+These functions are directly linked to the continuous.py classes.
 
 Examples
 --------
@@ -28,7 +28,7 @@ array([12,  4,  6,  4,  8,  8,  3,  6,  2,  7,  2, 12,  3,  3, 22])
 """
 
 import numpy as np
-from pystochastic.random.crandom import uniform, exponential
+from pystochastic.random.continuous import uniform, exponential
 from math import comb
 
 def duniform(N=2,n=1):

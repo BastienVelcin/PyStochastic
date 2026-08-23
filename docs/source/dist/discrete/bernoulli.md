@@ -2,9 +2,10 @@
 
 
 ## Import line
-You can import the Bernoulli distribution from the `dist` module as follows:
+You can import the Bernoulli distribution from the `continuous.py` module as follows:
+
 ```python
-from pystochastic.dist.dist import Bernoulli
+from pystochastic.dist.continuous import Bernoulli
 ```
 
 ## Description

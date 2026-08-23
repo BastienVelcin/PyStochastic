@@ -5,7 +5,7 @@ Tests for the distribution interfaces.
 import pytest
 
 from pystochastic.dist import Distribution, DiscreteDistribution
-from pystochastic.dist.dist import ContinuousDistribution
+from pystochastic.dist.continuous import ContinuousDistribution
 
 
 # ======================================================================

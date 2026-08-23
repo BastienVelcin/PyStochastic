@@ -6,9 +6,10 @@ a common interface. This page explores all the distributions available and their
 
 
 ## Import line
-You can import all the distributions listed in the `dist` module as follows:
+You can import all the distributions listed in the `continuous.py` module as follows:
+
 ```python
-from pystochastic.dist.dist import *
+from pystochastic.dist.continuous import *
 ```
 
 ## Implemented distributions

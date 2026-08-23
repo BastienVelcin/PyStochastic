@@ -207,8 +207,6 @@ class EulerMaruyama:
         Final time. Must be strictly greater than t_0.
     n_steps : int
         Number of time steps. Must be a strictly positive integer.
-    n_simulations : int
-        Number of solution simulations. Must be a strictly positive integer.
 
     Attributes
     ----------
@@ -265,12 +263,12 @@ class EulerMaruyama:
         self.t_0 = t_0
         self.t_n = t_n
         self.n_steps = n_steps
-        self.n_simulations = n_simulations
+        self.n_simulations = None
         self.dim = np.size(initial)
         self.t = np.linspace(t_0, t_n, n_steps + 1)
         self.dt = (t_n - t_0) / n_steps
 
-    def solve(self, plot=True, parallel=False, n_workers=None):
+    def solve(self, n_simulations = 1, plot=True, parallel=False, n_workers=None):
 
         """
         Solve method.
@@ -279,6 +277,8 @@ class EulerMaruyama:
 
         Parameters
         ----------
+        n_simulations : int
+            Number of solution simulations. Must be a strictly positive integer.
         plot : bool
             Specifies whether to plot the evolution of the SDE (only in 1D, 2D and 3D).
         parallel : bool
@@ -293,6 +293,9 @@ class EulerMaruyama:
         np.ndarray
             Simulated path of shape (n_simulations, n_steps+1, dim).
         """
+
+
+        self.n_simulations = n_simulations
 
         # We compute the different brownian path and increments that will be used in the simulation.
         W = Brownian(np.eye(self.dim), self.t_0, self.t_n, self.n_steps)
@@ -359,6 +362,12 @@ class EulerMaruyama:
                                                z=Y[sim, :, 2],
                                                mode="lines",
                                                line=dict(width=2)))
+
+            fig.update_layout(
+                title=f"Simulation with Euler-Maruyama method.",
+                xaxis_title="t",
+                template="plotly_white",
+            )
 
             fig.show()
 

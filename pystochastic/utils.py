@@ -4,10 +4,14 @@ def is_pos_def(x):
     return np.all(np.linalg.eigvals(x) > 0)
 
 def default_drift(x, t=None):
+    if not type(x) == np.ndarray:
+        return 1
     x = np.atleast_1d(x)
     return np.ones(len(x))
 
 def default_diffusion(x, t=None):
+    if not type(x) == np.ndarray:
+        return 1
     x = np.atleast_1d(x)
     return np.eye(len(x))
 

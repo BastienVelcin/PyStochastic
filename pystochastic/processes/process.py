@@ -87,7 +87,7 @@ class Process(ABC):
         """
         Plot method.
 
-        Plot the simulated path of the Geometric Brownian Motion. The path can be plotted only in 1D, 2D or 3D.
+        Plot the simulated path of the process. The path can be plotted only in 1D, 2D or 3D.
         """
 
         if self.path is None:
@@ -131,12 +131,12 @@ class Process(ABC):
         """
         Final position method
 
-        The function returns the state of the Brownian motion at the final time t_n.
+        The function returns the state of the process at the final time t_n.
 
         Returns
         -------
         float or np.ndarray
-            State of the Brownian motion at the final time t_n.
+            State of the process at the final time t_n.
         """
 
         if self.path is None:
@@ -167,7 +167,7 @@ class Process(ABC):
         """
         Min method
 
-        The min method returns the minimum value of the Brownian motion, the time index at which the minimum value
+        The min method returns the minimum value of the process, the time index at which the minimum value
         occurs, and the corresponding time.
 
         Returns
@@ -201,7 +201,7 @@ class Process(ABC):
         """
         Max norm method
 
-        The max norm method returns the maximum of the norm value of the Brownian motion, the time index at which the maximum norm value
+        The max norm method returns the maximum of the norm value of the process, the time index at which the maximum norm value
         occurs, and the corresponding time.
 
         Returns

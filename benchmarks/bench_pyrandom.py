@@ -9,8 +9,8 @@ reported but do not stop the benchmark.
 import time
 import numpy as np
 
-from pystochastic.random import crandom
-from pystochastic.random import drandom
+from pystochastic.random import continuous
+from pystochastic.random import discrete
 
 
 # ---------------------------------------------------------------------
@@ -59,32 +59,32 @@ def main():
     n_runs = 5
 
     continuous_laws = {
-        "uniform": lambda n: crandom.uniform(0, 1, n),
-        "exponential": lambda n: crandom.exponential(1, n),
-        "normal": lambda n: crandom.normal(0, 1, n),
-        "gamma (int shape)": lambda n: crandom.gamma(3, 1, n),
-        "gamma (frac shape)": lambda n: crandom.gamma(2.5, 1, n),
-        "beta": lambda n: crandom.beta(2, 3, n),
-        "weibull": lambda n: crandom.weibull(1.5, 1, n),
-        "frechet": lambda n: crandom.frechet(2, 1, 0, n),
-        "cauchy": lambda n: crandom.cauchy(0, 1, n),
-        "gumbel": lambda n: crandom.gumbel(0, 1, n),
-        "kumaraswamy": lambda n: crandom.kumaraswamy(2, 3, n),
-        "fisher": lambda n: crandom.fisher(4, 10, n),
-        "pareto": lambda n: crandom.pareto(1, 3, n),
-        "rayleigh": lambda n: crandom.rayleigh(1, n),
+        "uniform": lambda n: continuous.uniform(0, 1, n),
+        "exponential": lambda n: continuous.exponential(1, n),
+        "normal": lambda n: continuous.normal(0, 1, n),
+        "gamma (int shape)": lambda n: continuous.gamma(3, 1, n),
+        "gamma (frac shape)": lambda n: continuous.gamma(2.5, 1, n),
+        "beta": lambda n: continuous.beta(2, 3, n),
+        "weibull": lambda n: continuous.weibull(1.5, 1, n),
+        "frechet": lambda n: continuous.frechet(2, 1, 0, n),
+        "cauchy": lambda n: continuous.cauchy(0, 1, n),
+        "gumbel": lambda n: continuous.gumbel(0, 1, n),
+        "kumaraswamy": lambda n: continuous.kumaraswamy(2, 3, n),
+        "fisher": lambda n: continuous.fisher(4, 10, n),
+        "pareto": lambda n: continuous.pareto(1, 3, n),
+        "rayleigh": lambda n: continuous.rayleigh(1, n),
     }
 
     discrete_laws = {
-        "duniform": lambda n: drandom.duniform(10, n),
-        "bernoulli": lambda n: drandom.bernoulli(0.3, n),
-        "rademacher": lambda n: drandom.rademacher(0.5, n),
-        "binomial": lambda n: drandom.binomial(0.3, 20, n),
-        "poisson": lambda n: drandom.poisson(3, n),
-        "hypergeometric": lambda n: drandom.hypergeometric(50, 20, 10, n),
-        "geometric": lambda n: drandom.geometric(0.3, n),
-        "negative_binomial": lambda n: drandom.negative_binomial(0.3, 5, n),
-        "yule_simon": lambda n: drandom.yule_simon(2, n),
+        "duniform": lambda n: discrete.duniform(10, n),
+        "bernoulli": lambda n: discrete.bernoulli(0.3, n),
+        "rademacher": lambda n: discrete.rademacher(0.5, n),
+        "binomial": lambda n: discrete.binomial(0.3, 20, n),
+        "poisson": lambda n: discrete.poisson(3, n),
+        "hypergeometric": lambda n: discrete.hypergeometric(50, 20, 10, n),
+        "geometric": lambda n: discrete.geometric(0.3, n),
+        "negative_binomial": lambda n: discrete.negative_binomial(0.3, 5, n),
+        "yule_simon": lambda n: discrete.yule_simon(2, n),
     }
 
     run_group("continuous laws (crandom)", continuous_laws, sample_sizes, n_runs=n_runs)

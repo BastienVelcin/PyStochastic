@@ -35,7 +35,7 @@ import plotly.graph_objects as go
 from pystochastic.processes import *
 import sys, inspect
 from scipy.stats import norm, t
-from pystochastic.dist.dist import *
+from pystochastic.dist import *
 
 class MonteCarlo:
 

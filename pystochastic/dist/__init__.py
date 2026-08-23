@@ -1,6 +1,10 @@
-from .dist import Distribution, Uniform, Exponential, Normal, Gamma, Beta, Weibull, Frechet, Cauchy, Gumbel, Kumaraswamy, Fisher, Pareto, Rayleigh, DiscreteDistribution, DUniform, Bernoulli, Rademacher, Binomial, Poisson, Hypergeometric, Geometric, NegativeBinomial, YuleSimon
+from .continuous import *
+from .discrete import *
+from .distribution import *
 
-__all__ = ["Distribution", "DiscreteDistribution", "ContinuousDistribution"
+__all__ = ["Distribution",
+           "DiscreteDistribution",
+           "ContinuousDistribution",
            "Uniform",
            "Exponential",
            "Normal",

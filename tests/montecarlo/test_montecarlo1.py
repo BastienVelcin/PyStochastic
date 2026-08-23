@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 from pystochastic.montecarlo.montecarlo import MonteCarlo, MonteCarloProcess
-from pystochastic.random import crandom
+from pystochastic.random import continuous
 from pystochastic.processes.diffusion.vasicek import Vasicek
 
 
@@ -21,7 +21,7 @@ def make_normal_samples(
     mean=0.0,
     sigma=1.0,
 ):
-    samples = crandom.normal(
+    samples = continuous.normal(
         mean,
         sigma,
         n_simulations * n_pool_values * dim,
@@ -41,7 +41,7 @@ def make_normal_samples(
 class TestMonteCarloConstruction:
 
     def test_1d_input(self):
-        samples = crandom.normal(0, 1, 1000)
+        samples = continuous.normal(0, 1, 1000)
 
         mc = MonteCarlo(samples)
 
@@ -51,7 +51,7 @@ class TestMonteCarloConstruction:
         assert mc.samples.shape == (1, 1000, 1)
 
     def test_2d_input(self):
-        samples = crandom.normal(0, 1, 5 * 200).reshape(5, 200)
+        samples = continuous.normal(0, 1, 5 * 200).reshape(5, 200)
 
         mc = MonteCarlo(samples)
 

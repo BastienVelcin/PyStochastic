@@ -14,15 +14,14 @@ Examples
 --------
 >> R = OrnsteinUhlenbeck(mean=[2,1],speed=np.ones((2,2)),speed=np.ones((2,2)),initial=[1,1],t_0=0,t_n=1,steps=1000) #Ornstein-Uhlenbeck process with mean [2,1] and diffusion and form parameter np.ones((2,2)) and starting point [1,1]
 >>
->> R.simulate() #Simulate the  Ornstein-Uhlenbeck process path
+>> R.simulate() #Simulate the Ornstein-Uhlenbeck process path
 >>
 >> R.plot() #Plot the Ornstein-Uhlenbeck process path
 """
 
 import numpy as np
 import scipy
-import plotly.graph_objects as go
-from pystochastic.random import crandom
+from pystochastic.random import continuous
 from pystochastic.utils import _decompose
 from pystochastic.processes.diffusion.diffusion_process import DiffusionProcess
 from pystochastic.random.setseed import *
@@ -189,25 +188,19 @@ class OrnsteinUhlenbeck(DiffusionProcess):
 
         return self.volatility
 
-    def simulate(self, n_simulations=1, method="euler-maruyama",plot=False,parallel=False,n_workers=None):
+    def _simulate_exact(self, n_simulations=1, plot=False):
 
         """
         Simulate method.
 
-        Simulate an Ornstein Uhlenbeck process path using both the Euler-Maruyama method and the induction formula.
+        Simulate an Ornstein Uhlenbeck process path using the induction formula.
 
         Parameters
         ----------
         n_simulations : int, default=1
             Number of trajectories to simulate.
-        method : {"exact", "euler-maruyama", "milstein"}, default="euler-maruyama"
-            Simulation method to use.
         plot : bool
             Specify if the path should be plotted.
-        parallel: bool
-            In the case the vectorization doesn't work, the user can specify the usage of parallel computing.
-        n_workers: int
-            Number of workers to use in parallel computing.
 
         Returns
         -------
@@ -215,58 +208,25 @@ class OrnsteinUhlenbeck(DiffusionProcess):
             Path of the simulated Ornstein Uhlenbeck process of the form ``(n_simulations, steps + 1, dim)``.
         """
 
-        if method == "euler-maruyama":
-            from pystochastic.sde import EulerMaruyama
-            self.path = EulerMaruyama(self.drift,
-                                      self.diffusion,
-                                      self.initial,
-                                      self.t_0,
-                                      self.t_n,
-                                      self.steps,
-                                      n_simulations).solve(plot = plot,
-                                                           parallel=parallel,
-                                                           n_workers=n_workers)
-        elif method == "milstein":
-            if self.dim > 1:
-                raise ValueError(
-                    "The Milstein method is only implemented for 1D processes."
-                )
 
-            from pystochastic.sde import Milstein
-            self.path = Milstein(self.drift,
-                                      self.diffusion,
-                                      self.initial,
-                                      self.t_0,
-                                      self.t_n,
-                                      self.steps,
-                                      n_simulations).solve(plot=plot)
-
-        elif method == "exact":
-            if self.dim > 1:
-                raise ValueError(
-                    "The exact method is only implemented for 1D processes."
-                )
-
-            self.path = np.zeros((n_simulations,self.steps+1, 1))
-            self.path[:,0] = self.initial
-
-            # For every simulation, we compute different normal samples
-            Z = crandom.normal(0, 1, self.steps*n_simulations).reshape((n_simulations,self.steps))
-
-            for i in range(1,self.steps+1):
-                # The induction formula is given by R_t = (mean + R_{t-1} - mean) * exp(-speed * dt) + volatility * sqrt(1 - exp(-2 * speed * dt)) / (2 * speed)) * Z[i-1])
-                self.path[:,i,0] = (self.mean+ (self.path[:,i-1,0] - self.mean) * np.exp(-self.speed * self.dt) + self.volatility * np.sqrt((1 - np.exp(-2 * self.speed * self.dt)) / (2 * self.speed)) * Z[:,i-1])
-
-            if plot:
-                self.n_simulations = n_simulations
-                self.plot()
-        else:
+        if self.dim > 1:
             raise ValueError(
-                "The method must be either 'euler-maruyama', 'milstein' or 'exact'."
+                "The exact method is only implemented for 1D processes."
             )
 
-        # When the first simulation is launched, we define the global number of simulations
-        self.n_simulations = n_simulations
+        self.path = np.zeros((n_simulations,self.steps+1, 1))
+        self.path[:,0] = self.initial
+
+        # For every simulation, we compute different normal samples
+        Z = continuous.normal(0, 1, self.steps * n_simulations).reshape((n_simulations, self.steps))
+
+        for i in range(1,self.steps+1):
+            # The induction formula is given by R_t = (mean + R_{t-1} - mean) * exp(-speed * dt) + volatility * sqrt(1 - exp(-2 * speed * dt)) / (2 * speed)) * Z[i-1])
+            self.path[:,i,0] = (self.mean+ (self.path[:,i-1,0] - self.mean) * np.exp(-self.speed * self.dt) + self.volatility * np.sqrt((1 - np.exp(-2 * self.speed * self.dt)) / (2 * self.speed)) * Z[:,i-1])
+
+        if plot:
+            self.n_simulations = n_simulations
+            self.plot()
 
         return self.path
 

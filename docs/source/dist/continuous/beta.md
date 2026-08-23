@@ -2,9 +2,10 @@
 
 
 ## Import line
-You can import the Beta distribution from the `dist` module as follows:
+You can import the Beta distribution from the `continuous.py` module as follows:
+
 ```python
-from pystochastic.dist.dist import Beta
+from pystochastic.dist.continuous import Beta
 ```
 
 ## Description

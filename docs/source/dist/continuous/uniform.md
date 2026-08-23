@@ -2,9 +2,10 @@
 
 
 ## Import line
-You can import the Continuous-Time Uniform distribution from the `dist` module as follows:
+You can import the Continuous-Time Uniform distribution from the `continuous.py` module as follows:
+
 ```python
-from pystochastic.dist.dist import Uniform
+from pystochastic.dist.continuous import Uniform
 ```
 
 ## Description

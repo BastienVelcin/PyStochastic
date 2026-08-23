@@ -1,6 +1,6 @@
 """
 ============================================================
-Module CRANDOM
+Module CONTINUOUS RANDOM
 ============================================================
 
 Description
@@ -22,7 +22,7 @@ The following distributions are implemented :
     - Pareto
     - Rayleigh
 
-These functions are directly linked to the dist.py classes.
+These functions are directly linked to the continuous.py classes.
 
 Examples
 --------

@@ -1,4 +1,4 @@
 from .eulermaruyama import EulerMaruyama
 from .milstein import Milstein
-
-__all__ = ["EulerMaruyama", "Milstein"]
+from .rungekutta import RungeKutta
+__all__ = ["EulerMaruyama", "Milstein", "RungeKutta"]

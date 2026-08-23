@@ -100,12 +100,12 @@ PyStochastic provides random number generators for both continuous
 and discrete distributions through the `random` module.
 
 ```python
-from pystochastic.random import crandom
+from pystochastic.random import continuous
 
-samples = crandom.normal(
-    mu=0,
-    sigma=1,
-    size=10000,
+samples = continuous.normal(
+  mu=0,
+  sigma=1,
+  size=10000,
 )
 ```
 

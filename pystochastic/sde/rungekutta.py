@@ -1,21 +1,20 @@
 """
 ============================================================
-Module MILSTEIN
+Module RUNGE-KUTTA
 ============================================================
 
 Description
 -----------
-This module provides a way to approximatively solve unidimensional and autonomous SDEs using the Milstein method.
+This module provides a way to approximatively solve unidimensional and autonomous SDEs using the Runge-Kutta method.
 
-This module provides a general class "Milstein", which is an SDEs solver, with the following built-in methods:
-    - .approx_derivative_diffusion() : Approximation of the derivative of the diffusion function at a given point.
+This module provides a general class "RungeKutta", which is an SDEs solver, with the following built-in methods:
     - .solve() : SDEs solving function, with the Milstein induction formula.
 
-The Milstein class also handles the solution plotting.
+The Runge-Kutta class also handles the solution plotting.
 
 Examples
 --------
->> solver = Milstein(drift=lambda x : x, diffusion=lambda x : 0.1*x, initial=0, t_0=0, t_n=1, n_steps=1000, n_simulations=10) #Milstein SDE with drift x(t) = x and diffusion 0.1*x(t)
+>> solver = RungeKutta(drift=lambda x : x, diffusion=lambda x : 0.1*x, initial=0, t_0=0, t_n=1, n_steps=1000, n_simulations=10) #Runge-Kutta SDE with drift x(t) = x and diffusion 0.1*x(t)
 >>
 >> solver.solve(plot=True) #Plot the evolution of the SDE
 """
@@ -25,12 +24,12 @@ import plotly.graph_objects as go
 from pystochastic.processes import Brownian
 from pystochastic.utils import default_drift, default_diffusion
 
-class Milstein:
+class RungeKutta:
 
     """
-    Milstein method for SDEs.
+    Runge-Kutta method for SDEs.
 
-    The Milstein method is a numerical method for solving autonomous stochastic differential equations (ASDEs) of the form
+    The Runge-Kutta method is a numerical method for solving autonomous stochastic differential equations (ASDEs) of the form
                                         dX_t = drift(X_t)dt + diffusion(X_t)dW_t,
     where X_t is a random variable, W_t is a Standard Wiener process, drift(X_t) is the drift function, and diffusion(X_t)
     is the diffusion function.
@@ -74,7 +73,7 @@ class Milstein:
 
     Examples
     --------
-    >> solver = Milstein(drift=lambda x : x, diffusion=lambda x : 0.1*x, initial=0, t_0=0, t_n=1, n_steps=1000, n_simulations=10)
+    >> solver = RungeKutta(drift=lambda x : x, diffusion=lambda x : 0.1*x, initial=0, t_0=0, t_n=1, n_steps=1000, n_simulations=10)
     >> solver.solve(plot=True)
 
     """
@@ -88,7 +87,7 @@ class Milstein:
 
         if np.size(initial) != 1:
             raise NotImplementedError(
-                "Milstein is currently implemented only for autonomous one-dimensional SDEs."
+                "Runge-Kutta is currently implemented only for autonomous one-dimensional SDEs."
             )
         if not t_0 < t_n:
             raise ValueError(
@@ -106,34 +105,12 @@ class Milstein:
         self.t = np.linspace(t_0,t_n,n_steps+1)
         self.dt = (t_n-t_0)/n_steps
 
-    def approx_derivative_diffusion(self,x, eps=1e-6):
-
-        """
-        Approx derivative diffusion method.
-
-        Compute an approximation of the derivative of the diffusion function at a given point numerically, to avoid
-        symbolic computations.
-
-        Parameters
-        ----------
-        eps : float
-            Specifies the gap between diffusion(x) and diffusion(x+eps).
-
-        Returns
-        -------
-        float or np.ndarray
-            Approximation of the derivative of the diffusion function at x.
-        """
-
-        # Rate of change of the diffusion function at x, with a small gap eps.
-        return (self.diffusion(x + eps)- self.diffusion(x - eps)) / (2 * eps)
-
-    def solve(self, n_simulations=1, plot=True):
+    def solve(self, n_simulations = 1, plot=True):
 
         """
         Solve method.
 
-        Solve the SDE using the Milstein method.
+        Solve the SDE using the Runge-Kutta method.
 
         Parameters
         ----------
@@ -146,7 +123,6 @@ class Milstein:
         -------
         np.ndarray
             Array of every simulated path of the approximation of the SDE solution.
-            :param n_simulations:
         """
 
         if n_simulations < 1 or not isinstance(n_simulations, int):
@@ -169,8 +145,10 @@ class Milstein:
         dW = W.increments
 
         for i in range(1,self.n_steps+1):
-            # Milstein induction formula.
-            Y[:,i,:] = Y[:,i-1,:] + self.drift(Y[:,i-1,:])*self.dt + self.diffusion(Y[:,i-1,:]) * dW[:,i-1,:] + (1/2)*self.diffusion(Y[:,i-1,:])*self.approx_derivative_diffusion(Y[:,i-1,:])*(dW[:,i-1,:]**2-self.dt)
+            # Runge-Kutta induction formula.
+            Y[:,i,:] = Y[:,i-1,:] + self.drift(Y[:,i-1,:])*self.dt + self.diffusion(Y[:,i-1,:]) * dW[:,i-1,:]
+            + (1/2)*(self.diffusion(Y[:,i-1,:] + self.drift(Y[:,i-1,:])*self.dt+self.diffusion(Y[:,i-1,:])*np.power(self.dt,1/2))
+            - self.diffusion(Y[:,i-1,:]))*(dW[:,i-1,:]**2-self.dt)*np.power(self.dt,-1/2)
 
         # Plotting is allowed only if the user has specified the plot parameter to True.
 
@@ -181,7 +159,7 @@ class Milstein:
                                          mode="lines",
                                          line=dict(width=2)))
             fig.update_layout(
-                title=f"Simulation with Milstein method.",
+                title=f"Simulation with Runge-Kutta method.",
                 xaxis_title="t",
                 template="plotly_white",
             )

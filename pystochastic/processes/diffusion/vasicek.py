@@ -21,7 +21,7 @@ Examples
 import numpy as np
 import scipy
 import plotly.graph_objects as go
-from pystochastic.random import crandom
+from pystochastic.random import continuous
 from pystochastic.utils import _decompose
 from pystochastic.processes.diffusion.diffusion_process import DiffusionProcess
 from pystochastic.random.setseed import *
@@ -190,25 +190,19 @@ class Vasicek(DiffusionProcess):
 
         return self.volatility
 
-    def simulate(self, n_simulations=1, method="euler-maruyama",plot=False, parallel=False,n_workers=None):
+    def _simulate_exact(self, n_simulations=1,plot=False):
 
         """
-        Simulate method.
+        Exact simulation method.
 
-        Simulate a Vasicek process path using both the Euler-Maruyama method and the induction formula.
+        Simulate a Vasicek process path using the induction formula.
 
         Parameters
         ----------
         n_simulations : int
             Number of trajectories to simulate.
-        method : {"exact", "euler-maruyama", "milstein"}
-            Simulation method to use.
         plot : bool
             Specify if the path should be plotted.
-        parallel: bool
-            In the case the vectorization doesn't work, the user can specify the usage of parallel computing.
-        n_workers: int
-            Number of workers to use in parallel computing.
 
         Returns
         -------
@@ -216,55 +210,23 @@ class Vasicek(DiffusionProcess):
             Path of the simulated Vasicek process of the form ``(n_simulations, steps + 1, dim)``.
         """
 
-        if method == "euler-maruyama":
-            from pystochastic.sde import EulerMaruyama
-            self.path = EulerMaruyama(self.drift,
-                                      self.diffusion,
-                                      self.initial,
-                                      self.t_0,
-                                      self.t_n,
-                                      self.steps,
-                                      n_simulations).solve(plot=plot,
-                                                           parallel=parallel,
-                                                           n_workers=n_workers)
-        elif method == "milstein":
-            if self.dim > 1:
-                raise ValueError(
-                    "The Milstein method is only implemented for 1D processes."
-                )
-            from pystochastic.sde import Milstein
-            self.path = Milstein(self.drift,
-                                 self.diffusion,
-                                 self.initial,
-                                 self.t_0,
-                                 self.t_n,
-                                 self.steps,
-                                 n_simulations).solve(plot=plot)
-        elif method == "exact":
-            if self.dim > 1:
-                raise ValueError(
-                    "The exact method is only implemented for 1D processes."
-                )
-
-            self.path = np.zeros((n_simulations, self.steps+1, 1))
-            self.path[:,0] = self.initial
-
-            Z = crandom.normal(0, 1, self.steps * n_simulations).reshape((n_simulations, self.steps))
-
-            for i in range(1,self.steps+1):
-                #  The induction formula is given by R_t = (mean + R_{t-1} - mean) * exp(-speed * dt) + volatility * sqrt(1 - exp(-2 * speed * dt)) / (2 * theta)) * Z[i-1])
-                self.path[:,i,0] = (self.mean+ (self.path[:,i-1,0] - self.mean) * np.exp(-self.speed * self.dt) + self.volatility * np.sqrt((1 - np.exp(-2 * self.speed * self.dt)) / (2 * self.speed)) * Z[:,i-1])
-
-            if plot:
-                self.n_simulations = n_simulations
-                self.plot()
-        else:
+        if self.dim > 1:
             raise ValueError(
-                "The method must be either 'euler-maruyama', 'milstein' or 'exact'."
+                "The exact method is only implemented for 1D processes."
             )
 
-        # When the first simulation is launched, we define the global number of simulations
-        self.n_simulations = n_simulations
+        self.path = np.zeros((n_simulations, self.steps+1, 1))
+        self.path[:,0] = self.initial
+
+        Z = continuous.normal(0, 1, self.steps * n_simulations).reshape((n_simulations, self.steps))
+
+        for i in range(1,self.steps+1):
+            #  The induction formula is given by R_t = (mean + R_{t-1} - mean) * exp(-speed * dt) + volatility * sqrt(1 - exp(-2 * speed * dt)) / (2 * theta)) * Z[i-1])
+            self.path[:,i,0] = (self.mean+ (self.path[:,i-1,0] - self.mean) * np.exp(-self.speed * self.dt) + self.volatility * np.sqrt((1 - np.exp(-2 * self.speed * self.dt)) / (2 * self.speed)) * Z[:,i-1])
+
+        if plot:
+            self.n_simulations = n_simulations
+            self.plot()
 
         return self.path
 
@@ -287,7 +249,7 @@ class Vasicek(DiffusionProcess):
 
         Notes
         -----
-        The expectation of the Ornstein-Uhlenbeck process  at every time t with a fixed initial is given by
+        The expectation of the Ornstein-Uhlenbeck process at every time t with a fixed initial is given by
                             initial * exp(-speed*t) + mean * (Id - exp(-volatility*t))
         """
 

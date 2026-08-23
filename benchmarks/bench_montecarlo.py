@@ -5,7 +5,7 @@ Benchmark for pystochastic.montecarlo (MonteCarloEstimator, MonteCarloProcess).
 import time
 import numpy as np
 
-from pystochastic.random import crandom
+from pystochastic.random import continuous
 from pystochastic.processes.diffusion.vasicek import Vasicek
 from pystochastic.montecarlo.montecarlo import MonteCarlo, MonteCarloProcess
 
@@ -37,7 +37,7 @@ def run_estimator_benchmark(sample_sizes, n_runs=5):
 
     for n in sample_sizes:
         print(f"n_simulations = {n:,}")
-        samples = crandom.gamma(3, 2, n)
+        samples = continuous.gamma(3, 2, n)
         mc = MonteCarloEstimator(samples)
 
         for name, fn in {

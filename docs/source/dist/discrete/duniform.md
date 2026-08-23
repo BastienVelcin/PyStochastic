@@ -2,9 +2,10 @@
 
 
 ## Import line
-You can import the Discrete-Time Uniform distribution from the `dist` module as follows:
+You can import the Discrete-Time Uniform distribution from the `continuous.py` module as follows:
+
 ```python
-from pystochastic.dist.dist import DUniform
+from pystochastic.dist.continuous import DUniform
 ```
 
 ## Description

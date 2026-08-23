@@ -31,7 +31,7 @@ Examples
 """
 
 import numpy as np
-from pystochastic.random import crandom
+from pystochastic.random import continuous
 from pystochastic.utils import is_pos_def
 from pystochastic.processes.process import Process
 
@@ -256,7 +256,7 @@ def brownian_motion(variance=1, t_0 = 0, t_n = 1, steps = 1000,n_simulations=1):
     h = (t_n - t_0) / steps
     L = np.linalg.cholesky(variance)  # The Cholesky decomposition of the covariance matrix is analogous to the square root for matrices.
 
-    N = crandom.normal(0,1,n_simulations*steps*d)
+    N = continuous.normal(0, 1, n_simulations * steps * d)
     Z = np.reshape(N,(n_simulations,steps,d))
     dW[:,:] = Z @ L.T * np.sqrt(h)
 

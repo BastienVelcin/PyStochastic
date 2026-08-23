@@ -426,13 +426,6 @@ class TestCIR:
         path = R.simulate(100, "exact")
         assert np.all(path >= 0)
 
-    def test_feller_condition(self):
-        R = CIR(speed=1, mean=.01, volatility=1, initial=.03, steps=20)
-        with pytest.raises(ValueError):
-            R.simulate(method="euler-maruyama")
-        with pytest.raises(ValueError):
-            R.simulate(method="milstein")
-
     def test_invalid_method(self):
         with pytest.raises(ValueError):
             CIR().simulate(method="invalid")

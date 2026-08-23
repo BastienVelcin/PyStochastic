@@ -14,11 +14,9 @@ def test_euler_maruyama_deterministic_equation():
         initial=0,
         t_0=0,
         t_n=1,
-        n_steps=10,
-        n_simulations=4,
-    )
+        n_steps=10)
 
-    paths = solver.solve()
+    paths = solver.solve(n_simulations=4)
 
     assert paths.shape == (4, 11, 1)
     assert np.allclose(paths[:, 0, 0], 0)
@@ -32,11 +30,9 @@ def test_euler_maruyama_zero_drift_zero_diffusion():
         initial=3,
         t_0=0,
         t_n=1,
-        n_steps=20,
-        n_simulations=3,
-    )
+        n_steps=20)
 
-    paths = solver.solve()
+    paths = solver.solve(n_simulations=3)
 
     assert np.allclose(paths, 3)
 
@@ -48,11 +44,9 @@ def test_euler_maruyama_multidimensional_deterministic():
         initial=[0, 1],
         t_0=0,
         t_n=1,
-        n_steps=10,
-        n_simulations=2,
-    )
+        n_steps=10)
 
-    paths = solver.solve()
+    paths = solver.solve(n_simulations=2)
 
     assert paths.shape == (2, 11, 2)
     assert np.allclose(paths[:, -1, :], [1, -1])
@@ -69,12 +63,10 @@ def test_euler_maruyama_plot_rejects_dimension_above_three():
         diffusion=lambda x, t: np.zeros((4, 4)),
         initial=[0, 0, 0, 0],
         t_n=1,
-        n_steps=5,
-        n_simulations=1,
-    )
+        n_steps=10)
 
     with pytest.raises(ValueError):
-        solver.solve(plot=True)
+        solver.solve(n_simulations=1,plot=True)
 
 
 def test_milstein_derivative():
@@ -83,9 +75,7 @@ def test_milstein_derivative():
         diffusion=lambda x: 2 * x,
         initial=1,
         t_n=1,
-        n_steps=10,
-        n_simulations=1,
-    )
+        n_steps=10)
 
     derivative = solver.approx_derivative_diffusion(np.array([3.0]))
 
@@ -99,11 +89,9 @@ def test_milstein_deterministic_equation():
         initial=0,
         t_0=0,
         t_n=1,
-        n_steps=10,
-        n_simulations=2,
-    )
+        n_steps=10)
 
-    paths = solver.solve(plot=False)
+    paths = solver.solve(n_simulations=2,plot=False)
 
     assert paths.shape == (2, 11, 1)
     assert np.allclose(paths[:, 0, 0], 0)
