@@ -7,7 +7,7 @@ Description
 -----------
 This module provides a set of classes to work with probability distributions.
 
-This module provides a general class "Distribution" for continuous distributions, which yields to general methods :
+This module provides a general class "Distribution" for elementary distributions, which yields to general methods :
     - .pdf() : Probability density function, which can be evaluated at any point with an optional argument
     - .cdf() : Cumulative distribution function, which can be evaluated at any point with an optional argument
     - .plot_pdf() : Plot the probability density function of the distribution

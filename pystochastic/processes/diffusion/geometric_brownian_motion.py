@@ -20,7 +20,7 @@ Examples
 """
 
 import numpy as np
-from pystochastic.processes.continuous.brownian import Brownian
+from pystochastic.processes.elementary.brownian import Brownian
 from pystochastic.processes.diffusion.diffusion_process import DiffusionProcess
 from pystochastic.utils import _decompose
 from pystochastic.random.setseed import *

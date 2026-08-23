@@ -5,7 +5,7 @@ Module CRANDOM
 
 Description
 -----------
-This module provides a set of sample generators for multivariate continuous-time random variables.
+This module provides a set of sample generators for multivariate elementary-time random variables.
 The following distributions are implemented :
 
     - Continuous-Time Uniform
@@ -22,7 +22,7 @@ The following distributions are implemented :
     - Pareto
     - Rayleigh
 
-These functions are directly linked to the continuous.py classes.
+These functions are directly linked to the elementary.py classes.
 
 Examples
 --------

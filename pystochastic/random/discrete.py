@@ -16,7 +16,7 @@ The following distributions are implemented :
     - Negative Binomial
     - Yule-Simon
 
-These functions are directly linked to the continuous.py classes.
+These functions are directly linked to the elementary.py classes.
 
 Examples
 --------

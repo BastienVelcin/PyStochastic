@@ -1,8 +1,6 @@
-from pystochastic.processes.continuous.brownian import *
-from pystochastic.processes.diffusion.geometric_brownian_motion import *
-from pystochastic.processes.diffusion.ornstein_uhlenbeck import *
-from pystochastic.processes.jump.poisson import *
-from pystochastic.processes.diffusion.vasicek import *
-from pystochastic.processes.diffusion.cir import *
+from .process import *
+from .elementary import *
+from .diffusion import *
+from .jump import *
 
-__all__ = ["Brownian","GeometricBrownianMotion","OrnsteinUhlenbeck","Poisson","Vasicek","CIR"]
+__all__ = ["Brownian", "BrownianBridge","GeometricBrownianMotion","OrnsteinUhlenbeck","Poisson","Vasicek","CIR"]

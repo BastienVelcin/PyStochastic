@@ -15,7 +15,7 @@ from pystochastic.processes.diffusion.cir import CIR
 from pystochastic.processes.diffusion.ornstein_uhlenbeck import OrnsteinUhlenbeck
 from pystochastic.processes.diffusion.geometric_brownian_motion import GeometricBrownianMotion
 from pystochastic.processes.jump.poisson import Poisson
-from pystochastic.processes.continuous.brownian import Brownian
+from pystochastic.processes.elementary.brownian import Brownian
 
 
 # ---------------------------------------------------------------------

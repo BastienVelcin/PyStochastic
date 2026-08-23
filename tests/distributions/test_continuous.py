@@ -1,5 +1,5 @@
 """
-Tests for continuous probability distributions.
+Tests for elementary probability distributions.
 """
 
 import numpy as np

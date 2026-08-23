@@ -87,7 +87,7 @@ def main():
         "yule_simon": lambda n: discrete.yule_simon(2, n),
     }
 
-    run_group("continuous laws (crandom)", continuous_laws, sample_sizes, n_runs=n_runs)
+    run_group("elementary laws (crandom)", continuous_laws, sample_sizes, n_runs=n_runs)
     run_group("discrete laws (drandom)", discrete_laws, sample_sizes, n_runs=n_runs)
 
 
