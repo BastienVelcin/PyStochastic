@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the Poisson distribution from the `continuous.py` module as follows:
+You can import the Poisson distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import Poisson
+from pystochastic.dist import Poisson
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.Poisson(lam = 0.5)
 ```
 **Type :** Class
 
-Create an instance of the Poisson distribution. A Poisson distribution is a discrete-time distribution that counts the occurrences of an event on a fixed time interval.
+Creates an instance of the Poisson distribution. A Poisson distribution is a discrete-time distribution that counts the occurrences of an event on a fixed time interval.
 The probability distribution of the Poisson distribution of parameter $\lambda$ is given by:
 \begin{equation*}
 \mathbb{P}_P = e^{-\lambda} \sum_{k=0}^{+\infty} \frac{\lambda^k}{k!} \delta_k

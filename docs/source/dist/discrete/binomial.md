@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the Binomial distribution from the `continuous.py` module as follows:
+You can import the Binomial distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import Binomial
+from pystochastic.dist import Binomial
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.Binomial(p = 0.5, n = 1)
 ```
 **Type :** Class
 
-Create an instance of the Binomial distribution. A Binomial distribution is a discrete-time distribution which represents `n` independant repetitions of the same experience with two issues: a success and a failure.
+Creates an instance of the Binomial distribution. A Binomial distribution is a discrete-time distribution which represents `n` independant repetitions of the same experience with two issues: a success and a failure.
 The probability distribution of the Binomial distribution of parameters $p$ and $n$ is given by:
 \begin{equation*}
 \mathbb{P}_B = \sum_{k=0}^n \binom{n}{k} p^k (1-p)^{n-k}

@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the Fréchet distribution from the `continuous.py` module as follows:
+You can import the Fréchet distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import Frechet
+from pystochastic.dist import Frechet
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.Frechet(a = 1, s = 1, m = 0)
 ```
 **Type :** Class
 
-Create an instance of the Fréchet distribution. A Fréchet distribution is a continuous probability distribution used to model the maximum value of heavy-tailed samples.
+Creates an instance of the Fréchet distribution. A Fréchet distribution is a continuous probability distribution used to model the maximum value of heavy-tailed samples.
 
 The probability density function of the Fréchet distribution of parameters $a$, $s$ and $m$ is given by:
 

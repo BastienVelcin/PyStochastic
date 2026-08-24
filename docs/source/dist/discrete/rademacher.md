@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the Rademacher distribution from the `continuous.py` module as follows:
+You can import the Rademacher distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import Rademacher
+from pystochastic.dist import Rademacher
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.Rademacher(p = 0.5)
 ```
 **Type :** Class
 
-Create an instance of the Rademacher distribution. A Rademacher distribution is a discrete-time distribution which represents an experience with a gain and a loss.
+Creates an instance of the Rademacher distribution. A Rademacher distribution is a discrete-time distribution which represents an experience with a gain and a loss.
 The probability distribution of the Rademacher distribution of parameter $p$ is given by:
 \begin{equation*}
 \mathbb{P}_R = (1-p)\delta_{-1} + p\delta_1

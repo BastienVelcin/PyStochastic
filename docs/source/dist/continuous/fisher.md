@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the Fisher distribution from the `continuous.py` module as follows:
+You can import the Fisher distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import Fisher
+from pystochastic.dist import Fisher
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.Fisher(d1 = 2, d2 = 3)
 ```
 **Type :** Class
 
-Create an instance of the Fisher distribution. A Fisher distribution is a continuous probability distribution used in test statistics, in variance analysis, for example.
+Creates an instance of the Fisher distribution. A Fisher distribution is a continuous probability distribution used in test statistics, in variance analysis, for example.
 
 The probability density function of the Fisher distribution of parameters $d_1$ and $d_2$ is given by:
 

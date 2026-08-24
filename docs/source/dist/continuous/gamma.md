@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the Gamma distribution from the `continuous.py` module as follows:
+You can import the Gamma distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import Gamma
+from pystochastic.dist import Gamma
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.Gamma(k = 1, theta = 1)
 ```
 **Type :** Class
 
-Create an instance of the Gamma distribution. A gamma distribution is a continuous probability distribution used to model econometrics or insurance problems. 
+Creates an instance of the Gamma distribution. A gamma distribution is a continuous probability distribution used to model econometrics or insurance problems. 
 
 The probability density function of the Gamma distribution of parameter $k$ and $\theta$ is given by:
 

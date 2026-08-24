@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the Gumbel distribution from the `continuous.py` module as follows:
+You can import the Gumbel distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import Gumbel
+from pystochastic.dist import Gumbel
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.Gumbel(mu = 0, beta = 1)
 ```
 **Type :** Class
 
-Create an instance of the Gumbel distribution. A Gumbel distribution is a continuous probability distribution used to model extreme values from low-tailed phenomena. 
+Creates an instance of the Gumbel distribution. A Gumbel distribution is a continuous probability distribution used to model extreme values from low-tailed phenomena. 
 
 The probability density function of the Gumbel distribution of parameters $\mu$ and $\beta$ is given by:
 

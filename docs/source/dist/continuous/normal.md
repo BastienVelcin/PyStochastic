@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the Normal distribution from the `continuous.py` module as follows:
+You can import the Normal distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import Normal
+from pystochastic.dist import Normal
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.Normal(mu = 0, sd = 1)
 ```
 **Type :** Class
 
-Create an instance of the Normal distribution. A normal distribution is a continuous probability distribution used to model random natural phenomena.
+Creates an instance of the Normal distribution. A normal distribution is a continuous probability distribution used to model random natural phenomena.
 
 The probability density function of the Normal distribution of mean $\mu$ and standard deviation $\sigma$ is given by:
 

@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the Continuous-Time Uniform distribution from the `continuous.py` module as follows:
+You can import the Continuous-Time Uniform distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import Uniform
+from pystochastic.dist import Uniform
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.Uniform(a = 0, b = 1)
 ```
 **Type :** Class
 
-Create an instance of the Continuous-Time Uniform distribution. A Continuous-Time Uniform distribution is a continuous-time distribution that takes values in the interval [a,b],
+Creates an instance of the Continuous-Time Uniform distribution. A Continuous-Time Uniform distribution is a continuous-time distribution that takes values in the interval [a,b],
 where a and b are real numbers such that $a \leq b$.
 
 The probability density function of the Continuous-Time Uniform distribution of parameters $a$ and $b$ is given by:

@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the Cauchy distribution from the `continuous.py` module as follows:
+You can import the Cauchy distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import Cauchy
+from pystochastic.dist import Cauchy
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.Cauchy(x_0 = 0, a = 1)
 ```
 **Type :** Class
 
-Create an instance of the Cauchy distribution. A Cauchy distribution is a continuous probability distribution used to describe phenomena with extreme unpredictable fluctuations.
+Creates an instance of the Cauchy distribution. A Cauchy distribution is a continuous probability distribution used to describe phenomena with extreme unpredictable fluctuations.
 
 The probability density function of the Cauchy distribution of parameters $x_0$ and $a$ is given by:
 

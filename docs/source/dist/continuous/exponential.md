@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the Exponential distribution from the `continuous.py` module as follows:
+You can import the Exponential distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import Exponential
+from pystochastic.dist import Exponential
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.Exponential(alpha = 2)
 ```
 **Type :** Class
 
-Create an instance of the Exponential distribution. An exponential distribution is a continuous probability distribution that represents a memoryless phenomenon with an intensity parameter $\alpha$.
+Creates an instance of the Exponential distribution. An exponential distribution is a continuous probability distribution that represents a memoryless phenomenon with an intensity parameter $\alpha$.
 
 The probability density function of the Exponential distribution of parameter $\alpha$ is given by:
 

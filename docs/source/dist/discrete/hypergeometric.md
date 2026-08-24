@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the hypergeometric distribution from the `continuous.py` module as follows:
+You can import the hypergeometric distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import Hypergeometric
+from pystochastic.dist import Hypergeometric
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.Hypergeometric(N=2,K=1,m=1)
 ```
 **Type :** Class
 
-Create an instance of the hypergeometric distribution. A hypergeometric distribution is a discrete-time distribution that models the probability of obtaining a $m$ number of successes in a fixed number $K$ draws without replacement from a finite population of size $N$.
+Creates an instance of the hypergeometric distribution. A hypergeometric distribution is a discrete-time distribution that models the probability of obtaining a $m$ number of successes in a fixed number $K$ draws without replacement from a finite population of size $N$.
 The probability distribution of the hypergeometric distribution of parameters $N$, $K$ and $m$ is given by:
 \begin{equation*}
 \mathbb{P}_{HG} = \sum_{k=\max(0,m+K-N)}^{\min(m,K)}\frac{\binom{K}{k} \binom{N-K}{m-k}}{\binom{N}{m}}

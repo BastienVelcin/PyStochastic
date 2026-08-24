@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the Beta distribution from the `continuous.py` module as follows:
+You can import the Beta distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import Beta
+from pystochastic.dist import Beta
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.Beta(a = 1, b = 1)
 ```
 **Type :** Class
 
-Create an instance of the Beta distribution. A beta distribution is a continuous probability distribution used to study the variation of a probability, a percentage, or a rate. 
+Creates an instance of the Beta distribution. A beta distribution is a continuous probability distribution used to study the variation of a probability, a percentage, or a rate. 
 
 The probability density function of the Beta distribution of parameters $a$ and $b$ is given by:
 

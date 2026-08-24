@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the Kumaraswamy distribution from the `continuous.py` module as follows:
+You can import the Kumaraswamy distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import Kumaraswamy
+from pystochastic.dist import Kumaraswamy
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.Kumaraswamy(a = 0, b = 1)
 ```
 **Type :** Class
 
-Create an instance of the Kumaraswamy distribution. A Kumaraswamy distribution is a continuous probability distribution used to model bounded random variables.
+Creates an instance of the Kumaraswamy distribution. A Kumaraswamy distribution is a continuous probability distribution used to model bounded random variables.
 
 The probability density function of the Kumaraswamy distribution of parameters $a$ and $b$ is given by:
 

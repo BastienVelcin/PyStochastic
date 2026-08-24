@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the Rayleigh distribution from the `continuous.py` module as follows:
+You can import the Rayleigh distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import Rayleigh
+from pystochastic.dist import Rayleigh
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.Rayleigh(s = 1)
 ```
 **Type :** Class
 
-Create an instance of the Rayleigh distribution. A Rayleigh distribution is a continuous probability distribution used to describe the amplitude of random phenomena.
+Creates an instance of the Rayleigh distribution. A Rayleigh distribution is a continuous probability distribution used to describe the amplitude of random phenomena.
 
 The probability density function of the Rayleigh distribution of parameter $\sigma$ is given by:
 

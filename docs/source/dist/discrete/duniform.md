@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the Discrete-Time Uniform distribution from the `continuous.py` module as follows:
+You can import the Discrete-Time Uniform distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import DUniform
+from pystochastic.dist import DUniform
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.DUniform(N = 3)
 ```
 **Type :** Class
 
-Create an instance of the Discrete-Time Uniform distribution. A Discrete-Time Uniform distribution is a discrete-time distribution that picks an integer between 1 and $N$ with the same probability.
+Creates an instance of the Discrete-Time Uniform distribution. A Discrete-Time Uniform distribution is a discrete-time distribution that picks an integer between 1 and $N$ with the same probability.
 The probability distribution of the Discrete-Time Uniform distribution of parameter $N$ is given by:
 
 \begin{equation*}

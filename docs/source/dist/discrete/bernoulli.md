@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the Bernoulli distribution from the `continuous.py` module as follows:
+You can import the Bernoulli distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import Bernoulli
+from pystochastic.dist import Bernoulli
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.Bernoulli(p = 0.5)
 ```
 **Type :** Class
 
-Create an instance of the Bernoulli distribution. A Bernoulli distribution is a discrete-time distribution which represents an experience with two issues: a success and a failure.
+Creates an instance of the Bernoulli distribution. A Bernoulli distribution is a discrete-time distribution which represents an experience with two issues: a success and a failure.
 The probability distribution of the Bernouilli distribution of parameter $p$ is given by:
 \begin{equation*}
 \mathbb{P}_B = (1-p)\delta_0 + p\delta_1

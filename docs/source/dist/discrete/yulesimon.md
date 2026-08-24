@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the Yule-Simon distribution from the `continuous.py` module as follows:
+You can import the Yule-Simon distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import YuleSimon
+from pystochastic.dist import YuleSimon
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.YuleSimon(p = 0.5)
 ```
 **Type :** Class
 
-Create an instance of the Yule-Simon distribution. A Yule-Simon distribution is a discrete-time distribution that models preferential growth phenomena.
+Creates an instance of the Yule-Simon distribution. A Yule-Simon distribution is a discrete-time distribution that models preferential growth phenomena.
 The probability distribution of the Yule-Simon distribution of parameter $\rho$ is given by:
 \begin{equation*}
 \mathbb{P}_{YS} = \sum_{k=1}^{+\infty} \rho B(k,\rho + 1)

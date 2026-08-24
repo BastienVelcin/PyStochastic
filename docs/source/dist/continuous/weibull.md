@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the Weibull distribution from the `continuous.py` module as follows:
+You can import the Weibull distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import Weibull
+from pystochastic.dist import Weibull
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.Weibull(a = 1, b = 1)
 ```
 **Type :** Class
 
-Create an instance of the Weibull distribution. A Weibull distribution is a continuous probability distribution used for reliability modeling.
+Creates an instance of the Weibull distribution. A Weibull distribution is a continuous probability distribution used for reliability modeling.
 
 The probability density function of the Weibull distribution of parameters $k$ and $\lambda$ is given by:
 

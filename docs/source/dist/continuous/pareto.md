@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the Pareto distribution from the `continuous.py` module as follows:
+You can import the Pareto distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import Pareto
+from pystochastic.dist import Pareto
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.Pareto(x_m = 2, k = 3)
 ```
 **Type :** Class
 
-Create an instance of the Pareto distribution. A Pareto distribution is a continuous probability distribution used to model haivy-tailed phenomena where extreme values dominates the overall behavior.
+Creates an instance of the Pareto distribution. A Pareto distribution is a continuous probability distribution used to model haivy-tailed phenomena where extreme values dominates the overall behavior.
 
 The probability density function of the Pareto distribution of parameters $x_m$ and $k$ is given by:
 

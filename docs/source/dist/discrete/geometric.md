@@ -2,10 +2,10 @@
 
 
 ## Import line
-You can import the geometric distribution from the `continuous.py` module as follows:
+You can import the geometric distribution from the `dist` module as follows:
 
 ```python
-from pystochastic.dist.continuous import Geometric
+from pystochastic.dist import Geometric
 ```
 
 ## Description
@@ -14,7 +14,7 @@ pystochastic.dist.Geometric(p = 0.5)
 ```
 **Type :** Class
 
-Create an instance of the geometric distribution. A geometric distribution is a discrete-time distribution that counts the number of repetitions of a Bernoulli experiment needed to get a success.
+Creates an instance of the geometric distribution. A geometric distribution is a discrete-time distribution that counts the number of repetitions of a Bernoulli experiment needed to get a success.
 The probability distribution of the geometric distribution of parameter $p$ is given by:
 \begin{equation*}
 \mathbb{P}_G = p\sum_{k=1}^{+\infty} (1-p)^{k-1}
