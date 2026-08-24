@@ -55,7 +55,7 @@ class Heston(DiffusionProcess):
         self.variance = None
         self.vol = None #The volatility will be sqrt(self.variance)
         self.path = (self.price, self.variance)
-        self.dim = 1
+        self.dim = 1 #Plot dimension
 
     @property
     def feller_condition(self):
@@ -101,7 +101,7 @@ class Heston(DiffusionProcess):
                                                            brownian_sequence=W.increments)
         self.price = self.path[:, :, 0]
         self.variance = self.path[:, :, 1]
-        self.vol = np.sqrt(self.variance)
+        self.vol = np.sqrt(np.maximum(self.variance, 0))
         if plot:
             fig_price = go.Figure()
             fig_vol = go.Figure()
