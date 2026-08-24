@@ -3,7 +3,7 @@ import pytest
 
 from pystochastic.processes import (
     Brownian, GeometricBrownianMotion, OrnsteinUhlenbeck,
-    Poisson, Vasicek, CIR
+    PoissonProcess, Vasicek, CIR
 )
 
 
@@ -70,25 +70,25 @@ class TestBrownian:
 
 class TestPoisson:
     def test_initialization(self):
-        P = Poisson(intensity=2, t_n=1, steps=50)
+        P = PoissonProcess(intensity=2, t_n=1, steps=50)
         assert P.dim == 1
         assert P.t.shape == (51,)
         assert P.path is None
 
     def test_shape(self):
-        P = Poisson(intensity=2, t_n=1, steps=50)
+        P = PoissonProcess(intensity=2, t_n=1, steps=50)
         path = P.simulate(10)
         assert path.shape == (10, 51)
 
     def test_paths_are_non_decreasing_and_integer(self):
-        P = Poisson(intensity=2, t_n=1, steps=50)
+        P = PoissonProcess(intensity=2, t_n=1, steps=50)
         path = P.simulate(100)
         assert np.all(np.diff(path, axis=1) >= 0)
         assert np.all(path == np.floor(path))
         assert np.all(path[:, 0] == 0)
 
     def test_mean(self):
-        P = Poisson(intensity=2, t_n=2, steps=20)
+        P = PoissonProcess(intensity=2, t_n=2, steps=20)
         path = P.simulate(5000)
         assert np.mean(path[:, -1]) == pytest.approx(4, abs=0.15)
 

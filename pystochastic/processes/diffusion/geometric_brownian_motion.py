@@ -74,6 +74,8 @@ class GeometricBrownianMotion(DiffusionProcess):
         Path of the simulated GBM.
     _diagonal : bool
         Specify if volatility is an array that works well with vectorization.
+    name : str
+        Name of the process
 
     Examples
     --------
@@ -94,6 +96,7 @@ class GeometricBrownianMotion(DiffusionProcess):
                          t_n=t_n,
                          steps=steps)
 
+        self.name = "Geometric Brownian Motion"
         self.mu = np.atleast_1d(mu)
 
         self.volatility = np.atleast_1d(volatility)

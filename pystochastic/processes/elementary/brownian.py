@@ -81,6 +81,8 @@ class Brownian(Process):
         Increments of the simulated Brownian motion.
     t : np.ndarray
         Time interval on which we want to simulate the Brownian motion.
+    name : str
+        Name of the process
 
     Examples
     --------
@@ -99,6 +101,7 @@ class Brownian(Process):
                          t_n=t_n,
                          steps=steps)
 
+        self.name = "Brownian Motion"
         self.variance = np.atleast_2d(variance)
 
         if not is_pos_def(self.variance):

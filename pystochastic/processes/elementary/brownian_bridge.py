@@ -20,15 +20,56 @@ Examples
 
 import numpy as np
 from pystochastic.processes.process import Process
-from pystochastic.processes import Brownian
+from pystochastic.processes.elementary.brownian import Brownian
+
 class BrownianBridge(Process):
 
+    """
+    Brownian motion class
+
+    The Brownian bridge is a standard Brownian motion which terminal value is equal to 0.
+
+    Parameters
+    ----------
+    dim : int
+        Dimension of the brownian motion. The dimension must coincide with the dimension of the covariance matrix. Must be a strictly positive integer.
+    t_0 : float
+        Initial time.
+    t_n : float
+        Final time. Must be strictly greater than t_0.
+    steps : int
+        Number of time steps. Must be a strictly positive integer.
+
+    Attributes
+    ----------
+    dim : int
+        Dimension of the brownian motion.
+    t_0 : float
+        Initial time.
+    t_n : float
+        Final time.
+    steps : int
+        Number of time steps.
+    path : np.ndarray
+        Path of the simulated Brownian motion.
+    t : np.ndarray
+        Time interval on which we want to simulate the Brownian motion.
+    name : str
+        Name of the process
+
+    Examples
+    --------
+    >> B = BrownianBridge(dim=2,t_0=0,t_n=1,steps=1000)
+    >> B.simulate()
+    >> B.plot()
+    """
     def __init__(self,dim=1,t_0=0,t_n=1,steps=1000):
-        self.dim = dim
 
         super().__init__(t_0 = t_0,
                          t_n = t_n,
                          steps = steps)
+        self.name = "Brownian Bridge"
+        self.dim = dim
 
     def simulate(self,n_simulations=1,plot=False):
 

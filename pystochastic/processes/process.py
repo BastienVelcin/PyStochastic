@@ -123,7 +123,11 @@ class Process(ABC):
                                            z=self.path[sim,:, 2],
                                            mode="lines",
                                            line=dict(width=2)))
-
+        fig.update_layout(title=f"Simulations of {self.name}",
+                          xaxis_title="t",
+                          yaxis_title="Quadratic Variation",
+                          template="plotly_white")
+        fig.show()
         fig.show()
 
     def final_position(self):
@@ -223,3 +227,161 @@ class Process(ABC):
         arg_max = np.argmax(norms, axis=1)
         values = (self.path[np.arange(0,self.n_simulations),arg_max,:])
         return values, norms[arg_max], arg_max, self.t[arg_max]
+
+    def hitting_time(self,value, inequality=">"):
+
+        """
+        Hitting time method
+
+        The hitting time method returns an approximation of the first time at which the process reaches a given value.
+        The methods support both the inequality ">" and "<".
+
+        Parameters
+        ----------
+        value: float
+            Value at which we want to get the hitting time.
+        inequality : {"<", ">"}
+            Direction of the inequality
+
+        Returns
+        -------
+        np.ndarray
+            Estimation of the hitting time for each simulation.
+        """
+
+        if self.dim != 1:
+            raise ValueError(
+                "The hitting time can only be computed in 1D."
+            )
+
+        if self.path is None:
+            raise ValueError(
+                "The path has not been simulated yet. Please run the simulate method first."
+            )
+
+        if inequality not in ["<", ">"]:
+            raise ValueError(
+                "The inequality must be either '<' or '>'"
+            )
+        candidates = self.path >= value if inequality == ">" else self.path <= value
+        return np.where(candidates.any(axis=1),candidates.argmax(axis=1), None)
+
+    def hitting_norm_time(self,value, inequality=">", order=2):
+
+        """
+        Hitting norm time method
+
+        The hitting norm time method returns an approximation of the first time at which the process reaches a given norm.
+        The methods support both the inequality ">" and "<".
+
+        Parameters
+        ----------
+        value: float
+            Value at which we want to get the hitting time.
+        inequality: {"<", ">"}
+            Direction of the inequality
+        order: int
+            Order of the desired norm. If order = p, then || (x_1 , ... x,n) || = (x_1^p + ... x_n^p)^(1/p).
+            Must be a strictly positive integer.
+
+        Returns
+        -------
+        np.ndarray
+            Estimation of the hitting norm time for each simulation.
+        """
+
+        if self.dim != 1:
+            raise ValueError(
+                "The hitting time can only be computed in 1D."
+            )
+
+        if self.path is None:
+            raise ValueError(
+                "The path has not been simulated yet. Please run the simulate method first."
+            )
+
+        if inequality not in ["<", ">"]:
+            raise ValueError(
+                "The inequality must be either '<' or '>'"
+            )
+
+        if not isinstance(order, int) and not order >= 1:
+            raise ValueError(
+                "The order must be a strictly positive integer."
+            )
+
+        candidates = np.linalg.norm(self.path,axis=2,ord=order) >= value if inequality == ">" else np.linalg.norm(self.path,axis=2,ord=order) <= value
+        return np.where(candidates.any(axis=1),candidates.argmax(axis=1), None)
+
+    def _quad_var_at_index(self, t_index):
+        if t_index == 0:
+            return 0
+        quad_var_t = np.sum((self.path[:, 1:t_index] - self.path[:, 0:(t_index - 1)]) ** 2, axis=1)
+        return quad_var_t
+
+    def quadratic_variation(self,t=None, mean = False, plot=False):
+
+        """
+        Quadratic Variation method
+
+        The quadratic variation method returns an approximation of the first time at which the process reaches a given value.
+        The methods support both the inequality ">" and "<".
+
+        Parameters
+        ----------
+        value: float
+            Value at which we want to get the hitting time.
+        mean: bool
+            Specify if the quadratic variation should be computed at the mean of the quadratic variation estimation of all simulated processes.
+        plot : bool
+            Specify if the path should be plotted.
+
+        Returns
+        -------
+        np.ndarray
+            Estimation of the hitting time for each simulation, or average quadratic variation estimation.
+        """
+
+        if self.dim != 1:
+            raise ValueError(
+                "The quadratic variation can only be computed in 1D."
+            )
+
+        if self.path is None:
+            raise ValueError(
+                "The path has not been simulated yet. Please run the simulate method first."
+            )
+
+        if t is None:
+            quad_var = np.zeros((self.n_simulations, self.steps+1))
+            for i in range(1,self.steps+1):
+                quad_var[:,i] = self._quad_var_at_index(i).reshape((self.n_simulations,))
+            if plot:
+                fig = go.Figure()
+                if not mean:
+                    for sim in range(self.n_simulations):
+                        fig.add_trace(go.Scatter(x=self.t,
+                                                 y=quad_var[sim,:],
+                                                 mode="lines",
+                                                 line=dict(width=2)))
+
+
+                else:
+                    quad_var = np.mean(quad_var, axis=0)
+                    fig.add_trace(go.Scatter(x=self.t,
+                                             y=quad_var,
+                                             mode="lines",
+                                             line=dict(width=2)))
+
+                fig.update_layout(title=f"Estimation of the Quadratic Variation for {self.name}",
+                                  xaxis_title="t",
+                                  yaxis_title="Quadratic Variation",
+                                  template="plotly_white")
+                fig.show()
+        else:
+            t_index = np.argmin(np.abs(self.t - t))
+            quad_var = self._quad_var_at_index(t_index)
+            if mean:
+                quad_var = np.mean(quad_var)
+        return quad_var
+

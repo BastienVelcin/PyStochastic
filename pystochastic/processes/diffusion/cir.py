@@ -81,6 +81,8 @@ class CIR(DiffusionProcess):
         Factor for the second parameter of the Noncentral chi-squared distribution for the exact simulation equation.
     c : float
         Standardization coefficient for the Noncentral chi-squared distribution for the exact simulation equation.
+    name : str
+        Name of the process
 
     Examples
     --------
@@ -106,6 +108,7 @@ class CIR(DiffusionProcess):
         self.mean = mean
         self.volatility = volatility
         self.initial = initial
+        self.name = "Cox-Ingersoll-Ross process"
 
         if (self.speed <= 0) or (self.mean < 0) or (self.volatility <= 0) or (self.initial < 0):
             raise ValueError(

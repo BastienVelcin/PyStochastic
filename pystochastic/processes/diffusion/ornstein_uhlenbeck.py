@@ -81,6 +81,8 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         Path of the simulated process.
     _diagonal : bool
         Specify if volatility is an array that works well with vectorization.
+    name : str
+        Name of the process
 
     Examples
     --------
@@ -102,7 +104,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         super().__init__(t_0=t_0,
                          t_n=t_n,
                          steps=steps)
-
+        self.name = "Ornstein Uhlenbeck process"
         self.mean = np.atleast_1d(mean)
 
         self.speed = np.atleast_1d(speed)

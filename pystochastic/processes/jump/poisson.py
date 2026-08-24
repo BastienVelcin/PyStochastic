@@ -7,7 +7,7 @@ Description
 -----------
 This module provides a way to simulate a Poisson process with a given intensity parameter.
 
-This module provides a general class "CIR", with the following built-in methods:
+This module provides a general class "Poisson", with the following built-in methods:
     - .simulate() : Simulate a Poisson process path in 1D.
     - .plot() : Plot the Poisson process path.
     - .mean() : Mean of the Poisson process at a given time.
@@ -25,13 +25,14 @@ Examples
 import numpy as np
 import plotly.graph_objects as go
 from pystochastic.random import discrete
+from pystochastic.processes.jump.jump_process import JumpProcess
 
-class Poisson:
+class PoissonProcess(JumpProcess):
 
     """
     Poisson class
 
-    A Poisson process (N_t)_{t>=0} is an unidimensional stochastic process that satisfies the following assertions:
+    A Poisson process (N_t)_{t>=0} is a unidimensional stochastic process that satisfies the following assertions:
         - For all 0<= t_1 <= ... < t_k, the random variables (N_t_k - N_t_{k-1}) , ... , (N_t_1 - N_0) are independent.
         - P(N_{t+h}-N_t = 1) = intensity*h + o(h) when h ---> 0+
         - P(N_{t+h}-N_t > 1) = o(h) when h ---> 0+
@@ -70,6 +71,8 @@ class Poisson:
         Time step length.
     path : np.ndarray
         Path of the simulated process.
+    name : str
+        Name of the process.
 
     Examples
     --------
@@ -84,15 +87,19 @@ class Poisson:
                  t_n=10,
                  steps=1000):
 
+        super().__init__(t_0 = t_0,
+                         t_n = t_n,
+                         steps = steps)
+
+        self.name = "Poisson process"
+
+        if intensity <= 0:
+            raise ValueError(
+                "The intensity must be strictly positive."
+            )
+
         self.intensity = intensity
-        self.t_0 = t_0
-        self.t_n = t_n
-        self.steps = steps
-        self.n_simulations = None
         self.dim = 1
-        self.t = np.linspace(t_0,t_n,steps+1)
-        self.dt = (t_n-t_0)/steps
-        self.path = None
 
 
     def simulate(self,n_simulations=1,plot=False):
@@ -124,79 +131,14 @@ class Poisson:
 
         self.n_simulations = n_simulations
 
+        self.path = self.path.astype(int)
         if plot:
             self.plot()
-
         return self.path
 
-    def plot(self):
-
-        """
-        Plot method.
-
-        Plot the simulated path of the Poisson process.
-        """
-
-        if self.path is None:
-            raise ValueError(
-                "The path has not been simulated yet. Please run the simulate method first."
-            )
-
-        fig = go.Figure()
-
-        for sim in range(self.n_simulations):
-            fig.add_trace(go.Scatter(x=self.t,
-                                     y=self.path[sim,:],
-                                     mode="lines",
-                                     line=dict(width=2,shape="hv")))
-        fig.show()
 
     def expectation(self,t):
-
-        """
-        Expectation method.
-
-        Return the expectation of the Poisson process at a given time t.
-
-        Parameters
-        ----------
-        t : float
-            Time at which the expectation is evaluated. Must be between t_0 and t_n.
-
-        Returns
-        -------
-        float
-            Expectation of the Poisson process at a time t
-
-        Notes
-        -----
-        The expectation of the Poisson process at every time t is equal to the intensity times t, since the Poisson process at a time t
-        follows a Poisson distribution of parameter intensity times t.
-        """
-
         return self.intensity*t
 
     def variance(self,t):
-
-        """
-        Variance method.
-
-        Return the variance of the Poisson process at a given time t.
-
-        Parameters
-        ----------
-        t : float
-            Time at which the variance is evaluated. Must be between t_0 and t_n.
-
-        Returns
-        -------
-        float
-            Variance of the Poisson process at a time t
-
-        Notes
-        -----
-        The variance of the Poisson process at every time t is equal to the intensity times t, since the Poisson process at a time t
-        follows a Poisson distribution of parameter intensity times t.
-        """
-
         return self.intensity * t

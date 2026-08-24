@@ -81,6 +81,8 @@ class Vasicek(DiffusionProcess):
         Path of the simulated process.
     _diagonal : bool
         Specify if sigma is an array that works well with vectorization.
+    name : str
+        Name of the process
 
     Examples
     --------
@@ -102,6 +104,7 @@ class Vasicek(DiffusionProcess):
                          t_n=t_n,
                          steps=steps)
 
+        self.name = "Vasicek process"
         self.mean = np.atleast_1d(mean)
 
         self.speed = np.atleast_1d(speed)

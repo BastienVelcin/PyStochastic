@@ -7,3 +7,7 @@ __all__ = [
     "duniform", "bernoulli", "binomial", "rademacher","poisson", "negative_binomial", "geometric", "hypergeometric",
     "yule_simon", "multivariate_normal"
 ]
+
+
+class Normal:
+    pass
