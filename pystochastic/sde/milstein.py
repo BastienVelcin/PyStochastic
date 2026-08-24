@@ -179,7 +179,8 @@ class Milstein:
                 fig.add_trace(go.Scatter(x=self.t,
                                          y=Y[sim,:,0],
                                          mode="lines",
-                                         line=dict(width=2)))
+                                         line=dict(width=2),
+                                         name=f"Path {sim+1}"))
             fig.update_layout(
                 title=f"Simulation with Milstein method.",
                 xaxis_title="t",

@@ -122,7 +122,7 @@ class CIR(DiffusionProcess):
 
     @property
     def feller_condition(self):
-        return 2 * self.a * self.b >= self.sigma ** 2
+        return 2 * self.speed * self.mean >= self.volatility ** 2
 
     def drift(self,x,t=None):
         return self.speed * (self.mean-x)

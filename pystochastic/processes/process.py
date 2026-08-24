@@ -107,14 +107,16 @@ class Process(ABC):
                 fig.add_trace(go.Scatter(x=self.t,
                                          y=self.path[sim,:, 0],
                                          mode="lines",
-                                         line=dict(width=2)))
+                                         line=dict(width=2),
+                                         name=f"Path {sim+1}"))
 
         elif self.dim == 2:
             for sim in range(self.n_simulations):
                 fig.add_trace(go.Scatter(x=self.path[sim,:, 0],
                                          y=self.path[sim, :, 1],
                                          mode="lines",
-                                         line=dict(width=2)))
+                                         line=dict(width=2),
+                                         name=f"Path {sim+1}"))
 
         else:
             for sim in range(self.n_simulations):
@@ -122,7 +124,9 @@ class Process(ABC):
                                            y=self.path[sim,:, 1],
                                            z=self.path[sim,:, 2],
                                            mode="lines",
-                                           line=dict(width=2)))
+                                           line=dict(width=2),
+                                           name=f"Path {sim+1}"))
+
         fig.update_layout(title=f"Simulations of {self.name}",
                           xaxis_title="t",
                           yaxis_title="Quadratic Variation",
@@ -363,7 +367,8 @@ class Process(ABC):
                         fig.add_trace(go.Scatter(x=self.t,
                                                  y=quad_var[sim,:],
                                                  mode="lines",
-                                                 line=dict(width=2)))
+                                                 line=dict(width=2),
+                                                 name=f"Path {sim+1}"))
 
 
                 else:
@@ -371,7 +376,8 @@ class Process(ABC):
                     fig.add_trace(go.Scatter(x=self.t,
                                              y=quad_var,
                                              mode="lines",
-                                             line=dict(width=2)))
+                                             line=dict(width=2),
+                                             name=f"Mean Quadratic Variation"))
 
                 fig.update_layout(title=f"Estimation of the Quadratic Variation for {self.name}",
                                   xaxis_title="t",

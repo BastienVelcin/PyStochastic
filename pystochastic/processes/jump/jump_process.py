@@ -27,7 +27,8 @@ class JumpProcess(Process,ABC):
             fig.add_trace(go.Scatter(x=self.t,
                                      y=self.path[sim,:],
                                      mode="lines",
-                                     line=dict(width=2,shape="hv")))
+                                     line=dict(width=2,shape="hv"),
+                                     name=f"Path {sim+1}"))
         fig.show()
 
     def covariance(self, t, i, j):

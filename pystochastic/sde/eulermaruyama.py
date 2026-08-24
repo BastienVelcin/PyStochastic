@@ -268,7 +268,7 @@ class EulerMaruyama:
         self.t = np.linspace(t_0, t_n, n_steps + 1)
         self.dt = (t_n - t_0) / n_steps
 
-    def solve(self, n_simulations = 1, plot=True, parallel=False, n_workers=None):
+    def solve(self, n_simulations = 1, plot=True, parallel=False, n_workers=None, brownian_sequence = None):
 
         """
         Solve method.
@@ -287,6 +287,8 @@ class EulerMaruyama:
             faster than any parallelization could offer.
         n_workers : int
             Number of worker processes. Defaults to the number of available cores.
+        brownian_sequence : np.ndarray
+            Paths of n_simulations dim-dimensional Brownian increments. Useful when the Brownian increments are already computed.
 
         Returns
         -------
@@ -298,9 +300,12 @@ class EulerMaruyama:
         self.n_simulations = n_simulations
 
         # We compute the different brownian path and increments that will be used in the simulation.
-        W = Brownian(np.eye(self.dim), self.t_0, self.t_n, self.n_steps)
-        W.simulate(self.n_simulations)
-        dW = W.increments
+        if brownian_sequence is None:
+            W = Brownian(np.eye(self.dim), self.t_0, self.t_n, self.n_steps)
+            W.simulate(self.n_simulations)
+            dW = W.increments
+        else:
+            dW = brownian_sequence
 
         # We define the list of arguments that will be passed to the simulation functions.
         args = (self.drift, self.diffusion, self.initial, self.t, self.dt, self.n_steps, self.dim, dW)
@@ -348,20 +353,23 @@ class EulerMaruyama:
                     fig.add_trace(go.Scatter(x=self.t,
                                              y=Y[sim, :, 0],
                                              mode="lines",
-                                             line=dict(width=2)))
+                                             line=dict(width=2),
+                                             name=f"Path {sim+1}"))
 
                 elif self.dim == 2:
                     fig.add_trace(go.Scatter(x=Y[sim, :, 0],
                                              y=Y[sim, :, 1],
                                              mode="lines",
-                                             line=dict(width=2)))
+                                             line=dict(width=2),
+                                             name=f"Path {sim+1}"))
 
                 else:
                     fig.add_trace(go.Scatter3d(x=Y[sim, :, 0],
                                                y=Y[sim, :, 1],
                                                z=Y[sim, :, 2],
                                                mode="lines",
-                                               line=dict(width=2)))
+                                               line=dict(width=2),
+                                               name=f"Path {sim+1}"))
 
             fig.update_layout(
                 title=f"Simulation with Euler-Maruyama method.",
