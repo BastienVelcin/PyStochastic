@@ -1,3 +1,9 @@
 docs/build/
 dist/*.whl
 pystochastic.egg-info/
+dist/
+.idea/
+docs/temp/.idea/
+dist/
+*.egg-info/
+docs/temp/
