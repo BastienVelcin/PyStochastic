@@ -26,8 +26,13 @@ class Process(ABC):
                 "The number of steps must be strictly positive."
             )
 
-        self.t = np.linspace(self.t_0, self.t_n, self.steps + 1)
-        self.dt = (t_n - t_0) / steps
+    @property
+    def dt(self):
+        return (self.t_n - self.t_0) / self.steps
+
+    @property
+    def t(self):
+        return np.linspace(self.t_0, self.t_n, self.steps + 1)
 
     @abstractmethod
     def simulate(self):
@@ -131,7 +136,6 @@ class Process(ABC):
                           xaxis_title="t",
                           yaxis_title="Quadratic Variation",
                           template="plotly_white")
-        fig.show()
         fig.show()
 
     def final_position(self):
@@ -294,11 +298,6 @@ class Process(ABC):
             Estimation of the hitting norm time for each simulation.
         """
 
-        if self.dim != 1:
-            raise ValueError(
-                "The hitting time can only be computed in 1D."
-            )
-
         if self.path is None:
             raise ValueError(
                 "The path has not been simulated yet. Please run the simulate method first."
@@ -320,7 +319,7 @@ class Process(ABC):
     def _quad_var_at_index(self, t_index):
         if t_index == 0:
             return 0
-        quad_var_t = np.sum((self.path[:, 1:t_index] - self.path[:, 0:(t_index - 1)]) ** 2, axis=1)
+        quad_var_t = np.sum((self.path[:, 1:t_index+1] - self.path[:, 0:t_index]) ** 2, axis=1)
         return quad_var_t
 
     def quadratic_variation(self,t=None, mean = False, plot=False):

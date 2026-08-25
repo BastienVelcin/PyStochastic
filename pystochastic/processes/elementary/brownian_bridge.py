@@ -76,7 +76,7 @@ class BrownianBridge(Process):
         W = Brownian(variance = np.eye(self.dim), t_0 = self.t_0, t_n = self.t_n, steps = self.steps)
         W.simulate(n_simulations = n_simulations)
         self.path = np.zeros((n_simulations,self.steps+1, self.dim))
-        self.path = W.path - self.t[None, :, None] * W.path
+        self.path = W.path - (self.t/self.t_n * W.path[:, -1, :])[:,:,None]
         if plot:
             self.plot()
 

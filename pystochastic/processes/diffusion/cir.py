@@ -116,9 +116,18 @@ class CIR(DiffusionProcess):
             )
 
         self.dim = 1
-        self.nu = (4*self.speed*self.mean)/(self.volatility**2)
-        self.factor = (4*self.speed*np.exp(-self.speed * self.dt))/((self.volatility**2)*(1-np.exp(-self.speed * self.dt)))
-        self.c = ((self.volatility**2)*(1-np.exp(-self.speed * self.dt)))/(4*self.speed)
+
+    @property
+    def nu(self):
+        return (4*self.speed*self.mean)/(self.volatility**2)
+
+    @property
+    def factor(self):
+        return (4*self.speed*np.exp(-self.speed * self.dt))/((self.volatility**2)*(1-np.exp(-self.speed * self.dt)))
+
+    @property
+    def c(self):
+        return ((self.volatility ** 2) * (1 - np.exp(-self.speed * self.dt))) / (4 * self.speed)
 
     @property
     def feller_condition(self):

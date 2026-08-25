@@ -146,9 +146,7 @@ class RungeKutta:
 
         for i in range(1,self.n_steps+1):
             # Runge-Kutta induction formula.
-            Y[:,i,:] = Y[:,i-1,:] + self.drift(Y[:,i-1,:])*self.dt + self.diffusion(Y[:,i-1,:]) * dW[:,i-1,:]
-            + (1/2)*(self.diffusion(Y[:,i-1,:] + self.drift(Y[:,i-1,:])*self.dt+self.diffusion(Y[:,i-1,:])*np.power(self.dt,1/2))
-            - self.diffusion(Y[:,i-1,:]))*(dW[:,i-1,:]**2-self.dt)*np.power(self.dt,-1/2)
+            Y[:,i,:] = Y[:,i-1,:] + self.drift(Y[:,i-1,:])*self.dt + self.diffusion(Y[:,i-1,:]) * dW[:,i-1,:] + (1/2)*(self.diffusion(Y[:,i-1,:] + self.drift(Y[:,i-1,:])*self.dt+self.diffusion(Y[:,i-1,:])*np.power(self.dt,1/2)) - self.diffusion(Y[:,i-1,:]))*(dW[:,i-1,:]**2-self.dt)*np.power(self.dt,-1/2)
 
         # Plotting is allowed only if the user has specified the plot parameter to True.
 
