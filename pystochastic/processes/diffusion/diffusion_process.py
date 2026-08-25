@@ -74,6 +74,11 @@ class DiffusionProcess(Process,ABC):
             Path of the simulated Geometric Brownian Motion of the form ``(n_simulations, steps + 1, dim)``.
         """
         self.n_simulations = n_simulations
+
+        if not self.is_autonomous and method != "euler-maruyama":
+            print("Because the process SDE is not autonomous, the Euler-Maruyama method is used by default.")
+            method = "euler-maruyama"
+
         if method == "euler-maruyama":
             from pystochastic.sde import EulerMaruyama
             self.path = EulerMaruyama(self.drift,

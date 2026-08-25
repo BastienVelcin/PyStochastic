@@ -76,6 +76,8 @@ class GeometricBrownianMotion(DiffusionProcess):
         Specify if volatility is an array that works well with vectorization.
     name : str
         Name of the process
+    is_autonomous : bool
+        Specify if the process SDE is autonomous.
 
     Examples
     --------

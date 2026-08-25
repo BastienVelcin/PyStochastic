@@ -1,21 +1,21 @@
 """
 ============================================================
-Module VASIECK
+Module Vasicek
 ============================================================
 
 Description
 -----------
-This module provides a way to simulate a Vasieck process with a given long-term mean, diffusion and form parameter.
+This module provides a way to simulate a Vasicek process with a given long-term mean, diffusion and form parameter.
 
-This module provides a general class "Vasieck", which inherits from the methods of Process and DiffusionProcess abstract classes.
+This module provides a general class "Vasicek", which inherits from the methods of Process and DiffusionProcess abstract classes.
 
 Examples
 --------
->> R = Vasieck(speed=2,mean=3,volatility=1,initial=0,t_0=0,t_n=1,steps=1000) #Vasieck process with speed 2, mean 3 and volatility 1 and starting point 0.
+>> R = Vasicek(speed=2,mean=3,volatility=1,initial=0,t_0=0,t_n=1,steps=1000) #Vasicek process with speed 2, mean 3 and volatility 1 and starting point 0.
 >>
->> R.simulate() #Simulate the Vasieck process path
+>> R.simulate() #Simulate the Vasicek process path
 >>
->> R.plot() #Plot the Vasieck process path
+>> R.plot() #Plot the Vasicek process path
 """
 
 import numpy as np
@@ -32,13 +32,13 @@ class Vasicek(DiffusionProcess):
     Vasicek class
 
     A Vasicek process is a stochastic process that satisfies the following equation:
-                                 dR_t = a*(b - R_t)dt+sigma*dW_t,
+                                 dR_t = - speed*(R_t - mean)dt+volatility*dW_t,
     For more information, please refer to :
         - https://en.wikipedia.org/wiki/Ornstein%E2%80%93Uhlenbeck_process
 
     Parameters
     ----------
-    mu : float, or np.ndarray
+    mean : float, or np.ndarray
         Long term mean vector of the model. The dimension of the vector must coincide with the dimension of the reversion speed matrix.
     speed : float, or list, or np.ndarray
         Speed of reversion matrix of the model.
@@ -55,7 +55,7 @@ class Vasicek(DiffusionProcess):
 
     Attributes
     ----------
-    mu : float, or np.ndarray
+    mean : float, or np.ndarray
         Long term mean vector of the model.
     speed : float, or list, or np.ndarray
         Speed of reversion matrix of the model.
@@ -83,10 +83,12 @@ class Vasicek(DiffusionProcess):
         Specify if sigma is an array that works well with vectorization.
     name : str
         Name of the process
+    is_autonomous : bool
+        Specify if the process SDE is autonomous.
 
     Examples
     --------
-    >> R = Vasieck(speed=2,mean=3,volatility=1,initial=0,t_0=0,t_n=1,steps=1000)
+    >> R = Vasicek(speed=2,mean=3,volatility=1,initial=0,t_0=0,t_n=1,steps=1000)
     >> R.simulate()
     >> R.plot()
     """
@@ -144,7 +146,6 @@ class Vasicek(DiffusionProcess):
             raise ValueError(
                 "The sigma and theta parameters should be greater than 0."
             )
-
 
 
     def drift(self,x,t=None):

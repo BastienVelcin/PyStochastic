@@ -57,6 +57,7 @@ class Heston(DiffusionProcess):
         self.path = (self.price, self.variance)
         self.dim = 1 #Plot dimension
 
+        self.is_autonomous = True
     @property
     def feller_condition(self):
         return 2 * self.reverting_rate * self.long_variance >= self.volatility_volatility ** 2

@@ -16,6 +16,7 @@ class Process(ABC):
         self.n_simulations = None
         self.path = None
 
+
         if not t_0 < t_n:
             raise ValueError(
                 "The final time must be strictly greater than the initial time."

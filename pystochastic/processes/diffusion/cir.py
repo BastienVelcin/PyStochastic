@@ -83,6 +83,8 @@ class CIR(DiffusionProcess):
         Standardization coefficient for the Noncentral chi-squared distribution for the exact simulation equation.
     name : str
         Name of the process
+    is_autonomous : bool
+        Specify if the process SDE is autonomous.
 
     Examples
     --------
@@ -116,6 +118,7 @@ class CIR(DiffusionProcess):
             )
 
         self.dim = 1
+        self.is_autonomous = True
 
     @property
     def nu(self):

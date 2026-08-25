@@ -3,4 +3,4 @@ from .elementary import *
 from .diffusion import *
 from .jump import *
 
-__all__ = ["Brownian", "BrownianBridge","GeometricBrownianMotion","OrnsteinUhlenbeck","PoissonProcess","Vasicek","CIR", "CompoundPoisson"]
+__all__ = ["Process", "Brownian", "BrownianBridge","GeometricBrownianMotion","OrnsteinUhlenbeck","PoissonProcess","Vasicek","CIR", "CompoundPoisson"]

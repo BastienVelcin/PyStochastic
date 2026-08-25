@@ -66,10 +66,10 @@ def benchmark_euler(n_simulations, n_steps, mu, sigma, n_runs=3, dim=1, parallel
     x_0 = np.ones(dim)
     times = []
     for _ in range(n_runs):
-        solver = EulerMaruyama(mu=mu, sigma=sigma, x_0=x_0, t_0=0, t_n=1,
-                                n_steps=n_steps, n_simulations=n_simulations)
+        solver = EulerMaruyama(drift=mu, diffusion=sigma, initial=x_0, t_0=0, t_n=1,
+                                n_steps=n_steps)
         start = time.perf_counter()
-        solver.solve(plot=False, parallel=parallel, n_workers=n_workers)
+        solver.solve(plot=False, parallel=parallel, n_workers=n_workers,n_simulations=n_simulations)
         end = time.perf_counter()
         times.append(end - start)
     return np.mean(times), np.min(times), np.max(times)
@@ -78,10 +78,10 @@ def benchmark_euler(n_simulations, n_steps, mu, sigma, n_runs=3, dim=1, parallel
 def benchmark_milstein(n_simulations, n_steps, mu, sigma, n_runs=3):
     times = []
     for _ in range(n_runs):
-        solver = Milstein(mu=mu, sigma=sigma, x_0=1.0, t_0=0, t_n=1,
-                           n_steps=n_steps, n_simulations=n_simulations)
+        solver = Milstein(drift=mu, diffusion=sigma, initial=1.0, t_0=0, t_n=1,
+                           n_steps=n_steps)
         start = time.perf_counter()
-        solver.solve(plot=False)
+        solver.solve(plot=False, n_simulations=n_simulations)
         end = time.perf_counter()
         times.append(end - start)
     return np.mean(times), np.min(times), np.max(times)

@@ -5,14 +5,14 @@ Module ORNSTEIN UHLENBECK
 
 Description
 -----------
-This module provides a way to simulate an Ornstein-Uhlenbeck process with a given long-term mean, diffusion and form parameter.
+This module provides a way to simulate an Ornstein-Uhlenbeck process with a given long-term mean, diffusion and volatility parameter.
 
 This module provides a general class "OrnsteinUhlenbeck", which inherits from the methods of Process and
 DiffusionProcess abstract classes.
 
 Examples
 --------
->> R = OrnsteinUhlenbeck(mean=[2,1],speed=np.ones((2,2)),speed=np.ones((2,2)),initial=[1,1],t_0=0,t_n=1,steps=1000) #Ornstein-Uhlenbeck process with mean [2,1] and diffusion and form parameter np.ones((2,2)) and starting point [1,1]
+>> R = OrnsteinUhlenbeck(mean=[2,1],speed=np.ones((2,2)),volatility=np.ones((2,2)),initial=[1,1],t_0=0,t_n=1,steps=1000) #Ornstein-Uhlenbeck process with mean [2,1] and diffusion and form parameter np.ones((2,2)) and starting point [1,1]
 >>
 >> R.simulate() #Simulate the Ornstein-Uhlenbeck process path
 >>
@@ -32,18 +32,16 @@ class OrnsteinUhlenbeck(DiffusionProcess):
     Ornstein Uhlenbeck class
 
     An Ornstein Uhlenbeck process is a stochastic process that satisfies the following equation:
-                                 dR_t = - speed*(R_t - mean)dt+volatility*dW_t,
-    For more information, please refer to :
-        - https://en.wikipedia.org/wiki/Ornstein%E2%80%93Uhlenbeck_process
+                                 dR_t = [speed(t) - mean * R_t]dt + volatility * dW_t
 
     Parameters
     ----------
     mean : float, or list, or np.ndarray
         Long term mean vector of the model.
-    speed : float, or np.ndarray
-        Constant matrix diffusion of the model. The dimension of the matrix must coincide with the dimension of the starting point and the vector drift.
-    speed : float, or np.ndarray
-        Constant matrix shape parameter. The dimension of the matrix must coincide with the dimension of the starting point and the vector drift.
+    speed : function
+        Matrix Function diffusion of the model. The dimension of the matrix must coincide with the dimension of the starting point and the vector drift.
+    volatility : float, or np.ndarray
+        Constant matrix volatility parameter. The dimension of the matrix must coincide with the dimension of the starting point and the vector drift.
     initial : float, or list, or np.ndarray
         Initial condition of the model. The dimension of the starting point must coincide with the dimension of volatility and speed.
     t_0 : float
@@ -83,6 +81,8 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         Specify if volatility is an array that works well with vectorization.
     name : str
         Name of the process
+    is_autonomous : bool
+        Specify if the process SDE is autonomous.
 
     Examples
     --------
@@ -104,6 +104,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         super().__init__(t_0=t_0,
                          t_n=t_n,
                          steps=steps)
+
         self.name = "Ornstein Uhlenbeck process"
         self.mean = np.atleast_1d(mean)
 
@@ -143,6 +144,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
                 "The volatility and speed parameters should be greater than 0."
             )
 
+        self.is_autonomous = True
     def drift(self, x, t=None):
 
         """
