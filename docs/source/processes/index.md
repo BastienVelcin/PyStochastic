@@ -346,12 +346,12 @@ _np.ndarray_ :
 
 ## Implemented processes
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 :caption: Elementary processes
 elementary/brownian
 elementary/brownian_bridge
 
-:maxdepth: 2
+:maxdepth: 1
 :caption: Diffusion processes
 diffusion/index
 diffusion/geometric_brownian_motion
@@ -362,7 +362,7 @@ diffusion/heston
 diffusion/hull_white
 diffusion/constant_elasticity_variance
 
-:maxdepth: 2
+:maxdepth: 1
 :caption: Jump processes
 jump/index
 jump/poisson
