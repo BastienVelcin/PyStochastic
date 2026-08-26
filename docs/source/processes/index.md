@@ -86,9 +86,9 @@ No return value.
 .expectation(t = 0)
 ```
 Returns the expectation of the effective process at time `t`. The expectation of a stochastic process $(X_t)_{t\geq 0}$ defined on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$ is given by
-\begin{equation}
+\begin{equation*}
 \mathbb{E}[X_t] = \int_{\Omega} X_t d\mathbb{P} = \int_\mathbb{R} x d\mathbb{P}_{X_t}(x)
-\end{equation}
+\end{equation*}
 
 > [!NOTE]
 > For some processes, the expectation is not defined. In this case, PyStochastic raises an `NonImplementedError` error.
@@ -107,9 +107,9 @@ _float_ or _np.ndarray_
 .variance(t = 0)
 ```
 Returns the variance of the effective process at time `t`. The expectation of a stochastic process $(X_t)_{t\geq 0}$ defined on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$ is given by
-\begin{equation}
+\begin{equation*}
 \mathbb{V}[X_t] = \mathbb{E}\left[(X_t-\mathbb{E}[X_t])^2\right]
-\end{equation}
+\end{equation*}
 
 > [!NOTE]
 > For some processes, the variance is not defined. In this case, PyStochastic raises an `NonImplementedError` error.
@@ -128,9 +128,9 @@ _float_ or _np.ndarray_
 .covariance(t = 0, i = 0, j = 0)
 ```
 For a multidimensional process, the `covariance` method returns the covariance of the $i$-th and $j$-th coordinates of the effective process at time `t`. The covariance of the $i$-th and $j$-th coordinates of a $d$-dimensional stochastic process $(X_t)_{t\geq 0}$ defined on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$ is given by
-\begin{equation}
+\begin{equation*}
 \mathrm{Cov}(X_t^i, X_t^j) = \mathbb{E}\left[(X_t^i-\mathbb{E}[X_t^i])(X_t^j-\mathbb{E}[X_t^j])\right]
-\end{equation}
+\end{equation*}
 
 > [!NOTE]
 > For some processes, the covariance is not defined. In this case, PyStochastic raises an `NonImplementedError` error.
@@ -158,9 +158,9 @@ _float_
 .covariance_matrix(t = 0)
 ```
 For a multidimensional process, the `covariance_matrix` method returns the covariance matrix the effective process at time `t`. The covariance matrix of a $d$-dimensional stochastic process $(X_t)_{t\geq 0}$ is given by
-\begin{equation}
+\begin{equation*}
 \Gamma(i,j)=\mathrm{Cov}(X_t^i,X_t^j)~~ \forall 0 \leq i,j < \mathrm{dim}_X
-\end{equation}
+\end{equation*}
 
 > [!NOTE]
 > For some processes, the covariance matrix is not defined. In this case, PyStochastic raises an `NonImplementedError` error.
