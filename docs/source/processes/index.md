@@ -94,10 +94,12 @@ Returns the expectation of the effective process at time `t`. The expectation of
 > For some processes, the expectation is not defined. In this case, PyStochastic raises an `NonImplementedError` error.
 
 **Parameters**
+
 `t` : _float_
 : Time at which the expectation is computed. Must be in the interval $[0,T]$.
 
 **Returns**
+
 _float_ or _np.ndarray_
 : Expectation of the effective process at time `t`.
 
@@ -115,10 +117,12 @@ Returns the variance of the effective process at time `t`. The expectation of a 
 > For some processes, the variance is not defined. In this case, PyStochastic raises an `NonImplementedError` error.
 
 **Parameters**
+
 `t` : _float_
 : Time at which the variance is computed. Must be in the interval $[0,T]$.
 
 **Returns**
+
 _float_ or _np.ndarray_
 : Variance of the effective process at time `t`.
 
@@ -138,6 +142,7 @@ For a multidimensional process, the `covariance` method returns the covariance o
 > For unidimensional processes, the `covariance` method calls the `variance` method.
 
 **Parameters**
+
 `t` : _float_
 : Time at which the covariance is computed. Must be in the interval $[0,T]$.
 
@@ -149,6 +154,7 @@ For a multidimensional process, the `covariance` method returns the covariance o
 
 
 **Returns**
+
 _float_
 : Covariance of the effective process $i$-th and $j$-th coordinates at time `t`.
 
@@ -169,10 +175,12 @@ For a multidimensional process, the `covariance_matrix` method returns the covar
 
 
 **Parameters**
+
 `t` : _float_
 : Time at which the covariance matrix is computed. Must be in the interval $[0,T]$.
 
 **Returns**
+
 _np.ndarray_
 : Covariance matrix of the effective process at time `t`.
 
@@ -305,6 +313,7 @@ depending on the value of the `inequality` parameter.
 
 `order` : _int_
 : Order of the norm. If `order = p`, then the norm is defined by : $||x||_p = \sqrt[p]{\sum_{i=1}^d x_i^p}$.
+
 **Returns**
 
 _tuple_ : (np.ndarray, np.ndarray)
