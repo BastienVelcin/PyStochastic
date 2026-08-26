@@ -16,7 +16,8 @@ from pystochastic.dist.continuous import *
 ```{toctree}
 :maxdepth: 2
 :caption: Elementary processes
-
+elementary/brownian
+elementary/brownian_bridge
 :maxdepth: 2
 :caption: Diffusion processes
 

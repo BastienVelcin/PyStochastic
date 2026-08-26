@@ -104,9 +104,13 @@ class BrownianBridge(Process):
         return 0
 
     def variance(self,t):
+        if self.dim == 1:
+            return t*(self.T - t)/self.T
         return np.diag(t*(self.T - t)/self.T*np.eye(self.dim))
 
     def covariance_matrix(self,t):
+        if self.dim == 1:
+            return t*(self.T - t)/self.T
         return t*(self.T - t)/self.T*np.eye(self.dim)
 
     def covariance(self,t,i,j):

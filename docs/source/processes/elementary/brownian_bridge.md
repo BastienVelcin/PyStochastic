@@ -12,68 +12,64 @@ pystochastic.processes.BrownianBridge(dim = 1, t_0 = 0, t_n = 1, steps = 1000)
 ```
 **Type :** Class
 
-Creates an instance of a $d$-dimensional Brownian Bridge on the interval $[t_0, t_n]$. A Brownian Bridge is a process $(B_t)_{t\geq 0}$ defined, for all $t\in\mathbb{R_+}$ by
-\begin{equation*}
-B_t = W_t + \frac{t-t_0}{2} \int_{t_0}^{t} Q(s) \mathrm{d}s
-\end{equation*}
+**Multidimensional support :** ✅
+
+Creates an instance of a $d$-dimensional Brownian Bridge on the interval $[0, T]$. A Brownian Bridge $(B_t)_{t\in[0,T]}$ is a particular example of a standard Brownian motion, where $B_T = 0$ a.s.
 
 >[!NOTE]
-> A $d$-dimensional Brownian motion is said standard if $Q = \mathrm{Id}_d$.
+> A $d$-dimensional Brownian bridge can be defined, for all $t\in[0,T] by the following equation:
+>
+> \begin{equation}
+> B_t = W_t + \frac{t}{T}W_T
+> \begin{*equation}
+>
+> where $(W_t)_{t\geq 0}$ is a standard $d$-dimensional Brownian motion. 
 
-The Brownian motion is one of the fundamental object of stochastic calculus, since it mathematically formalizes the concept of random motion.
-It appears naturally in stochastic differential equations, and so, within the diffusion process definitions.
 
 ### Parameters
 
-`variance` : _float_ or _np.ndarray_
-: Variance-covariance matrix of the Brownian motion. In the previous example, it is represented by $Q$.
+`dim` : _int_
+: Dimension of the Brownian bridge. Must be strictly a strictly positive integer.
 
-`t_0` : _float_
-: Initial time of the Brownian motion simulation.
 
-`t_n` : _float_
-: Final time of the Brownian motion simulation. Must be greater than `t_0`.
+`T` : _float_
+: Final time of the Brownian motion simulation. Must be greater than `0`.
 
 `steps` : _int_
-: Number of time steps between `t_0` and `t_n` on which the Brownian motion is simulated. Must be strictly greater than 0.
+: Number of time steps between `0` and `T` on which the Brownian motion is simulated. Must be strictly greater than 0.
 
 ### Attributes
-The Brownian motion inherits all attributes from the [Processes](<project:/index.md>) class.
+The Brownian Bridge class inherits all attributes from the [Processes](<project:/index.md>) class.
+It also possesses the attributes deduced from its parameters.
+
 ### Methods
-The Cauchy distribution inherits all methods from the [Processes](<project:/index.md>) class.
+The Brownian Bridge class inherits all methods from the [Processes](<project:/index.md>) class.
 
 ## Examples
 
 ```python
->>> W = Brownian(variance = np.eye(2),t_0 = 0, t_n = 1, steps = 1000)
->>> W.simulate(2, plot = True)
-array([[[ 0.        ,  0.        ],
-        [-0.00944504, -0.0103207 ],
-        [-0.01089965, -0.06896138],
+>>> B = BrownianBridge(dim = 1, T = 5, steps = 500)
+>>> B.simulate(3, plot = True)
+array([[[ 0.        ],
+        [-0.01655659],
+        [-0.12330862],
         ...,
-        [-0.26183923, -0.04326542],
-        [-0.32149696, -0.0815789 ],
-        [-0.36599909, -0.04858352]],
-       [[ 0.        ,  0.        ],
-        [ 0.07904865, -0.01548704],
-        [ 0.03610401, -0.05401726],
+        [-0.19210069],
+        [-0.01051594],
+        [ 0.        ]],
+       [[ 0.        ],
+        [ 0.09441971],
+        [ 0.22554915],
         ...,
-        [-1.79254653, -1.4591608 ],
-        [-1.7628466 , -1.44618102],
-        [-1.7475036 , -1.40262064]]], shape=(2, 1001, 2))
->>> dW = W.increments
-dW
-array([[[-0.00944504, -0.0103207 ],
-        [-0.00145461, -0.05864069],
-        [ 0.01951358, -0.04491318],
+        [-0.00463925],
+        [-0.11652599],
+        [ 0.        ]],
+       [[ 0.        ],
+        [ 0.09192548],
+        [ 0.15507396],
         ...,
-        [ 0.00941946,  0.00232427],
-        [-0.05965772, -0.03831348],
-        [-0.04450214,  0.03299538]],
-       [[ 0.07904865, -0.01548704],
-        [-0.04294464, -0.03853022],
-        [ 0.00371223, -0.01490523],
-        ...,
-        [-0.04196104, -0.0015993 ],
-        [ 0.02969993,  0.01297978],
-        [ 0.015343  ,  0.04356038]]], shape=(2, 1000, 2))
+        [-0.00224112],
+        [ 0.06494432],
+        [ 0.        ]]], shape=(3, 501, 1))
+>>> B.variance(1)
+0.8
