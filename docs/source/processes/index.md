@@ -21,7 +21,10 @@ This section lists all the attributes that are common to all implemented process
 
 ## Methods
 
-#### .simulate(n_simulations = 1, plot = False)
+#### .simulate()
+```python
+.simulate(n_simulations = 1, plot = False)
+```
 Simulate a $d$-dimensional Brownian motion of covariance matrix `variance` on the interval $[0,T]$.
 **Parameters**
 
@@ -62,6 +65,9 @@ W.path[:,200,:]
 > 
 
 #### .plot()
+```python
+.plot()
+```
 Plot all the previous simulations of the effective process.
 
 > [!NOTE]
@@ -75,7 +81,10 @@ No parameters.
 
 No return value.
 
-#### .expectation(t = 0)
+#### .expectation()
+```python
+.expectation(t = 0)
+```
 Returns the expectation of the effective process at time `t`. The expectation of a stochastic process $(X_t)_{t\geq 0}$ defined on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$ is given by
 \begin{equation}
 \mathbb{E}[X_t] = \int_{\Omega} X_t d\mathbb{P} = \int_\mathbb{R} x d\mathbb{P}_{X_t}(x)
@@ -93,7 +102,10 @@ _float_ or _np.ndarray_
 : Expectation of the effective process at time `t`.
 
 
-#### .variance(t = 0)
+#### .variance()
+```python
+.variance(t = 0)
+```
 Returns the variance of the effective process at time `t`. The expectation of a stochastic process $(X_t)_{t\geq 0}$ defined on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$ is given by
 \begin{equation}
 \mathbb{V}[X_t] = \mathbb{E}\left[(X_t-\mathbb{E}[X_t])^2\right]
@@ -111,7 +123,10 @@ _float_ or _np.ndarray_
 : Variance of the effective process at time `t`.
 
 
-#### .covariance(t = 0, i = 0, j = 0)
+#### .covariance()
+```python
+.covariance(t = 0, i = 0, j = 0)
+```
 For a multidimensional process, the `covariance` method returns the covariance of the $i$-th and $j$-th coordinates of the effective process at time `t`. The covariance of the $i$-th and $j$-th coordinates of a $d$-dimensional stochastic process $(X_t)_{t\geq 0}$ defined on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$ is given by
 \begin{equation}
 \mathrm{Cov}(X_t^i, X_t^j) = \mathbb{E}\left[(X_t^i-\mathbb{E}[X_t^i])(X_t^j-\mathbb{E}[X_t^j])\right]
@@ -138,7 +153,10 @@ _float_
 : Covariance of the effective process $i$-th and $j$-th coordinates at time `t`.
 
 
-#### .covariance_matrix(t = 0)
+#### .covariance_matrix()
+```python
+.covariance_matrix(t = 0)
+```
 For a multidimensional process, the `covariance_matrix` method returns the covariance matrix the effective process at time `t`. The covariance matrix of a $d$-dimensional stochastic process $(X_t)_{t\geq 0}$ is given by
 \begin{equation}
 \Gamma(i,j)=\mathrm{Cov}(X_t^i,X_t^j)~~ \forall 0 \leq i,j < \mathrm{dim}_X
@@ -160,6 +178,9 @@ _np.ndarray_
 
 
 #### .final_position()
+```python
+.final_position()
+```
 Returns the final position of the effective process.
 
 **Parameters**
@@ -173,6 +194,9 @@ _np.ndarray_
 
 
 #### .max()
+```python
+.max()
+```
 Returns the maximum value of the effective process.
 
 > [!NOTE]
@@ -191,6 +215,9 @@ _tuple_ : (np.ndarray, np.ndarray, np.ndarray)
 - The third element is the array of time values where the maximum value occurs for each simulation.
 
 #### .min()
+```python
+.min()
+```
 Returns the minimum value of the effective process.
 
 > [!NOTE]
@@ -208,7 +235,10 @@ _tuple_ : (np.ndarray, np.ndarray, np.ndarray)
 - The second element is the array of time indexes where the minimum value occurs for each simulation.
 - The third element is the array of time values where the minimum value occurs for each simulation.
 
-#### .max_norm(order = 2)
+#### .max_norm()
+```python
+.max_norm(order = 2)
+```
 Returns the maximum norm value of the effective process. The available norms are p-norms for $1 \leq p < +\infty$.
 
 **Parameters**
@@ -224,8 +254,10 @@ _tuple_ : (np.ndarray, np.ndarray, np.ndarray)
 - The second element is the array of time indexes where the maximum norm occurs for each simulation.
 - The third element is the array of time values where the maximum norm occurs for each simulation.
 
-#### .hitting_time(value, inequality = ">")
-
+#### .hitting_time()
+```python
+.hitting_time(value = 1, inequality = ">")
+```
 Returns the first time when each simulation reaches the value `value`. The hitting time can be defined as
 \begin{equation*}
 \inf \left\{ t \mid X_t \geq value \right\} ~~~\text{ or }~~~ \inf \left\{ t \mid X_t \leq value \right\}
@@ -253,8 +285,10 @@ _tuple_ : (np.ndarray, np.ndarray)
 > [!IMPORTANT]
 > If the process is not reaching the target value at any time, the method returns `np.nan` for the corresponding time index and time value.
 
-#### .hitting_norm_time(value, inequality = ">", order = 2)
-
+#### .hitting_norm_time()
+```python
+.hitting_norm_time(value = 1, inequality = ">", order = 2)
+```
 Returns the first time when each simulation reaches the norm `value` with a specified $p$-norm. The hitting time can be defined as
 \begin{equation*}
 \inf \left\{ t \mid ||X_t||_p \geq value \right\} ~~~\text{ or }~~~ \inf \left\{ t \mid ||X_t||_p \leq value \right\}
@@ -281,8 +315,10 @@ _tuple_ : (np.ndarray, np.ndarray)
 > [!IMPORTANT]
 > If the process is not reaching the target value at any time, the method returns `np.nan` for the corresponding time index and time value.
 
-#### .quadratic_variation(t = None, mean = False, plot = False)
-
+#### .quadratic_variation()
+```python
+.quadratic_variation(t = None, mean = False, plot = False)
+```
 Returns an estimation of the quadratic variation process deduced from all simulations of the process. The quadratic variation of process $(X_t)_{t\geq 0}$ is defined as
 \begin{equation*}
 <X>_t = \lim_{n\to\+infty} \sum_{i=1}^n \left(X_{t_i^n}-X_{t_{i-1}^n}\right)^2

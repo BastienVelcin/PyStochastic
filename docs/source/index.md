@@ -42,9 +42,8 @@ Now, you're ready to use PyStochastic!
 
 ```{toctree}
 :maxdepth: 2
-:caption: Random module and distributions
+:caption: Contents
 dist/index
 
 :maxdepth: 3
-:caption: Stochastic calculus
 processes/index
