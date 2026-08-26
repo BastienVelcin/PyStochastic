@@ -109,13 +109,13 @@ class HullWhite(DiffusionProcess):
             )
 
         if isinstance(calibration, (int, float)):
-            calibration = lambda t : calibration
+            calibration = lambda t, c = calibration : c
         elif not callable(calibration):
             raise ValueError(
                 "The calibration parameter should be a real number or a function."
             )
         if isinstance(volatility, (int, float)):
-            volatility = lambda t: volatility
+            volatility = lambda t, v=volatility: v
         elif not callable(volatility):
             raise ValueError(
                 "The volatility parameter should be a real number or a function."

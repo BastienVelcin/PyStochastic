@@ -99,6 +99,8 @@ class GeometricBrownianMotion(DiffusionProcess):
                          steps=steps)
 
         self.name = "Geometric Brownian Motion"
+        self.is_autonomous = True
+
         self.mu = np.atleast_1d(mu)
 
         self.volatility = np.atleast_1d(volatility)

@@ -73,6 +73,25 @@ class BrownianBridge(Process):
 
     def simulate(self,n_simulations=1,plot=False):
 
+        """
+        Simulate method.
+
+        Simulate a Brownian Bridge path using the following formula:
+            B_t = W_t - (t/t_n * W_{t_n})
+
+        Parameters
+        ----------
+        n_simulations : int
+            Number of trajectories to simulate.
+        plot : bool
+            Specify if the path should be plotted.
+
+        Returns
+        -------
+        np.ndarray
+            Path of the simulated Brownian Bridge process of the form ``(n_simulations, steps + 1, dim)``.
+        """
+
         W = Brownian(variance = np.eye(self.dim), t_0 = self.t_0, t_n = self.t_n, steps = self.steps)
         W.simulate(n_simulations = n_simulations)
         self.path = np.zeros((n_simulations,self.steps+1, self.dim))

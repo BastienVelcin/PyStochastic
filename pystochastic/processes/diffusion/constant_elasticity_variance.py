@@ -195,7 +195,7 @@ class CEV(DiffusionProcess):
                             initial * exp(-speed*t) + mean * (Id - exp(-volatility*t))
         """
 
-        return self.initial * np.exp(-self.speed * t)
+        return self.initial * np.exp(self.speed * t)
 
     def covariance_matrix(self, t):
         pass

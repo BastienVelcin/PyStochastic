@@ -107,6 +107,7 @@ class Vasicek(DiffusionProcess):
                          steps=steps)
 
         self.name = "Vasicek process"
+        self.is_autonomous = True
         self.mean = np.atleast_1d(mean)
 
         self.speed = np.atleast_1d(speed)

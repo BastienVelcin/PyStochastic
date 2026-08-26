@@ -5,43 +5,37 @@ Module FRACTIONAL BROWNIAN
 
 Description
 -----------
-This module provides a way to simulate a Fractional Brownian motion with a given hurst value
+This module provides a way to simulate a Fractional Brownian motion with a given hurst index.
 
 This module provides a general class "FractionalBrownian", which inherits from the methods of Process abstract class.
 
 Examples
 --------
->> W = FractionalBrownian(variance=np.eye(2),dim=2,t_0=0,t_n=1,steps=1000) #Brownian motion with covariance matrix np.eye(2)
+>> F = FractionalBrownian(hurst=0.7,t_0=0,t_n=1,steps=1000) #Fractional Brownian motion with hurst index 0.7
 >>
->> W.simulate() #Simulate the Brownian motion path
+>> F.simulate() #Simulate the Fractional Brownian motion path
 >>
->> W.plot() #Plot the Brownian motion path
+>> F.plot() #Plot the Fractional Brownian motion path
 """
 
 import numpy as np
 from pystochastic.random import continuous
-from pystochastic.utils import is_pos_def
 from pystochastic.processes.process import Process
 
-class Brownian(Process):
+class FractionalBrownian(Process):
 
     """
     Brownian motion class
 
-    The Brownian motion (or Wiener process) is a Gaussian process that models noises and randomness mathematically.
-    For more information, please refer to :
-        - Stochastic Differential Equations: An Introduction with Applications - Bernt Øksendal
-    or for a simpler explanation:
-        - Stochastic calculus applied to some non-linear filtering problems (French version) - Bastien Velcin :
-        https://bastienvelcin.github.io/
-        - https://en.wikipedia.org/wiki/Brownian_motion#Mathematics
+    The Fractional Brownian motion is an extension of the Brownian motion. It is a zero-mean Gaussian process which covariance function is
+    given by the following equation:
+                        Cov(B(t),B(s)) = |t|^2H + |s|^2H - |t-s|^2H,
+    where, H is the Hurst index, which is a float between 0 and 1.
 
     Parameters
     ----------
-    variance : None, float, or np.ndarray
-        Covariance matrix of the Brownian motion. If None, the covariance matrix is set to identity. The matrix must be positive-definite.
-    dim : int
-        Dimension of the brownian motion. The dimension must coincide with the dimension of the covariance matrix. Must be a strictly positive integer.
+    hurst : float
+        Hurst index of the Fractional Brownian motion. Must be a float between 0 and 1.
     t_0 : float
         Initial time.
     t_n : float
@@ -51,24 +45,20 @@ class Brownian(Process):
 
     Attributes
     ----------
-    variance : None, float, or np.ndarray
-        Covariance matrix of the Brownian motion. If None, the covariance matrix is set to identity.
-    dim : int
-        Dimension of the brownian motion.
+    hurst : float
+        Hurst index of the Fractional Brownian motion
     t_0 : float
         Initial time.
     t_n : float
         Final time.
     steps : int
         Number of time steps.
-    sim : np.ndarray
-        Simulation of a Brownian motion and its increments.
     path : np.ndarray
         Path of the simulated Brownian motion.
-    increments : np.ndarray
-        Increments of the simulated Brownian motion.
     t : np.ndarray
         Time interval on which we want to simulate the Brownian motion.
+    dim : int
+        Dimension of the brownian motion.
     name : str
         Name of the process
 
@@ -80,53 +70,60 @@ class Brownian(Process):
     """
 
     def __init__(self,
-                 variance=1,
-                 t_0=0,
+                 hurst=1,
+                 t_0 = 0,
                  t_n=1,
                  steps=1000):
+
 
         super().__init__(t_0=t_0,
                          t_n=t_n,
                          steps=steps)
 
-        self.name = "Brownian Motion"
-        self.variance = np.atleast_2d(variance)
-
-        if not is_pos_def(self.variance):
+        if not 0 < hurst < 1:
             raise ValueError(
-                "The covariance matrix is not positive-definite."
+                "The Hurst index must be a float strictly between 0 and 1."
             )
 
-        self.dim = np.shape(self.variance)[0]
-        self.sim = None
-        self.increments =None
+        self.hurst = hurst
+        self.name = f"Fractional Brownian Motion with Hurst index {self.hurst}"
+        self.dim = 1
+
+    @property
+    def time_matrix(self):
+        return np.repeat(np.atleast_2d(self.t),self.t.size,axis=0)
+
+    @property
+    def time_covar_matrix(self):
+        epsi = 1e-10
+        return np.eye(self.t.size)* epsi +  (np.abs(self.time_matrix) ** (2 * self.hurst) + (np.abs(self.time_matrix.T)) ** (2 * self.hurst)- np.abs(self.time_matrix - self.time_matrix.T) ** (2 * self.hurst)) / 2
+
+    @property
+    def sqrt_time_covar_matrix(self):
+        return np.linalg.cholesky(self.time_covar_matrix).T
 
     def simulate(self,n_simulations=1,plot=False):
 
         """
         Simulate method.
 
-        Simulate a brownian motion path and increments by using the brownian_motion() function.
+        Simulate a Fractional Brownian motion using the Cholesky decomposition of the time covariance matrix.
 
         Returns
         -------
         np.ndarray
-            Path of the simulated brownian motion.
+            Path of the simulated Fractional Brownian motion.
 
-        Notes
-        -----
-        The function only returns the path and not the increments. The increments can be accessed through the 'increments' attribute.
         """
         self.n_simulations = n_simulations
 
-        self.sim = brownian_motion(self.variance, self.t_0,self.t_n,self.steps, n_simulations)
-        self.path = self.sim[0]
-        self.increments = self.sim[1]
+        Z = continuous.normal(0,1,n_simulations*(self.steps+1)).reshape(self.steps+1,n_simulations)
 
-
+        self.path = (Z.T @ self.sqrt_time_covar_matrix)[:,:,None]
 
         if plot:
             self.plot()
+
         return self.path
 
     def expectation(self,t):
@@ -134,7 +131,7 @@ class Brownian(Process):
         """
         Expectation method.
 
-        Return the expectation of the Brownian motion at a given time t.
+        Return the expectation of the Fractional Brownian motion at a given time t.
 
         Parameters
         ----------
@@ -144,72 +141,26 @@ class Brownian(Process):
         Returns
         -------
         float
-            0 : Expectation of the Brownian motion at a time t
+            0 : Expectation of the Fractional Brownian motion at a time t
 
         Notes
         -----
-        The expectation of the Brownian motion at every time t is always 0, since W_t ~ N(0,t*Q), where Q is the covariance matrix.
+        The expectation of the Fractional Brownian motion at every time t is always 0, since W_t ~ N(0,t*Q), where Q is the covariance matrix.
         """
 
         return 0
 
     def covariance_matrix(self,t):
-
-        """
-        Covariance matrix method.
-
-        Return the covariance matrix of the Brownian motion at a given time t.
-
-        Parameters
-        ----------
-        t : float
-            Time at which the covariance matrix is evaluated. Must be between t_0 and t_n.
-
-        Returns
-        -------
-        np.ndarray
-            Covariance matrix of the Brownian motion at a time t
-
-        Notes
-        -----
-        The covariance matrix of the Brownian motion at every time t is always t*Q, since W_t ~ N(0,t*Q), where Q is the Brownian matrix parameter
-        """
-
-        return t*self.variance
-
+        pass
     def covariance(self, t,i,j):
-
-        """
-        Covariance Matrix method.
-
-        Return the covariance between the i-th and j-th coordinates
-        of the Brownian motion at a given time t.
-
-
-        Parameters
-        ----------
-        t : float
-            Time at which the covariance is evaluated.
-        i : int
-            Index of the first coordinate. It must verify 0 <= i < dim.
-        j : int
-            Index of the second coordinate. It must verify 0 <= j < dim.
-
-        Returns
-        -------
-        np.ndarray
-            Covariance between the i-th and j-th coordinates.
-        """
-
-        return self.covariance_matrix(t)[i,j]
-
+        pass
 
     def variance(self, t):
 
         """
         Variance method.
 
-        Return the variance of the Brownian Motion coordinates at a given time t.
+        Return the variance of the Fractional Brownian Motion coordinates at a given time t.
 
         Parameters
         ----------
@@ -219,38 +170,8 @@ class Brownian(Process):
         Returns
         -------
         np.ndarray
-            Variance of the Brownian Motion path coordinates at a given time t.
+            Variance of the Fractional Brownian Motion path coordinates at a given time t.
         """
 
-        return np.array([self.covariance(t,i,i) for i in range(self.dim)])
-
-
-def brownian_motion(variance=1, t_0 = 0, t_n = 1, steps = 1000,n_simulations=1):
-
-    """
-    Brownian motion function.
-
-    The brownian motion functions simulate a Brownian motion path and increments by using the Cholesky decomposition.
-
-    Returns
-    -------
-    tuple
-        np.ndarray of the simulated brownian motion path and np.ndarray of the increments.
-
-    """
-    variance = np.atleast_2d(variance)
-    d = np.shape(variance)[0]
-
-    W = np.zeros((n_simulations,steps+1, d))
-    dW = np.zeros((n_simulations, steps, d))
-
-    # Computation of the step length and Cholesky decomposition
-    h = (t_n - t_0) / steps
-    L = np.linalg.cholesky(variance)  # The Cholesky decomposition of the covariance matrix is analogous to the square root for matrices.
-
-    N = continuous.normal(0, 1, n_simulations * steps * d)
-    Z = np.reshape(N,(n_simulations,steps,d))
-    dW[:,:] = Z @ L.T * np.sqrt(h)
-
-    W[:, 1:, :] = np.cumsum(dW, axis=1)
-    return W,dW
+        t_index = np.argmin(np.abs(self.t-t))
+        return self.time_covar_matrix[t_index,t_index]

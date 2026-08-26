@@ -129,6 +129,7 @@ class Brownian(Process):
         -----
         The function only returns the path and not the increments. The increments can be accessed through the 'increments' attribute.
         """
+
         self.n_simulations = n_simulations
 
         self.sim = brownian_motion(self.variance, self.t_0,self.t_n,self.steps, n_simulations)
