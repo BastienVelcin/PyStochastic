@@ -9,6 +9,9 @@ You can import all the distributions listed in the `continuous.py` module as fol
 from pystochastic.dist.continuous import *
 ```
 
+## Methods
+
+#### simulate(n_simulations = 1, 
 ## Implemented distributions
 ```{toctree}
 :maxdepth: 2
