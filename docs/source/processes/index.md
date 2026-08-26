@@ -25,7 +25,7 @@ This section lists all the attributes that are common to all implemented process
 ```python
 .simulate(n_simulations = 1, plot = False)
 ```
-Simulate a $d$-dimensional Brownian motion of covariance matrix `variance` on the interval $[0,T]$.
+Simulates a $d$-dimensional Brownian motion of covariance matrix `variance` on the interval $[0,T]$.
 **Parameters**
 
 `n_simulations` : _int_
@@ -68,7 +68,7 @@ W.path[:,200,:]
 ```python
 .plot()
 ```
-Plot all the previous simulations of the effective process.
+Plots all the previous simulations of the effective process.
 
 > [!NOTE]
 > This method plots the simulation only if the process is 1D, 2D or 3D. The plot is made with `plotly` for better interactive figures.
