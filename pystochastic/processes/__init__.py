@@ -1,3 +1,4 @@
+from .elementary import Brownian
 from .process import *
 from .elementary import *
 from .diffusion import *

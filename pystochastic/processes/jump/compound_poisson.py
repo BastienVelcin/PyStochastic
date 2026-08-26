@@ -15,7 +15,7 @@ This module provides a general class "CompoundPoisson", with the following built
 
 Examples
 --------
->> P = CompoundPoisson(intensity=2,t_0=0, t_n=1, steps=1000) #Poisson process with intensity 2
+>> P = CompoundPoisson(intensity=2,T=1, steps=1000) #Poisson process with intensity 2
 >>
 >> P.simulate() #Simulate the Poisson process path
 >>
@@ -41,10 +41,8 @@ class CompoundPoisson(JumpProcess):
         Intensity parameter of the poisson process. Must be strictly positive.
     distribution : pystochastic.dist.ContinuousDistribution or pystochastic.dist.DiscreteDistribution
         Distribution of the random variables X_i.
-    t_0 : float
-        Initial time.
-    t_n : float
-        Final time. Must be strictly greater than t_0.
+    T : float
+        Final time. Must be strictly greater than 0.
     steps : int
         Number of time steps. Must be a strictly positive integer.
 
@@ -52,9 +50,7 @@ class CompoundPoisson(JumpProcess):
     ----------
     intensity : float
         Intensity parameter.
-    t_0 : float
-        Initial time.
-    t_n : float
+    T : float
         Final time.
     steps : int
         Number of time steps.
@@ -73,19 +69,17 @@ class CompoundPoisson(JumpProcess):
 
     Examples
     --------
-    >> P = Poisson(intensity=2,t_0=0, t_n=1, steps=1000)
+    >> P = Poisson(intensity=2,T=1, steps=1000)
     >> P.simulate()
     >> P.plot()
     """
     def __init__(self,
                  intensity = 1,
                  distribution=Normal(0,1),
-                 t_0=0,
-                 t_n=1,
+                 T = 1,
                  steps=1000):
 
-        super().__init__(t_0 = t_0,
-                         t_n = t_n,
+        super().__init__(T = T,
                          steps = steps)
 
         self.name = f"Compound Poisson process with {type(distribution).__name__} distribution of parameters {distribution.__dict__}"
@@ -120,7 +114,7 @@ class CompoundPoisson(JumpProcess):
         self.n_simulations = n_simulations
         self.path = np.zeros((n_simulations,self.steps+1))
 
-        N = PoissonProcess(intensity=self.intensity,t_0=self.t_0, t_n=self.t_n, steps=self.steps)
+        N = PoissonProcess(intensity=self.intensity,T=self.T, steps=self.steps)
         N.simulate(n_simulations=n_simulations)
 
         max_val_sim = np.max(N.path[:,-1]).astype(int)

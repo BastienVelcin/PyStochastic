@@ -12,7 +12,7 @@ This module provides a general class "Heston", which inherits from the methods o
 
 Examples
 --------
->> H = Heston(mean=[2,1],speed=np.ones((2,2)),speed=np.ones((2,2)),initial=[1,1],t_0=0,t_n=1,steps=1000) #Ornstein-Uhlenbeck process with mean [2,1] and diffusion and form parameter np.ones((2,2)) and starting point [1,1]
+>> H = Heston(mean=[2,1],speed=np.ones((2,2)),speed=np.ones((2,2)),initial=[1,1],T=1,steps=1000) #Ornstein-Uhlenbeck process with mean [2,1] and diffusion and form parameter np.ones((2,2)) and starting point [1,1]
 >>
 >> H.simulate() #Simulate the Ornstein-Uhlenbeck process path
 >>
@@ -53,10 +53,8 @@ class Heston(DiffusionProcess):
         Rate at which the variance reverts to the long variance.
     variance_volatility : float
         Volatility parameter of the variance process.
-    t_0 : float
-        Initial time.
-    t_n : float
-        Final time. Must be strictly greater than t_0.
+    T : float
+        Final time. Must be strictly greater than 0.
     steps : int
         Number of time steps. Must be a strictly positive integer.
 
@@ -70,9 +68,7 @@ class Heston(DiffusionProcess):
         Volatility function of the model
     initial : float
         Initial condition of the model.
-    t_0 : float
-        Initial time.
-    t_n : float
+    T : float
         Final time.
     steps : int
         Number of time steps.
@@ -99,7 +95,7 @@ class Heston(DiffusionProcess):
 
     Examples
     --------
-    >> R = HullWhite(speed=2,mean=3,volatility=1,initial=0,t_0=0,t_n=1,steps=1000)
+    >> R = HullWhite(speed=2,mean=3,volatility=1,initial=0,T=1,steps=1000)
     >> R.simulate()
     >> R.plot()
     """
@@ -112,12 +108,10 @@ class Heston(DiffusionProcess):
             correlation = 0,
             reverting_rate = 1,
             variance_volatility = 1,
-            t_0=0,
-            t_n=1,
+            T=1,
             steps=1000):
 
-        super().__init__(t_0 = t_0,
-                         t_n = t_n,
+        super().__init__(T = T,
                          steps = steps)
 
         if initial_price < 0:
@@ -262,15 +256,14 @@ class Heston(DiffusionProcess):
 
         covariance_matrix = np.array([[1, self.correlation], [self.correlation, 1]])
 
-        W = Brownian(variance = covariance_matrix, t_0 = self.t_0, t_n = self.t_n, steps = self.steps)
+        W = Brownian(variance = covariance_matrix, T = self.T, steps = self.steps)
         W.simulate(n_simulations = n_simulations)
 
         self.path = EulerMaruyama(drift=self.drift,
                                   diffusion=self.diffusion,
                                   initial=np.array([self.initial_price, self.initial_variance]),
-                                  t_0=self.t_0,
-                                  t_n=self.t_n,
-                                  n_steps=self.steps).solve(n_simulations=n_simulations,
+                                  T = self.T,
+                                  steps=self.steps).solve(n_simulations=n_simulations,
                                                            plot=False,
                                                            parallel=parallel,
                                                            n_workers=n_workers,

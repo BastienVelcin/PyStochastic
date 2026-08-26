@@ -547,8 +547,7 @@ class TestMonteCarloProcess:
             mean=1.5,
             volatility=0.3,
             initial=0,
-            t_0=0,
-            t_n=5,
+            T = 5,
             steps=100,
         )
 

@@ -11,7 +11,7 @@ This module provides a general class "HullWhite", which inherits from the method
 
 Examples
 --------
->> R = HullWhite(speed=2,mean=3,volatility=1,initial=0,t_0=0,t_n=1,steps=1000) #HullWhite process with speed 2, mean 3 and volatility 1 and starting point 0.
+>> R = HullWhite(speed=2,mean=3,volatility=1,initial=0,T=1,steps=1000) #HullWhite process with speed 2, mean 3 and volatility 1 and starting point 0.
 >>
 >> R.simulate() #Simulate the HullWhite process path
 >>
@@ -19,11 +19,7 @@ Examples
 """
 
 import numpy as np
-import scipy
-from pystochastic.random import continuous
-from pystochastic.utils import _decompose
 from pystochastic.processes.diffusion.diffusion_process import DiffusionProcess
-from pystochastic.random.setseed import *
 
 class HullWhite(DiffusionProcess):
 
@@ -31,7 +27,7 @@ class HullWhite(DiffusionProcess):
     HullWhite class
 
     A HullWhite process is a stochastic process that satisfies the following equation:
-                                 dR_t = [calibration(t) + mean * R_t]dt + volatility(t)*dW_t,
+                                 dR_t = [calibration(t) + mean * R_t]dt + volatility(t)*dW_t
 
     Parameters
     ----------
@@ -43,10 +39,8 @@ class HullWhite(DiffusionProcess):
         Volatility function of the model
     initial : float
         Initial condition of the model.
-    t_0 : float
-        Initial time.
-    t_n : float
-        Final time. Must be strictly greater than t_0.
+    T : float
+        Final time. Must be strictly greater than 0.
     steps : int
         Number of time steps. Must be a strictly positive integer.
 
@@ -60,9 +54,7 @@ class HullWhite(DiffusionProcess):
         Volatility function of the model
     initial : float
         Initial condition of the model.
-    t_0 : float
-        Initial time.
-    t_n : float
+    T : float
         Final time.
     steps : int
         Number of time steps.
@@ -83,7 +75,7 @@ class HullWhite(DiffusionProcess):
 
     Examples
     --------
-    >> R = HullWhite(speed=2,mean=3,volatility=1,initial=0,t_0=0,t_n=1,steps=1000)
+    >> R = HullWhite(speed=2,mean=3,volatility=1,initial=0,T=1,steps=1000)
     >> R.simulate()
     >> R.plot()
     """
@@ -93,12 +85,10 @@ class HullWhite(DiffusionProcess):
                  calibration=lambda t : t,
                  volatility=lambda t : 1,
                  initial=0,
-                 t_0=0,
-                 t_n=1,
+                 T=1,
                  steps=1000):
 
-        super().__init__(t_0=t_0,
-                         t_n=t_n,
+        super().__init__(T=T,
                          steps=steps)
 
         self.name = "HullWhite process"

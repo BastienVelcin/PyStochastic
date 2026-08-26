@@ -84,8 +84,7 @@ class DiffusionProcess(Process,ABC):
             self.path = EulerMaruyama(self.drift,
                                       self.diffusion,
                                       self.initial,
-                                      self.t_0,
-                                      self.t_n,
+                                      self.T,
                                       self.steps).solve(n_simulations=n_simulations,
                                                         plot=plot,
                                                         parallel=parallel,
@@ -101,8 +100,7 @@ class DiffusionProcess(Process,ABC):
             self.path = Milstein(self.drift,
                                  self.diffusion,
                                  self.initial,
-                                 self.t_0,
-                                 self.t_n,
+                                 self.T,
                                  self.steps).solve(n_simulations=n_simulations, plot=plot)
 
         elif method == "runge-kutta":
@@ -115,8 +113,7 @@ class DiffusionProcess(Process,ABC):
             self.path = RungeKutta(self.drift,
                                    self.diffusion,
                                    self.initial,
-                                   self.t_0,
-                                   self.t_n,
+                                   self.T,
                                    self.steps).solve(n_simulations, plot=plot)
 
         elif method == "exact":

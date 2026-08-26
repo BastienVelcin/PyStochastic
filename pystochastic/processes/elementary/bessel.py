@@ -11,7 +11,7 @@ This module provides a general class "Bessel", which inherits from the methods o
 
 Examples
 --------
->> BSL = Bessel(order=2,t_0=0, t_n=1, steps=1000)
+>> BSL = Bessel(order=2, T=1, steps=1000)
 >>
 >> BSL.simulate() #Simulate the Bessel process path
 >>
@@ -19,13 +19,8 @@ Examples
 """
 
 import numpy as np
-import scipy
-import plotly.graph_objects as go
-
-from pystochastic.processes import Brownian
-from pystochastic.random import continuous
-from pystochastic.utils import _decompose
-from pystochastic.processes import Process
+from pystochastic.processes.elementary.brownian import Brownian
+from pystochastic.processes.process import Process
 from pystochastic.random.setseed import *
 
 class Bessel(Process):
@@ -41,10 +36,8 @@ class Bessel(Process):
     ----------
     order : int
         Order of the Bessel process.
-    t_0 : float
-        Initial time.
-    t_n : float
-        Final time. Must be strictly greater than t_0.
+    T : float
+        Final time. Must be strictly greater than 0.
     steps : int
         Number of time steps. Must be a strictly positive integer.
 
@@ -52,10 +45,8 @@ class Bessel(Process):
     ----------
     order : int
         Order of the Bessel process.
-    t_0 : float
-        Initial time.
-    t_n : float
-        Final time. Must be strictly greater than t_0.
+    T : float
+        Final time.
     steps : int
         Number of time steps. Must be a strictly positive integer.
     n_simulations : None, or int
@@ -73,19 +64,17 @@ class Bessel(Process):
 
     Examples
     --------
-    >> BSL = Bessel(order=2,t_0=0, t_n=1, steps=1000)
+    >> BSL = Bessel(order=2, T=1, steps=1000)
     >> BSL.simulate() #Simulate the Bessel process path
     >> BSL.plot() #Plot the Bessel process path
     """
 
     def __init__(self,
                  order=1,
-                 t_0=1e-5,
-                 t_n=1,
+                 T=1,
                  steps=1000):
 
-        super().__init__(t_0=t_0,
-                         t_n=t_n,
+        super().__init__(T=T,
                          steps=steps)
         self.initial = 0
         self.order = order
@@ -121,7 +110,7 @@ class Bessel(Process):
 
         self.n_simulations = n_simulations
 
-        W = Brownian(np.eye(self.order),t_0 = self.t_0, t_n = self.t_n, steps = self.steps)
+        W = Brownian(np.eye(self.order),T = self.T, steps = self.steps)
         W.simulate(n_simulations=n_simulations)
 
         self.path = np.linalg.norm(W.path,axis=2)[:,:,None]

@@ -185,7 +185,7 @@ class TestMonteCarloProcess:
 
     def test_estimate_matches_theoretical_mean(self):
         seed(0)
-        v = Vasicek(speed=2, mean=1.5, volatility=0.3, initial=0, t_0=0, t_n=5, steps=100)
+        v = Vasicek(speed=2, mean=1.5, volatility=0.3, initial=0, T=5, steps=100)
         mc = MonteCarloProcess(v, n_simulations=5000)
         est = mc.estimate(t_0=5, function=lambda x: x[:, 0])
         theo = 1.5 + (0 - 1.5) * np.exp(-2 * 5)
@@ -193,14 +193,14 @@ class TestMonteCarloProcess:
 
     def test_values_at_shape(self):
         seed(0)
-        v = Vasicek(speed=2, mean=1.5, volatility=0.3, initial=0, t_0=0, t_n=5, steps=100)
+        v = Vasicek(speed=2, mean=1.5, volatility=0.3, initial=0, T=5, steps=100)
         mc = MonteCarloProcess(v, n_simulations=500)
         vals = mc.values_at(t_0=5)
         assert vals.shape == (500,)
 
     def test_mean_path_matches_theory(self):
         seed(0)
-        v = Vasicek(speed=2, mean=1.5, volatility=0.3, initial=0, t_0=0, t_n=5, steps=100)
+        v = Vasicek(speed=2, mean=1.5, volatility=0.3, initial=0, T=5, steps=100)
         mc = MonteCarloProcess(v, n_simulations=3000)
         path = mc.mean_path(plot_sim=False)
         theo_path = 1.5 + (0 - 1.5) * np.exp(-2 * v.t)

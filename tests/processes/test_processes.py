@@ -13,7 +13,7 @@ from pystochastic.processes import (
 
 class TestBrownian:
     def test_scalar_initialization(self):
-        W = Brownian(variance=1, t_n=1, steps=50)
+        W = Brownian(variance=1, T=1, steps=50)
         assert W.dim == 1
         assert W.variance.shape == (1, 1)
         assert W.t.shape == (51,)
@@ -21,7 +21,7 @@ class TestBrownian:
         assert W.increments is None
 
     def test_multidimensional_initialization(self):
-        W = Brownian(variance=np.eye(2), t_n=1, steps=20)
+        W = Brownian(variance=np.eye(2), T=1, steps=20)
         assert W.dim == 2
         assert W.variance.shape == (2, 2)
 
@@ -31,29 +31,29 @@ class TestBrownian:
 
     def test_invalid_time(self):
         with pytest.raises(ValueError):
-            Brownian(t_0=1, t_n=0)
+            Brownian(T=0)
 
     @pytest.mark.parametrize("n_simulations", [1, 5, 20])
     def test_simulation_shape(self, n_simulations):
-        W = Brownian(t_n=1, steps=50)
+        W = Brownian(T=1, steps=50)
         path = W.simulate(n_simulations)
         assert path.shape == (n_simulations, 51, 1)
         assert W.increments.shape == (n_simulations, 50, 1)
 
     def test_multidimensional_shape(self):
-        W = Brownian(variance=np.eye(2), t_n=1, steps=50)
+        W = Brownian(variance=np.eye(2), T=1, steps=50)
         path = W.simulate(8)
         assert path.shape == (8, 51, 2)
         assert W.increments.shape == (8, 50, 2)
 
     def test_initial_value_and_increments(self):
-        W = Brownian(t_n=1, steps=50)
+        W = Brownian(T=1, steps=50)
         path = W.simulate(10)
         assert np.allclose(path[:, 0, :], 0)
         assert np.allclose(np.diff(path, axis=1), W.increments)
 
     def test_final_position(self):
-        W = Brownian(t_n=1, steps=50)
+        W = Brownian(T=1, steps=50)
         path = W.simulate(10)
         assert np.allclose(W.final_position(), path[:, -1, :])
 
@@ -70,25 +70,25 @@ class TestBrownian:
 
 class TestPoisson:
     def test_initialization(self):
-        P = PoissonProcess(intensity=2, t_n=1, steps=50)
+        P = PoissonProcess(intensity=2, T=1, steps=50)
         assert P.dim == 1
         assert P.t.shape == (51,)
         assert P.path is None
 
     def test_shape(self):
-        P = PoissonProcess(intensity=2, t_n=1, steps=50)
+        P = PoissonProcess(intensity=2, T=1, steps=50)
         path = P.simulate(10)
         assert path.shape == (10, 51)
 
     def test_paths_are_non_decreasing_and_integer(self):
-        P = PoissonProcess(intensity=2, t_n=1, steps=50)
+        P = PoissonProcess(intensity=2, T=1, steps=50)
         path = P.simulate(100)
         assert np.all(np.diff(path, axis=1) >= 0)
         assert np.all(path == np.floor(path))
         assert np.all(path[:, 0] == 0)
 
     def test_mean(self):
-        P = PoissonProcess(intensity=2, t_n=2, steps=20)
+        P = PoissonProcess(intensity=2, T=2, steps=20)
         path = P.simulate(5000)
         assert np.mean(path[:, -1]) == pytest.approx(4, abs=0.15)
 
@@ -431,12 +431,12 @@ class TestCIR:
             CIR().simulate(method="invalid")
 
     def test_mean_and_variance_at_initial_time(self):
-        R = CIR(speed=2, mean=.05, volatility=.1, initial=.03, t_0=0, t_n=1)
+        R = CIR(speed=2, mean=.05, volatility=.1, initial=.03, T=1)
         assert R.expectation(0) == pytest.approx(R.initial)
         assert R.variance(0) == pytest.approx(0.)
 
     def test_time_validation(self):
-        R = CIR(t_0=0, t_n=1)
+        R = CIR(T=1)
         with pytest.raises(ValueError):
             R.expectation(-.1)
         with pytest.raises(ValueError):

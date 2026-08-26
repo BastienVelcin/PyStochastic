@@ -14,7 +14,7 @@ The Runge-Kutta class also handles the solution plotting.
 
 Examples
 --------
->> solver = RungeKutta(drift=lambda x : x, diffusion=lambda x : 0.1*x, initial=0, t_0=0, t_n=1, n_steps=1000, n_simulations=10) #Runge-Kutta SDE with drift x(t) = x and diffusion 0.1*x(t)
+>> solver = RungeKutta(drift=lambda x : x, diffusion=lambda x : 0.1*x, initial=0, T=1, steps=1000, n_simulations=10) #Runge-Kutta SDE with drift x(t) = x and diffusion 0.1*x(t)
 >>
 >> solver.solve(plot=True) #Plot the evolution of the SDE
 """
@@ -43,11 +43,9 @@ class RungeKutta:
         Diffusion function of the SDE.
     initial : float, or list, or np.ndarray
         Initial condition.
-    t_0 : float
-        Initial time.
-    t_n : float
-        Final time. Must be strictly greater than t_0.
-    n_steps : int
+    T : float
+        Final time. Must be strictly greater than 0.
+    steps : int
         Number of time steps. Must be a strictly positive integer.
     n_simulations : int
         Number of solution simulations. Must be a strictly positive integer.
@@ -60,20 +58,18 @@ class RungeKutta:
         Diffusion function of the SDE.
     initial : float, list, or np.ndarray
         Initial condition.
-    t_0 : float
-        Initial time.
-    t_n : float
+    T : float
         Final time.
     t : np.ndarray
         Time interval on which we want to solve the SDE.
-    n_steps : int
+    steps : int
         Number of time steps.
     dt : float
         Time step
 
     Examples
     --------
-    >> solver = RungeKutta(drift=lambda x : x, diffusion=lambda x : 0.1*x, initial=0, t_0=0, t_n=1, n_steps=1000, n_simulations=10)
+    >> solver = RungeKutta(drift=lambda x : x, diffusion=lambda x : 0.1*x, initial=0, T=1, steps=1000, n_simulations=10)
     >> solver.solve(plot=True)
 
     """
@@ -81,29 +77,27 @@ class RungeKutta:
     def __init__(self,
                  drift=lambda x : 1,diffusion=lambda x : 1,
                  initial=0,
-                 t_0=0,
-                 t_n=1,
-                 n_steps=1000):
+                 T = 1,
+                 steps=1000):
 
         if np.size(initial) != 1:
             raise NotImplementedError(
                 "Runge-Kutta is currently implemented only for autonomous one-dimensional SDEs."
             )
-        if not t_0 < t_n:
+        if not 0 < T:
             raise ValueError(
-                "The final time must be strictly greater than the initial time."
+                "The final time must be strictly greater than t0."
             )
 
         initial = np.atleast_1d(initial)
         self.drift = drift
         self.diffusion = diffusion
         self.initial = initial
-        self.t_0 = t_0
-        self.t_n = t_n
-        self.n_steps = n_steps
+        self.T = T
+        self.steps = steps
         self.n_simulations = None
-        self.t = np.linspace(t_0,t_n,n_steps+1)
-        self.dt = (t_n-t_0)/n_steps
+        self.t = np.linspace(0,T,steps+1)
+        self.dt = T/steps
 
     def solve(self, n_simulations = 1, plot=True):
 
@@ -133,18 +127,18 @@ class RungeKutta:
         self.n_simulations = n_simulations
 
         # Initialization of the 'n_simulations' simulations.
-        Y = np.zeros((self.n_simulations,self.n_steps+1,1))
+        Y = np.zeros((self.n_simulations,self.steps+1,1))
 
         # Fixing the initial condition on every simulation.
         Y[:,0,:] = self.initial
 
         fig = go.Figure()
 
-        W = Brownian(1, self.t_0, self.t_n, self.n_steps)
+        W = Brownian(1, self.T, self.steps)
         W.simulate(self.n_simulations)
         dW = W.increments
 
-        for i in range(1,self.n_steps+1):
+        for i in range(1,self.steps+1):
             # Runge-Kutta induction formula.
             Y[:,i,:] = Y[:,i-1,:] + self.drift(Y[:,i-1,:])*self.dt + self.diffusion(Y[:,i-1,:]) * dW[:,i-1,:] + (1/2)*(self.diffusion(Y[:,i-1,:] + self.drift(Y[:,i-1,:])*self.dt+self.diffusion(Y[:,i-1,:])*np.power(self.dt,1/2)) - self.diffusion(Y[:,i-1,:]))*(dW[:,i-1,:]**2-self.dt)*np.power(self.dt,-1/2)
 
@@ -163,4 +157,5 @@ class RungeKutta:
                 template="plotly_white",
             )
             fig.show()
+
         return Y

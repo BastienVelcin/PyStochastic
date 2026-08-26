@@ -11,7 +11,7 @@ This module provides a general class "CIR", which inherits from the methods of P
 
 Examples
 --------
->> R = CIR(a=2,b=3,volatility=1,initial=0,t_0=0,t_n=1,steps=1000) #Cox-Ingersoll-Ross process with speed 2, mean 3 and volatility 1 and starting point 0.
+>> R = CIR(speed=2,mean=3,volatility=1,initial=0,T=1,steps=1000) #Cox-Ingersoll-Ross process with speed 2, mean 3 and volatility 1 and starting point 0.
 >>
 >> R.simulate() #Simulate the CIR process path
 >>
@@ -42,10 +42,8 @@ class CIR(DiffusionProcess):
         Volatility parameter.
     initial : float, or list, or np.ndarray
         Initial condition of the model.
-    t_0 : float
-        Initial time.
-    t_n : float
-        Final time. Must be strictly greater than t_0.
+    T : float
+        Final time. Must be strictly greater than 0.
     steps : int
         Number of time steps. Must be a strictly positive integer.
 
@@ -59,9 +57,7 @@ class CIR(DiffusionProcess):
         Volatility parameter.
     initial : float, or list, or np.ndarray
         Initial condition of the model.
-    t_0 : float
-        Initial time.
-    t_n : float
+    T : float
         Final time.
     steps : int
         Number of time steps.
@@ -88,7 +84,7 @@ class CIR(DiffusionProcess):
 
     Examples
     --------
-    >> R = CIR(a=2,b=3,volatility=1,initial=0,t_0=0,t_n=1,steps=1000)
+    >> R = CIR(speed=2,mean=3,volatility=1,initial=0,T=1,steps=1000)
     >> R.simulate()
     >> R.plot()
     """
@@ -98,12 +94,10 @@ class CIR(DiffusionProcess):
                  mean=1,
                  volatility=1,
                  initial=0,
-                 t_0=0,
-                 t_n=1,
+                 T=1,
                  steps=1000):
 
-        super().__init__(t_0=t_0,
-                         t_n=t_n,
+        super().__init__(T = T,
                          steps=steps)
 
         self.speed = speed
@@ -190,16 +184,16 @@ class CIR(DiffusionProcess):
         Parameters
         ----------
         t : float
-            Time at which the expectation is evaluated. Must be between t_0 and t_n.
+            Time at which the expectation is evaluated. Must be between 0 and T.
 
         Notes
         -----
         The expectation of the CIR path at every time t with a fixed initial is given by initial * exp(-speed*t) + b*(1-exp(-speed*t))
         """
 
-        if not self.t_0 <= t <= self.t_n:
+        if not 0 <= t <= self.T:
             raise ValueError(
-                "The time must be between t_0 and t_n."
+                "The time must be between 0 and T."
             )
 
         return self.initial * np.exp(-self.speed * t) + self.mean*(1-np.exp(-self.speed * t))
@@ -214,7 +208,7 @@ class CIR(DiffusionProcess):
         Parameters
         ----------
         t : float
-            Time at which the variance is evaluated. Must be between t_0 and t_n.
+            Time at which the variance is evaluated. Must be between 0 and T.
 
         Returns
         -------
@@ -227,9 +221,9 @@ class CIR(DiffusionProcess):
         initial * volatility^2/a * (exp(-a*t)-exp(-2*a*t)) + (b*volatility^2)/(2*a) * (1-exp(-a*t))^2
         """
 
-        if not self.t_0 <= t <= self.t_n:
+        if not 0 <= t <= self.T:
             raise ValueError(
-                "The time must be between t_0 and t_n."
+                "The time must be between 0 and T."
             )
 
         return self.initial * (self.volatility**2 / self.speed) * (np.exp(-self.speed*t)-np.exp(-2 * self.speed * t)) + (self.mean * self.volatility**2)/(2*self.speed) * (1-np.exp(-self.speed*t))**2

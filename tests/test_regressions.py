@@ -25,25 +25,25 @@ from pystochastic.random.setseed import seed
 
 
 # ======================================================================
-# dt / derived attributes stay in sync with t_0, t_n, steps
+# dt / derived attributes stay in sync with T, steps
 # ======================================================================
 
 class TestDerivedAttributesStayFresh:
 
     def test_dt_updates_when_steps_changes(self):
-        v = Vasicek(speed=2, mean=1.5, volatility=0.3, initial=0, t_0=0, t_n=1, steps=1000)
+        v = Vasicek(speed=2, mean=1.5, volatility=0.3, initial=0,T=1, steps=1000)
         assert v.dt == pytest.approx(0.001)
         v.steps = 50
         assert v.dt == pytest.approx(0.02)
 
     def test_dt_updates_when_horizon_changes(self):
-        v = Vasicek(speed=2, mean=1.5, volatility=0.3, initial=0, t_0=0, t_n=1, steps=100)
+        v = Vasicek(speed=2, mean=1.5, volatility=0.3, initial=0,T=1, steps=100)
         assert v.dt == pytest.approx(0.01)
-        v.t_n = 2
+        v.T = 2
         assert v.dt == pytest.approx(0.02)
 
     def test_t_grid_updates_when_steps_changes(self):
-        v = Vasicek(speed=2, mean=1.5, volatility=0.3, initial=0, t_0=0, t_n=1, steps=10)
+        v = Vasicek(speed=2, mean=1.5, volatility=0.3, initial=0, T=1, steps=10)
         assert v.t.size == 11
         v.steps = 20
         assert v.t.size == 21
@@ -51,7 +51,7 @@ class TestDerivedAttributesStayFresh:
 
     def test_cir_derived_constants_track_dt(self):
         """nu/factor/c depend on dt; changing steps must refresh all three."""
-        c = CIR(speed=2, mean=0.05, volatility=0.1, initial=0.03, t_0=0, t_n=1, steps=1000)
+        c = CIR(speed=2, mean=0.05, volatility=0.1, initial=0.03, T=1, steps=1000)
         factor_before = c.factor
         c.steps = 50
         factor_after = c.factor
@@ -88,11 +88,11 @@ class TestRungeKuttaConvergence:
 
         for n_steps in n_steps_list:
             seed(42)
-            rk = RungeKutta(drift=drift, diffusion=diffusion, initial=x0, t_0=0, t_n=1, n_steps=n_steps)
+            rk = RungeKutta(drift=drift, diffusion=diffusion, initial=x0, T=1, steps=n_steps)
             Y_rk = rk.solve(n_simulations=n_sim, plot=False)
 
             seed(42)
-            W = Brownian(1, 0, 1, n_steps)
+            W = Brownian(1,  1, n_steps)
             W.simulate(n_sim)
             W_path = np.cumsum(W.increments, axis=1)[:, :, 0]
             t_arr = np.linspace(0, 1, n_steps + 1)[1:]
@@ -115,15 +115,15 @@ class TestBrownianBridge:
 
     def test_endpoints_are_zero(self):
         seed(0)
-        bb = BrownianBridge(dim=1, t_0=0, t_n=1, steps=200)
+        bb = BrownianBridge(dim=1, T=1, steps=200)
         Y = bb.simulate(n_simulations=5000)
         assert Y[:, 0, 0].mean() == pytest.approx(0, abs=1e-9)
         assert np.abs(Y[:, -1, 0]).max() < 1e-9
 
     def test_interior_variance_matches_t_times_one_minus_t(self):
-        """Var(B_t) = t(t_n - t)/t_n; at t=0.5, t_n=1 this is 0.25."""
+        """Var(B_t) = t(T - t)/T; at t=0.5, T=1 this is 0.25."""
         seed(0)
-        bb = BrownianBridge(dim=1, t_0=0, t_n=1, steps=200)
+        bb = BrownianBridge(dim=1,T=1, steps=200)
         Y = bb.simulate(n_simulations=20000)
         mid = Y.shape[1] // 2
         assert Y[:, mid, 0].var() == pytest.approx(0.25, abs=0.02)
@@ -138,7 +138,7 @@ class TestQuadraticVariation:
     def test_matches_elapsed_time_for_standard_brownian_motion(self):
         """For standard BM, the quadratic variation on [0, t] equals t."""
         seed(0)
-        W = Brownian(variance=np.eye(1), t_0=0, t_n=1, steps=10)
+        W = Brownian(variance=np.eye(1), T=1, steps=10)
         W.simulate(n_simulations=200000)
         qv = W.quadratic_variation(t=1.0, mean=True, plot=False)
         assert qv == pytest.approx(1.0, abs=0.05)
@@ -151,7 +151,7 @@ class TestQuadraticVariation:
         specific off-by-one regression.
         """
         seed(1)
-        W = Brownian(variance=np.eye(1), t_0=0, t_n=1, steps=10)
+        W = Brownian(variance=np.eye(1), T=1, steps=10)
         W.simulate(n_simulations=200000)
         qv = W.quadratic_variation(t=1.0, mean=True, plot=False)
         assert abs(qv - 1.0) < 0.05
@@ -165,7 +165,7 @@ class TestHittingNormTime:
 
     def test_runs_on_multidimensional_process(self):
         seed(0)
-        W = Brownian(variance=np.eye(2), t_0=0, t_n=10, steps=1000)
+        W = Brownian(variance=np.eye(2), T=10, steps=1000)
         W.simulate(n_simulations=200)
         result = W.hitting_norm_time(value=1.0)
         assert result.shape == (200,)
@@ -173,7 +173,7 @@ class TestHittingNormTime:
     def test_hitting_time_increases_with_higher_threshold(self):
         """On average, it should take longer to reach a norm of 3 than a norm of 1."""
         seed(0)
-        W = Brownian(variance=np.eye(2), t_0=0, t_n=20, steps=2000)
+        W = Brownian(variance=np.eye(2), T=20, steps=2000)
         W.simulate(n_simulations=2000)
 
         low = W.hitting_norm_time(value=1.0)

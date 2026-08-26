@@ -11,7 +11,7 @@ This module provides a general class "FractionalBrownian", which inherits from t
 
 Examples
 --------
->> F = FractionalBrownian(hurst=0.7,t_0=0,t_n=1,steps=1000) #Fractional Brownian motion with hurst index 0.7
+>> F = FractionalBrownian(hurst=0.7,T=1,steps=1000) #Fractional Brownian motion with hurst index 0.7
 >>
 >> F.simulate() #Simulate the Fractional Brownian motion path
 >>
@@ -36,10 +36,8 @@ class FractionalBrownian(Process):
     ----------
     hurst : float
         Hurst index of the Fractional Brownian motion. Must be a float between 0 and 1.
-    t_0 : float
-        Initial time.
-    t_n : float
-        Final time. Must be strictly greater than t_0.
+    T : float
+        Final time. Must be strictly greater than 0.
     steps : int
         Number of time steps. Must be a strictly positive integer.
 
@@ -47,9 +45,7 @@ class FractionalBrownian(Process):
     ----------
     hurst : float
         Hurst index of the Fractional Brownian motion
-    t_0 : float
-        Initial time.
-    t_n : float
+    T : float
         Final time.
     steps : int
         Number of time steps.
@@ -64,20 +60,18 @@ class FractionalBrownian(Process):
 
     Examples
     --------
-    >> W = Brownian(variance=np.eye(2),t_0=0,t_n=1,steps=1000)
+    >> W = Brownian(variance=np.eye(2),T=1,steps=1000)
     >> W.simulate()
     >> W.plot()
     """
 
     def __init__(self,
-                 hurst=1,
-                 t_0 = 0,
-                 t_n=1,
+                 hurst=0.5,
+                 T = 1,
                  steps=1000):
 
 
-        super().__init__(t_0=t_0,
-                         t_n=t_n,
+        super().__init__(T = 1,
                          steps=steps)
 
         if not 0 < hurst < 1:
@@ -136,7 +130,7 @@ class FractionalBrownian(Process):
         Parameters
         ----------
         t : float
-            Time at which the expectation is evaluated. Must be between t_0 and t_n.
+            Time at which the expectation is evaluated. Must be between 0 and T.
 
         Returns
         -------

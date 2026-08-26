@@ -15,7 +15,7 @@ This module provides a general class "Poisson", with the following built-in meth
 
 Examples
 --------
->> P = Poisson(intensity=2,t_0=0, t_n=1, steps=1000) #Poisson process with intensity 2
+>> P = Poisson(intensity=2,T=1, steps=1000) #Poisson process with intensity 2
 >>
 >> P.simulate() #Simulate the Poisson process path
 >>
@@ -44,10 +44,8 @@ class PoissonProcess(JumpProcess):
     ----------
     intensity : float
         Intensity parameter. Must be strictly positive.
-    t_0 : float
-        Initial time.
-    t_n : float
-        Final time. Must be strictly greater than t_0.
+    T : float
+        Final time. Must be strictly greater than 0.
     steps : int
         Number of time steps. Must be a strictly positive integer.
 
@@ -55,9 +53,7 @@ class PoissonProcess(JumpProcess):
     ----------
     intensity : float
         Intensity parameter.
-    t_0 : float
-        Initial time.
-    t_n : float
+    T : float
         Final time.
     steps : int
         Number of time steps.
@@ -76,19 +72,17 @@ class PoissonProcess(JumpProcess):
 
     Examples
     --------
-    >> P = Poisson(intensity=2,t_0=0, t_n=1, steps=1000)
+    >> P = Poisson(intensity=2,T=1, steps=1000)
     >> P.simulate()
     >> P.plot()
     """
 
     def __init__(self,
                  intensity=1,
-                 t_0=0,
-                 t_n=10,
+                 T = 1,
                  steps=1000):
 
-        super().__init__(t_0 = t_0,
-                         t_n = t_n,
+        super().__init__(T = T,
                          steps = steps)
 
         self.name = "Poisson process"

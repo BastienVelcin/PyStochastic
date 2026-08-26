@@ -6,34 +6,32 @@ class Process(ABC):
 
     def __init__(
             self,
-            t_0=0,
-            t_n=1,
+            T = 1,
             steps=1000):
 
-        self.t_0 = t_0
-        self.t_n = t_n
+        self.T = T
+    
         self.steps = steps
         self.n_simulations = None
         self.path = None
 
 
-        if not t_0 < t_n:
+        if not 0 < T:
             raise ValueError(
-                "The final time must be strictly greater than the initial time."
+                "The final time must be strictly greater 0."
             )
 
         if steps <= 0:
             raise ValueError(
                 "The number of steps must be strictly positive."
             )
-
     @property
     def dt(self):
-        return (self.t_n - self.t_0) / self.steps
+        return self.T / self.steps
 
     @property
     def t(self):
-        return np.linspace(self.t_0, self.t_n, self.steps + 1)
+        return np.linspace(0, self.T, self.steps + 1)
 
     @abstractmethod
     def simulate(self):
@@ -42,9 +40,9 @@ class Process(ABC):
     @abstractmethod
     def expectation(self,t):
 
-        if not self.t_0 <= t <= self.t_n:
+        if not 0 <= t <= self.T:
             raise ValueError(
-                f"The time must be between {self.t_0} and {self.t_n}."
+                f"The time must be between 0 and {self.T}."
             )
 
         pass
@@ -52,9 +50,9 @@ class Process(ABC):
     @abstractmethod
     def covariance_matrix(self,t):
 
-        if not self.t_0 <= t <= self.t_n:
+        if not 0 <= t <= self.T:
             raise ValueError(
-                f"The time must be between {self.t_0} and {self.t_n}."
+                f"The time must be between {0} and {self.T}."
             )
 
         pass
@@ -62,9 +60,9 @@ class Process(ABC):
     @abstractmethod
     def covariance(self,t,i,j):
 
-        if not self.t_0 <= t <= self.t_n:
+        if not 0 <= t <= self.T:
             raise ValueError(
-                f"The time must be between {self.t_0} and {self.t_n}."
+                f"The time must be between {0} and {self.T}."
             )
 
         if not 0 <= i < self.dim:
@@ -81,9 +79,9 @@ class Process(ABC):
     @abstractmethod
     def variance(self,t):
 
-        if not self.t_0 <= t <= self.t_n:
+        if not 0 <= t <= self.T:
             raise ValueError(
-                f"The time must be between {self.t_0} and {self.t_n}."
+                f"The time must be between {0} and {self.T}."
             )
 
         pass
@@ -135,7 +133,6 @@ class Process(ABC):
 
         fig.update_layout(title=f"Simulations of {self.name}",
                           xaxis_title="t",
-                          yaxis_title="Quadratic Variation",
                           template="plotly_white")
         fig.show()
 

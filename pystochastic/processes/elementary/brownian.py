@@ -23,7 +23,7 @@ as well as an external trajectory simulation function.
 
 Examples
 --------
->> W = Brownian(variance=np.eye(2),dim=2,t_0=0,t_n=1,steps=1000) #Brownian motion with covariance matrix np.eye(2)
+>> W = Brownian(variance=np.eye(2),T=1,steps=1000) #Brownian motion with covariance matrix np.eye(2)
 >>
 >> W.simulate() #Simulate the Brownian motion path
 >>
@@ -52,12 +52,8 @@ class Brownian(Process):
     ----------
     variance : None, float, or np.ndarray
         Covariance matrix of the Brownian motion. If None, the covariance matrix is set to identity. The matrix must be positive-definite.
-    dim : int
-        Dimension of the brownian motion. The dimension must coincide with the dimension of the covariance matrix. Must be a strictly positive integer.
-    t_0 : float
-        Initial time.
-    t_n : float
-        Final time. Must be strictly greater than t_0.
+    T : float
+        Final time. Must be strictly greater than 0.
     steps : int
         Number of time steps. Must be a strictly positive integer.
 
@@ -65,11 +61,7 @@ class Brownian(Process):
     ----------
     variance : None, float, or np.ndarray
         Covariance matrix of the Brownian motion. If None, the covariance matrix is set to identity.
-    dim : int
-        Dimension of the brownian motion.
-    t_0 : float
-        Initial time.
-    t_n : float
+    T : float
         Final time.
     steps : int
         Number of time steps.
@@ -86,19 +78,17 @@ class Brownian(Process):
 
     Examples
     --------
-    >> W = Brownian(variance=np.eye(2),t_0=0,t_n=1,steps=1000)
+    >> W = Brownian(variance=np.eye(2),T=1,steps=1000)
     >> W.simulate()
     >> W.plot()
     """
 
     def __init__(self,
                  variance=1,
-                 t_0=0,
-                 t_n=1,
+                 T=1,
                  steps=1000):
 
-        super().__init__(t_0=t_0,
-                         t_n=t_n,
+        super().__init__(T=T,
                          steps=steps)
 
         self.name = "Brownian Motion"
@@ -132,7 +122,7 @@ class Brownian(Process):
 
         self.n_simulations = n_simulations
 
-        self.sim = brownian_motion(self.variance, self.t_0,self.t_n,self.steps, n_simulations)
+        self.sim = brownian_motion(self.variance, self.T,self.steps, n_simulations)
         self.path = self.sim[0]
         self.increments = self.sim[1]
 
@@ -152,7 +142,7 @@ class Brownian(Process):
         Parameters
         ----------
         t : float
-            Time at which the expectation is evaluated. Must be between t_0 and t_n.
+            Time at which the expectation is evaluated. Must be between 0 and T.
 
         Returns
         -------
@@ -176,7 +166,7 @@ class Brownian(Process):
         Parameters
         ----------
         t : float
-            Time at which the covariance matrix is evaluated. Must be between t_0 and t_n.
+            Time at which the covariance matrix is evaluated. Must be between 0 and T.
 
         Returns
         -------
@@ -238,7 +228,7 @@ class Brownian(Process):
         return np.array([self.covariance(t,i,i) for i in range(self.dim)])
 
 
-def brownian_motion(variance=1, t_0 = 0, t_n = 1, steps = 1000,n_simulations=1):
+def brownian_motion(variance=1, T=1, steps = 1000,n_simulations=1):
 
     """
     Brownian motion function.
@@ -258,7 +248,7 @@ def brownian_motion(variance=1, t_0 = 0, t_n = 1, steps = 1000,n_simulations=1):
     dW = np.zeros((n_simulations, steps, d))
 
     # Computation of the step length and Cholesky decomposition
-    h = (t_n - t_0) / steps
+    h = T / steps
     L = np.linalg.cholesky(variance)  # The Cholesky decomposition of the covariance matrix is analogous to the square root for matrices.
 
     N = continuous.normal(0, 1, n_simulations * steps * d)

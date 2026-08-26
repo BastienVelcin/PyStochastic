@@ -1,0 +1,79 @@
+# Brownian Bridge 
+
+## Import line
+You can import the Brownian Bridge class from the `processes` module as follows:
+```python
+from pystochastic.processes import BrownianBridge
+```
+## Description
+
+```python
+pystochastic.processes.BrownianBridge(dim = 1, t_0 = 0, t_n = 1, steps = 1000)
+```
+**Type :** Class
+
+Creates an instance of a $d$-dimensional Brownian Bridge on the interval $[t_0, t_n]$. A Brownian Bridge is a process $(B_t)_{t\geq 0}$ defined, for all $t\in\mathbb{R_+}$ by
+\begin{equation*}
+B_t = W_t + \frac{t-t_0}{2} \int_{t_0}^{t} Q(s) \mathrm{d}s
+\end{equation*}
+
+>[!NOTE]
+> A $d$-dimensional Brownian motion is said standard if $Q = \mathrm{Id}_d$.
+
+The Brownian motion is one of the fundamental object of stochastic calculus, since it mathematically formalizes the concept of random motion.
+It appears naturally in stochastic differential equations, and so, within the diffusion process definitions.
+
+### Parameters
+
+`variance` : _float_ or _np.ndarray_
+: Variance-covariance matrix of the Brownian motion. In the previous example, it is represented by $Q$.
+
+`t_0` : _float_
+: Initial time of the Brownian motion simulation.
+
+`t_n` : _float_
+: Final time of the Brownian motion simulation. Must be greater than `t_0`.
+
+`steps` : _int_
+: Number of time steps between `t_0` and `t_n` on which the Brownian motion is simulated. Must be strictly greater than 0.
+
+### Attributes
+The Brownian motion inherits all attributes from the [Processes](<project:/index.md>) class.
+### Methods
+The Cauchy distribution inherits all methods from the [Processes](<project:/index.md>) class.
+
+## Examples
+
+```python
+>>> W = Brownian(variance = np.eye(2),t_0 = 0, t_n = 1, steps = 1000)
+>>> W.simulate(2, plot = True)
+array([[[ 0.        ,  0.        ],
+        [-0.00944504, -0.0103207 ],
+        [-0.01089965, -0.06896138],
+        ...,
+        [-0.26183923, -0.04326542],
+        [-0.32149696, -0.0815789 ],
+        [-0.36599909, -0.04858352]],
+       [[ 0.        ,  0.        ],
+        [ 0.07904865, -0.01548704],
+        [ 0.03610401, -0.05401726],
+        ...,
+        [-1.79254653, -1.4591608 ],
+        [-1.7628466 , -1.44618102],
+        [-1.7475036 , -1.40262064]]], shape=(2, 1001, 2))
+>>> dW = W.increments
+dW
+array([[[-0.00944504, -0.0103207 ],
+        [-0.00145461, -0.05864069],
+        [ 0.01951358, -0.04491318],
+        ...,
+        [ 0.00941946,  0.00232427],
+        [-0.05965772, -0.03831348],
+        [-0.04450214,  0.03299538]],
+       [[ 0.07904865, -0.01548704],
+        [-0.04294464, -0.03853022],
+        [ 0.00371223, -0.01490523],
+        ...,
+        [-0.04196104, -0.0015993 ],
+        [ 0.02969993,  0.01297978],
+        [ 0.015343  ,  0.04356038]]], shape=(2, 1000, 2))

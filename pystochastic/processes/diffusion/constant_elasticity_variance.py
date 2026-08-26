@@ -11,7 +11,7 @@ This module provides a general class "CEV", which inherits from the methods of P
 
 Examples
 --------
->> C = CEV(speed=3,volatility=2.2,relation=0.5,initial=12,t_0=0,t_n=1,steps=1000) #CEV process with speed 3, volatility 2.2, relation 0.5 and starting point 12.
+>> C = CEV(speed=3,volatility=2.2,relation=0.5,initial=12,T=1,steps=1000) #CEV process with speed 3, volatility 2.2, relation 0.5 and starting point 12.
 >>
 >> C.simulate() #Simulate the CEV process path
 >>
@@ -40,10 +40,8 @@ class CEV(DiffusionProcess):
         Constant relation parameter between the price and the volatility.
     initial : float
         Initial condition of the model.
-    t_0 : float
-        Initial time.
-    t_n : float
-        Final time. Must be strictly greater than t_0.
+    T : float
+        Final time. Must be strictly greater than 0.
     steps : int
         Number of time steps. Must be a strictly positive integer.
 
@@ -57,9 +55,7 @@ class CEV(DiffusionProcess):
         Constant relation parameter between the price and the volatility.
     initial : float
         Initial condition of the model.
-    t_0 : float
-        Initial time.
-    t_n : float
+    T : float
         Final time.
     steps : int
         Number of time steps.
@@ -80,7 +76,7 @@ class CEV(DiffusionProcess):
 
     Examples
     --------
-    >> C = CEV(speed=3,volatility=2.2,relation=0.5,initial=12,t_0=0,t_n=1,steps=1000)
+    >> C = CEV(speed=3,volatility=2.2,relation=0.5,initial=12,T=1,steps=1000)
     >> C.simulate()
     >> C.plot()
     """
@@ -90,12 +86,10 @@ class CEV(DiffusionProcess):
                  volatility=1,
                  relation=1,
                  initial=1,
-                 t_0=0,
-                 t_n=1,
+                 T = 1,
                  steps=1000):
 
-        super().__init__(t_0=t_0,
-                         t_n=t_n,
+        super().__init__(T = T,
                          steps=steps)
 
         self.name = "CEV process"
@@ -182,7 +176,7 @@ class CEV(DiffusionProcess):
         Parameters
         ----------
         t : float
-            Time at which the expectation is evaluated. Must be between t_0 and t_n.
+            Time at which the expectation is evaluated. Must be between 0 and T.
 
         Returns
         -------

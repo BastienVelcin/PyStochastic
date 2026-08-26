@@ -94,12 +94,12 @@ def rmse(process):
     for i, steps in enumerate(n_steps):
 
         steps = int(steps)
-        process.n_steps = steps
+        process.steps = steps
 
         # We need to update the time grid at every different value of "n_steps"
         process.t = np.linspace(
-            process.t_0,
-            process.t_n,
+            0,
+            process.T,
             steps + 1
         )
         process.dt = (process.t[-1] - process.t[0]) / steps
@@ -202,7 +202,7 @@ def monte_carlo_convergence(
     n_simulations = np.asarray(n_simulations, dtype=int)
 
     # Exact theoretical expectation
-    t = process.t_n
+    t = process.T
     exact_mean = np.asarray(process.mean(t)).item()
 
     mc_rmse = np.zeros(n_simulations.size)

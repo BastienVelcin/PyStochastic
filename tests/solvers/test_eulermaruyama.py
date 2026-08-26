@@ -81,8 +81,8 @@ def rmse(process):
 
         # We need to update the time grid at every different value of "n_steps"
         process.t = np.linspace(
-            process.t_0,
-            process.t_n,
+            0,
+            process.T,
             steps + 1
         )
         process.dt = (process.t[-1]-process.t[0])/steps
@@ -158,7 +158,7 @@ def monte_carlo_convergence(
     n_simulations = np.asarray(n_simulations, dtype=int)
 
     # Exact theoretical expectation
-    t = process.t_n
+    t = process.T
     exact_mean = np.asarray(process.mean(t)).item()
 
     mc_rmse = np.zeros(n_simulations.size)
@@ -284,7 +284,7 @@ def weak_error(process, n_steps=(50, 100, 200, 400, 800), n_simulations=50000,
         Ordre de convergence faible estime (pente log-log par moindres carres).
     """
     n_steps = np.asarray(n_steps)
-    t = process.t_n
+    t = process.T
     exact_mean = np.atleast_1d(process.mean(t)).item()
 
     errors = np.zeros((n_steps.size, n_repeats))
@@ -292,8 +292,8 @@ def weak_error(process, n_steps=(50, 100, 200, 400, 800), n_simulations=50000,
     for i, steps in enumerate(n_steps):
         steps = int(steps)
         process.n_steps = steps
-        process.t = np.linspace(process.t_0, process.t_n, steps + 1)
-        process.dt = (process.t_n - process.t_0) / steps
+        process.t = np.linspace(0, process.t, steps + 1)
+        process.dt = process.T / steps
 
         for r in range(n_repeats):
             seed(base_seed + r)

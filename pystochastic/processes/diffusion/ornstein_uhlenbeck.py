@@ -12,7 +12,7 @@ DiffusionProcess abstract classes.
 
 Examples
 --------
->> R = OrnsteinUhlenbeck(mean=[2,1],speed=np.ones((2,2)),volatility=np.ones((2,2)),initial=[1,1],t_0=0,t_n=1,steps=1000) #Ornstein-Uhlenbeck process with mean [2,1] and diffusion and form parameter np.ones((2,2)) and starting point [1,1]
+>> R = OrnsteinUhlenbeck(mean=[2,1],speed=np.ones((2,2)),volatility=np.ones((2,2)),initial=[1,1],T=1,steps=1000) #Ornstein-Uhlenbeck process with mean [2,1] and diffusion and form parameter np.ones((2,2)) and starting point [1,1]
 >>
 >> R.simulate() #Simulate the Ornstein-Uhlenbeck process path
 >>
@@ -44,10 +44,8 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         Constant matrix volatility parameter. The dimension of the matrix must coincide with the dimension of the starting point and the vector drift.
     initial : float, or list, or np.ndarray
         Initial condition of the model. The dimension of the starting point must coincide with the dimension of volatility and speed.
-    t_0 : float
-        Initial time.
-    t_n : float
-        Final time. Must be strictly greater than t_0.
+    T : float
+        Final time. Must be strictly greater than 0.
     steps : int
         Number of time steps. Must be a strictly positive integer.
 
@@ -61,9 +59,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         Constant matrix shape parameter.
     initial : float, or list, or np.ndarray
         Initial condition of the model.
-    t_0 : float
-        Initial time.
-    t_n : float
+    T : float
         Final time.
     steps : int
         Number of time steps.
@@ -86,7 +82,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
 
     Examples
     --------
-    >> R = OrnsteinUhlenbeck(mean=[2,2],volatility=np.ones((2,2)),speed=np.ones((2,2)),initial=[1,1],t_0=0,t_n=1,steps=1000)
+    >> R = OrnsteinUhlenbeck(mean=[2,2],volatility=np.ones((2,2)),speed=np.ones((2,2)),initial=[1,1],T=1,steps=1000)
     >> R.simulate()
     >> R.plot()
     """
@@ -96,13 +92,11 @@ class OrnsteinUhlenbeck(DiffusionProcess):
                  speed=1,
                  volatility=1,
                  initial=0,
-                 t_0=0,
-                 t_n=1,
+                 T = 1,
                  steps=1000):
 
 
-        super().__init__(t_0=t_0,
-                         t_n=t_n,
+        super().__init__(T = T,
                          steps=steps)
 
         self.name = "Ornstein Uhlenbeck process"
@@ -244,7 +238,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         Parameters
         ----------
         t : float
-            Time at which the expectation is evaluated. Must be between t_0 and t_n.
+            Time at which the expectation is evaluated. Must be between 0 and T.
 
         Returns
         -------

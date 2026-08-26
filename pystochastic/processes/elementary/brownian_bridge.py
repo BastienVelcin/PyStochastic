@@ -11,7 +11,7 @@ This module provides a general class "BrownianBridge", which inherits from the m
 
 Examples
 --------
->> B = BrownianBridge(dim=2,t_0=0,t_n=1,steps=1000) #Brownian bridge with covariance matrix np.eye(2)
+>> B = BrownianBridge(dim=2,T=1,steps=1000) #Brownian bridge with covariance matrix np.eye(2)
 >>
 >> B.simulate() #Simulate the Brownian bridge path
 >>
@@ -33,10 +33,8 @@ class BrownianBridge(Process):
     ----------
     dim : int
         Dimension of the brownian motion. The dimension must coincide with the dimension of the covariance matrix. Must be a strictly positive integer.
-    t_0 : float
-        Initial time.
-    t_n : float
-        Final time. Must be strictly greater than t_0.
+    T : float
+        Final time. Must be strictly greater than 0.
     steps : int
         Number of time steps. Must be a strictly positive integer.
 
@@ -44,9 +42,7 @@ class BrownianBridge(Process):
     ----------
     dim : int
         Dimension of the brownian motion.
-    t_0 : float
-        Initial time.
-    t_n : float
+    T : float
         Final time.
     steps : int
         Number of time steps.
@@ -59,14 +55,16 @@ class BrownianBridge(Process):
 
     Examples
     --------
-    >> B = BrownianBridge(dim=2,t_0=0,t_n=1,steps=1000)
+    >> B = BrownianBridge(dim=2,T=1,steps=1000)
     >> B.simulate()
     >> B.plot()
     """
-    def __init__(self,dim=1,t_0=0,t_n=1,steps=1000):
+    def __init__(self,
+                 dim=1,
+                 T = 1,
+                 steps=1000):
 
-        super().__init__(t_0 = t_0,
-                         t_n = t_n,
+        super().__init__(T = T,
                          steps = steps)
         self.name = "Brownian Bridge"
         self.dim = dim
@@ -77,7 +75,7 @@ class BrownianBridge(Process):
         Simulate method.
 
         Simulate a Brownian Bridge path using the following formula:
-            B_t = W_t - (t/t_n * W_{t_n})
+            B_t = W_t - (t/T * W_{T})
 
         Parameters
         ----------
@@ -91,25 +89,25 @@ class BrownianBridge(Process):
         np.ndarray
             Path of the simulated Brownian Bridge process of the form ``(n_simulations, steps + 1, dim)``.
         """
-
-        W = Brownian(variance = np.eye(self.dim), t_0 = self.t_0, t_n = self.t_n, steps = self.steps)
+        self.n_simulations = n_simulations
+        W = Brownian(variance = np.eye(self.dim), T = self.T, steps = self.steps)
         W.simulate(n_simulations = n_simulations)
         self.path = np.zeros((n_simulations,self.steps+1, self.dim))
-        self.path = W.path - (self.t/self.t_n * W.path[:, -1, :])[:,:,None]
+
+        self.path = W.path - np.einsum("t,sd->std",self.t / self.T,W.path[:, -1, :])
         if plot:
             self.plot()
 
-        self.n_simulations = n_simulations
         return self.path
 
     def expectation(self,t):
         return 0
 
     def variance(self,t):
-        return np.diag(t*(self.t_n - t)/self.t_n*np.eye(self.dim))
+        return np.diag(t*(self.T - t)/self.T*np.eye(self.dim))
 
     def covariance_matrix(self,t):
-        return t*(self.t_n - t)/self.t_n*np.eye(self.dim)
+        return t*(self.T - t)/self.T*np.eye(self.dim)
 
     def covariance(self,t,i,j):
-        return t*(self.t_n - t)/self.t_n if i == j else 0
+        return t*(self.T - t)/self.T if i == j else 0

@@ -12,7 +12,7 @@ DiffusionProcess abstract classes.
 
 Examples
 --------
->> S = GeometricBrownianMotion(mu=[2,1],volatility=np.eye(2),initial=[1,1],t_0=0,t_n=1,steps=1000) #Geometric Brownian Motion with mean [2,1] and covariance matrix np.eye(2) and starting point [1,1]
+>> S = GeometricBrownianMotion(mu=[2,1],volatility=np.eye(2),initial=[1,1],T=1,steps=1000) #Geometric Brownian Motion with mean [2,1] and covariance matrix np.eye(2) and starting point [1,1]
 >>
 >> S.simulate() #Simulate the Brownian motion path
 >>
@@ -43,10 +43,8 @@ class GeometricBrownianMotion(DiffusionProcess):
         Constant matrix drift of the model. The dimension of the matrix must coincide with the dimension of the starting point and the vector mu.
     initial : None, float, or list, or np.ndarray
         Initial condition of the model. The dimension of the starting point must coincide with the dimension of the covariance matrix and the vector mu.
-    t_0 : float
-        Initial time.
-    t_n : float
-        Final time. Must be strictly greater than t_0.
+    T : float
+        Final time. Must be strictly greater than 0.
     steps : int
         Number of time steps. Must be a strictly positive integer.
 
@@ -58,9 +56,7 @@ class GeometricBrownianMotion(DiffusionProcess):
         Factor diffusion matrix of the model.
     initial : None, float, or list, or np.ndarray
         Initial condition of the model.
-    t_0 : float
-        Initial time.
-    t_n : float
+    T : float
         Final time.
     steps : int
         Number of time steps.
@@ -81,7 +77,7 @@ class GeometricBrownianMotion(DiffusionProcess):
 
     Examples
     --------
-    >> S = GeometricBrownianMotion(mu=[2,1],volatility=np.eye(2),initial=[1,1],t_0=0,t_n=1,steps=1000)
+    >> S = GeometricBrownianMotion(mu=[2,1],volatility=np.eye(2),initial=[1,1],T=1,steps=1000)
     >> S.simulate()
     >> S.plot()
     """
@@ -90,12 +86,10 @@ class GeometricBrownianMotion(DiffusionProcess):
                  mu=1,
                  volatility=1,
                  initial=None,
-                 t_0=0,
-                 t_n=1,
+                 T=1,
                  steps=1000):
 
-        super().__init__(t_0=t_0,
-                         t_n=t_n,
+        super().__init__(T = T,
                          steps=steps)
 
         self.name = "Geometric Brownian Motion"
@@ -155,7 +149,7 @@ class GeometricBrownianMotion(DiffusionProcess):
         """
         Exact simulation method.
 
-        Simulate a Geometric Brownian Motion path using both the the explicit solution.
+        Simulate a Geometric Brownian Motion path using both the explicit solution.
 
         Parameters
         ----------
@@ -172,7 +166,7 @@ class GeometricBrownianMotion(DiffusionProcess):
 
         self.path = np.zeros((n_simulations,self.steps+1, self.dim))
 
-        W = Brownian(np.eye(self.dim), self.t_0, self.t_n, self.steps)
+        W = Brownian(np.eye(self.dim), self.T, self.steps)
         W.simulate(n_simulations=n_simulations)
         #If the volatility is a scalar, a vector or a diagonal matrix, then volatility is reshaped as a vector,
         # so we need to sum on the only available axis. Otherwise, volatility is a matrix, and we need to sum on the axis 1.
@@ -205,7 +199,7 @@ class GeometricBrownianMotion(DiffusionProcess):
         Parameters
         ----------
         t : float
-            Time at which the expectation is evaluated. Must be between t_0 and t_n.
+            Time at which the expectation is evaluated. Must be between 0 and T.
 
         Returns
         -------
@@ -230,7 +224,7 @@ class GeometricBrownianMotion(DiffusionProcess):
         Parameters
         ----------
         t : float
-            Time at which the covariance is evaluated. Must be between t_0 and t_n.
+            Time at which the covariance is evaluated. Must be between 0 and T.
         i : int
             Index of the first coordinate. It must verify 0 <= i < dim.
         j : int

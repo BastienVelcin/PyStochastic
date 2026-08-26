@@ -11,7 +11,7 @@ This module provides a general class "Vasicek", which inherits from the methods 
 
 Examples
 --------
->> R = Vasicek(speed=2,mean=3,volatility=1,initial=0,t_0=0,t_n=1,steps=1000) #Vasicek process with speed 2, mean 3 and volatility 1 and starting point 0.
+>> R = Vasicek(speed=2,mean=3,volatility=1,initial=0,T=1,steps=1000) #Vasicek process with speed 2, mean 3 and volatility 1 and starting point 0.
 >>
 >> R.simulate() #Simulate the Vasicek process path
 >>
@@ -46,10 +46,8 @@ class Vasicek(DiffusionProcess):
         Volatility matrix. The dimension of the vector must coincide with the dimension of the reversion speed matrix.
     initial : float, or list, or np.ndarray
         Initial condition of the model. The dimension of the vector must coincide with the dimension of the reversion speed matrix.
-    t_0 : float
-        Initial time.
-    t_n : float
-        Final time. Must be strictly greater than t_0.
+    T : float
+        Final time. Must be strictly greater than 0.
     steps : int
         Number of time steps. Must be a strictly positive integer.
 
@@ -63,9 +61,7 @@ class Vasicek(DiffusionProcess):
         Volatility matrix.
     initial : float, or list, or np.ndarray
         Initial condition of the model.
-    t_0 : float
-        Initial time.
-    t_n : float
+    T : float
         Final time.
     steps : int
         Number of time steps.
@@ -88,7 +84,7 @@ class Vasicek(DiffusionProcess):
 
     Examples
     --------
-    >> R = Vasicek(speed=2,mean=3,volatility=1,initial=0,t_0=0,t_n=1,steps=1000)
+    >> R = Vasicek(speed=2,mean=3,volatility=1,initial=0,T=1,steps=1000)
     >> R.simulate()
     >> R.plot()
     """
@@ -98,12 +94,10 @@ class Vasicek(DiffusionProcess):
                  speed=1,
                  volatility=1,
                  initial=0,
-                 t_0=0,
-                 t_n=1,
+                 T = 1,
                  steps=1000):
 
-        super().__init__(t_0=t_0,
-                         t_n=t_n,
+        super().__init__(T = T,
                          steps=steps)
 
         self.name = "Vasicek process"
@@ -245,7 +239,7 @@ class Vasicek(DiffusionProcess):
         Parameters
         ----------
         t : float
-            Time at which the expectation is evaluated. Must be between t_0 and t_n.
+            Time at which the expectation is evaluated. Must be between 0 and T.
 
         Returns
         -------
@@ -258,7 +252,7 @@ class Vasicek(DiffusionProcess):
                             initial * exp(-speed*t) + mean * (Id - exp(-volatility*t))
         """
 
-        return self.mean + scipy.linalg.expm(-self.m_speed * (t - self.t_0)) @ (self.initial - self.mean)
+        return self.mean + scipy.linalg.expm(-self.m_speed * t) @ (self.initial - self.mean)
 
     def covariance_matrix(self, t):
 
