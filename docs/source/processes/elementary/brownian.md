@@ -40,43 +40,10 @@ When
 
 ### Attributes
 The Brownian class inherits all attributes from the [Processes](<project:/processes/index.md>) class.
+It also possesses the attributes deduced from its parameters.
+
 ### Methods
 
-#### .simulate(n_simulations = 1, plot = False)
-Simulate a $d$-dimensional Brownian motion of covariance matrix `variance` on the interval $[0,T]$.
-**Parameters**
-
-`n_simulations` : _int_
-: Number of desired simulations.
-
-`plot` : _bool_
-: Specifies whether to plot the simulation.
-
-**Returns**
-
-_np.ndarray_
-: Path of `n_simulations` Brownian motions on $[0,T]$. The final array is a three-dimensional array such that :
-- 1st dimension is the number of simulations
-- 2nd dimension is the number of time steps
-- 3rd dimension is the dimension of the Brownian motion
-
-For example, if we run 4 simulations of a 2D standard Brownian motion on the interval $[0,1]$ with 1000 time steps with the following code:
-```python
-W = Brownian(variance = np.eye(2), T = 1, steps = 1000)
-W.simulate(n_simulations = 4, plot = False)
-```
-then we can access to the first simulation with:
-```python
-W.path[0]
-```
-or to the second coordinates of the third simulation with:
-```python
-W.path[2,:,1]
-```
-or to the value of each path at the 201th time step with:
-```python
-W.path[:,200,:]
-```
 The Brownian class inherits all methods from the [Processes](<project:/processes/index.md>) class.
 ## Examples
 

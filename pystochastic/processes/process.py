@@ -2,6 +2,7 @@ import numpy as np
 import plotly.graph_objects as go
 from abc import abstractmethod, ABC
 
+
 class Process(ABC):
 
     def __init__(
@@ -206,7 +207,7 @@ class Process(ABC):
         return np.min(self.path, axis=1), argmin, self.t[argmin]
 
 
-    def max_norm(self):
+    def max_norm(self, order=2):
 
         """
         Max norm method
@@ -214,14 +215,15 @@ class Process(ABC):
         The max norm method returns the maximum of the norm value of the process, the time index at which the maximum norm value
         occurs, and the corresponding time.
 
+        Parameters
+        ----------
+        order : int
+            Order of the norm. If order = p, then || (x_1 , ... x,n) || = (x_1^p + ... x_n^p)^(1/p).
+
         Returns
         -------
         tuple
             Value of the maximum norm value, time index at which the maximum norm occurs, and corresponding time.
-
-        Notes
-        -----
-        The norm used in this function is the Euclidean norm.
         """
 
         if self.path is None:
@@ -229,7 +231,7 @@ class Process(ABC):
                 "The path has not been simulated yet. Please run the simulate method first."
             )
 
-        norms = np.sum(self.path**2, axis=2)
+        norms = np.linalg.norm(self.path**2, ord=order, axis=2)
         arg_max = np.argmax(norms, axis=1)
         values = (self.path[np.arange(0,self.n_simulations),arg_max,:])
         return values, norms[arg_max], arg_max, self.t[arg_max]
@@ -269,8 +271,19 @@ class Process(ABC):
             raise ValueError(
                 "The inequality must be either '<' or '>'"
             )
-        candidates = self.path >= value if inequality == ">" else self.path <= value
-        return np.where(candidates.any(axis=1),candidates.argmax(axis=1), None)
+
+        path = self.path[:,:,0]
+        candidates = path >= value if inequality == ">" else path <= value
+
+        selected = candidates.any(axis=1)
+
+        first_indexes = candidates.argmax(axis=1)
+
+        t_indexes = np.where(selected,first_indexes,np.nan)
+
+        t_val = np.where(selected, self.t[first_indexes], np.nan)
+
+        return t_indexes, t_val
 
     def hitting_norm_time(self,value, inequality=">", order=2):
 
@@ -312,7 +325,16 @@ class Process(ABC):
             )
 
         candidates = np.linalg.norm(self.path,axis=2,ord=order) >= value if inequality == ">" else np.linalg.norm(self.path,axis=2,ord=order) <= value
-        return np.where(candidates.any(axis=1),candidates.argmax(axis=1), None)
+
+        selected = candidates.any(axis=1)
+
+        first_indexes = candidates.argmax(axis=1)
+
+        t_indexes = np.where(selected,first_indexes,np.nan)
+
+        t_val = np.where(selected, self.t[first_indexes], np.nan)
+
+        return t_indexes, t_val
 
     def _quad_var_at_index(self, t_index):
         if t_index == 0:
