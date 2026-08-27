@@ -19,9 +19,9 @@ Creates an instance of a $d$-dimensional Brownian Bridge on the interval $[0, T]
 >[!NOTE]
 > A $d$-dimensional Brownian bridge can be defined, for all $t\in[0,T] by the following equation:
 >
-> \begin{equation}
+> \begin{equation*}
 > B_t = W_t - \frac{t}{T}W_T
-> \end{*equation}
+> \end{equation*}
 >
 > where $(W_t)_{t\geq 0}$ is a standard $d$-dimensional Brownian motion. 
 
