@@ -1,5 +1,3 @@
-from pystochastic.processes import GeometricBrownianMotion
-
 # Diffusion Process class
 
 The `DiffusionProcess` module provides an abstract class for all diffusion processes. A diffusion process is a stochastic process that is defined as a solution of a stochastic differential equation of the following form:
