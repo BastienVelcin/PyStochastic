@@ -37,7 +37,7 @@ The Gamma distribution inherits all methods from the [Continuous-Time Distributi
 ## Examples
 
 ```python
->>> from pystochastic.dist.dist import Gamma
+>>> from pystochastic.dist import Gamma
 >>> G = Gamma(2,3.5)
 >>> G.sample(8)
 array([0.5225304 , 0.74659204, 0.20366063, 0.40455494, 0.31522825,

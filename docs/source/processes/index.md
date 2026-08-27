@@ -150,7 +150,7 @@ For a multidimensional process, the `covariance` method returns the covariance o
 : First coordinate index of the process. It must verify $0 \leq i < \mathrm{dim}_X$.
 
 `j` : _int_
-: Second coordinate index of the process. It must verify $0 \leq i < \mathrm{dim}_X$
+: Second coordinate index of the process. It must verify $0 \leq j < \mathrm{dim}_X$
 
 
 **Returns**
@@ -165,7 +165,7 @@ _float_
 ```
 For a multidimensional process, the `covariance_matrix` method returns the covariance matrix the effective process at time `t`. The covariance matrix of a $d$-dimensional stochastic process $(X_t)_{t\geq 0}$ is given by
 \begin{equation*}
-\Gamma(i,j)=\mathrm{Cov}(X_t^i,X_t^j)~~ \forall 0 \leq i,j < \mathrm{dim}_X
+\Gamma(i,j)=\mathrm{Cov}(X_t^i,X_t^j),~~~ \forall~ 0 \leq i,j < \mathrm{dim}_X
 \end{equation*}
 
 > [!NOTE]
@@ -330,9 +330,9 @@ _tuple_ : (np.ndarray, np.ndarray)
 ```
 Returns an estimation of the quadratic variation process deduced from all simulations of the process. The quadratic variation of process $(X_t)_{t\geq 0}$ is defined as
 \begin{equation*}
-<X>_t = \lim_{n\to\+infty} \sum_{i=1}^n \left(X_{t_i^n}-X_{t_{i-1}^n}\right)^2
+<X>_t = \lim_{n\to +\infty} \sum_{i=1}^n \left(X_{t_i^n}-X_{t_{i-1}^n}\right)^2
 \end{equation*}
-where (t_i^n)_{1\leq i \leq n} is a mesh of $[0,T]$.
+where $(t_i^n)_{1\leq i \leq n}$ is a mesh of $[0,T]$.
 
 > [!NOTE]
 > This method is only implemented for unidimensional processes.
@@ -350,10 +350,11 @@ where (t_i^n)_{1\leq i \leq n} is a mesh of $[0,T]$.
 
 **Returns**
 
-_np.ndarray_ :
-    Estimation of the quadratic variation of the process at time `t`.
+_np.ndarray_ 
+: Estimation of the quadratic variation of the process at time `t`.
 
 ## Implemented processes
+
 ```{toctree}
 :maxdepth: 1
 :caption: Elementary processes

@@ -1,4 +1,4 @@
-# Brownian motion
+# Brownian Motion
 
 ## Import line
 You can import the Brownian motion class from the `processes` module as follows:

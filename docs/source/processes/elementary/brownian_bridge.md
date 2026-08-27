@@ -8,7 +8,7 @@ from pystochastic.processes import BrownianBridge
 ## Description
 
 ```python
-pystochastic.processes.BrownianBridge(dim = 1, t_0 = 0, t_n = 1, steps = 1000)
+pystochastic.processes.BrownianBridge(dim = 1, T = 1, steps = 1000)
 ```
 **Type :** Class
 
@@ -20,8 +20,8 @@ Creates an instance of a $d$-dimensional Brownian Bridge on the interval $[0, T]
 > A $d$-dimensional Brownian bridge can be defined, for all $t\in[0,T] by the following equation:
 >
 > \begin{equation}
-> B_t = W_t + \frac{t}{T}W_T
-> \begin{*equation}
+> B_t = W_t - \frac{t}{T}W_T
+> \end{*equation}
 >
 > where $(W_t)_{t\geq 0}$ is a standard $d$-dimensional Brownian motion. 
 
