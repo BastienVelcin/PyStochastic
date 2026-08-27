@@ -67,7 +67,7 @@ W.path[:,200,:]
 
 #### .plot()
 ```python
-.plot()
+.plot(density = True)
 ```
 Plots all the previous simulations of the effective process.
 
@@ -76,7 +76,8 @@ Plots all the previous simulations of the effective process.
 
 **Parameters**
 
-No parameters.
+`density` : _bool_
+: If `True`, the plot shows the empirical probability density function of the effective process and the true probability density function (if it exists).
 
 **Returns**
 

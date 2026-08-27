@@ -289,3 +289,14 @@ class GeometricBrownianMotion(DiffusionProcess):
         """
 
         return np.array([self.covariance(t,i,i) for i in range(self.dim)])
+
+    def density(self,t,x):
+
+        if self.dim > 1:
+            raise ValueError(
+                "The density is only defined implemented for 1D processes yet."
+            )
+
+        if t == 0:
+            return np.array([0])
+        return 1/(x*self.volatility*np.sqrt(2*np.pi*t)) * np.exp(-(np.log(x)-(np.log(self.initial)+(self.mu-0.5*self.volatility**2)*t))**2/(2*self.volatility**2 * t))

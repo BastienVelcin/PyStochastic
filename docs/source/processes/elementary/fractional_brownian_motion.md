@@ -96,3 +96,4 @@ array([[0.00000000e+00, 2.39441791e-04, 2.59528137e-04, ...,
 
 - Mandelbrot, B. B., & Van Ness, J. W. (1968). Fractional Brownian Motions, Fractional Noises and Applications. SIAM Review, 10(4), 422–437. http://www.jstor.org.bases-doc.univ-lorraine.fr/stable/2027184
 - Nourdin, I. (2012). Selected Aspects of Fractional Brownian Motion. Springer Milan. https://doi.org/10.1007/978-88-470-2823-4
+- Vojta, T., Warhover, A. (2020). Probability density of fractional Brownian motion and the fractional Langevin equation with absorbing walls. arXiv. https://doi.org/10.48550/ARXIV.2012.03142

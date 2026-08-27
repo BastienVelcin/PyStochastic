@@ -21,7 +21,7 @@ Examples
 import numpy as np
 from pystochastic.processes.process import Process
 from pystochastic.processes.elementary.brownian import Brownian
-
+from pystochastic.dist import Normal
 class BrownianBridge(Process):
 
     """
@@ -115,3 +115,9 @@ class BrownianBridge(Process):
 
     def covariance(self,t,i,j):
         return t*(self.T - t)/self.T if i == j else 0
+
+    def density(self,t,x):
+        if t == 0 or t == self.T:
+            return np.array([0])
+        N = Normal(mu = 0, sd = np.sqrt(t*(self.T - t)/self.T))
+        return N.pdf(x)

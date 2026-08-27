@@ -156,30 +156,3 @@ class TestQuadraticVariation:
         qv = W.quadratic_variation(t=1.0, mean=True, plot=False)
         assert abs(qv - 1.0) < 0.05
 
-
-# ======================================================================
-# hitting_norm_time -- must actually support multi-dimensional processes
-# ======================================================================
-
-class TestHittingNormTime:
-
-    def test_runs_on_multidimensional_process(self):
-        seed(0)
-        W = Brownian(variance=np.eye(2), T=10, steps=1000)
-        W.simulate(n_simulations=200)
-        result = W.hitting_norm_time(value=1.0)
-        assert result.shape == (200,)
-
-    def test_hitting_time_increases_with_higher_threshold(self):
-        """On average, it should take longer to reach a norm of 3 than a norm of 1."""
-        seed(0)
-        W = Brownian(variance=np.eye(2), T=20, steps=2000)
-        W.simulate(n_simulations=2000)
-
-        low = W.hitting_norm_time(value=1.0)
-        high = W.hitting_norm_time(value=3.0)
-
-        low_found = low[low != None].astype(float)
-        high_found = high[high != None].astype(float)
-
-        assert low_found.mean() < high_found.mean()

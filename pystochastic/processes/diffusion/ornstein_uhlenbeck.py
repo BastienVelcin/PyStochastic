@@ -355,3 +355,15 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         """
 
         return np.diag(self.covariance_matrix(t))
+
+    def density(self,t,x):
+
+        if self.dim > 1:
+            raise ValueError(
+                "The density is only defined implemented for 1D processes yet."
+            )
+
+        if t == 0:
+            return np.array([0])
+        N = Normal(mu = np.exp(-self.speed*t)*(self.initial - self.mean) + self.mean, sd = np.sqrt(self.volatility/(np.sqrt(2*self.speed)) * np.sqrt(1-np.exp(-2*t*self.speed))))
+        return N.pdf(x)

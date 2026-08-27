@@ -171,3 +171,14 @@ class FractionalBrownianMotion(Process):
 
         t_index = np.argmin(np.abs(self.t - t))
         return self.time_covar_matrix[t_index, t_index]
+
+    def density(self,t,x):
+
+        if self.dim > 1:
+            raise ValueError(
+                "The density is only defined implemented for 1D processes yet."
+            )
+
+        if t == 0:
+            return np.array([0])
+        return (1/np.sqrt(2*np.pi*t**(self.hurst/2))) * np.exp( -x**2 /(2*t**(self.hurst/2)))

@@ -34,6 +34,7 @@ import numpy as np
 from pystochastic.random import continuous
 from pystochastic.utils import is_pos_def
 from pystochastic.processes.process import Process
+from pystochastic.dist import Normal
 
 class Brownian(Process):
 
@@ -221,6 +222,17 @@ class Brownian(Process):
 
         return np.array([self.covariance(t,i,i) for i in range(self.dim)])
 
+    def density(self,t,x):
+
+        if self.dim > 1:
+            raise ValueError(
+                "The density is only defined implemented for 1D processes yet."
+            )
+
+        if t == 0:
+            return np.array([0])
+        N = Normal(mu=0,sd=np.sqrt(t))
+        return N.pdf(x)
 
 def brownian_motion(variance=1, T=1, steps = 1000,n_simulations=1):
 
