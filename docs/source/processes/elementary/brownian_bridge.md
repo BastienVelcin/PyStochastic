@@ -52,7 +52,7 @@ The Brownian Bridge class inherits all methods from the [Processes](<project:/in
 >>> B.simulate(3, plot = True)
 array([[[ 0.        ],
         [-0.01655659],
-        [-0.12330862],
+        [-0.12330863],
         ...,
         [-0.19210069],
         [-0.01051594],
