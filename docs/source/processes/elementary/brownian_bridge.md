@@ -17,7 +17,7 @@ pystochastic.processes.BrownianBridge(dim = 1, T = 1, steps = 1000)
 Creates an instance of a $d$-dimensional Brownian Bridge on the interval $[0, T]$. A Brownian Bridge $(B_t)_{t\in[0,T]}$ is a particular example of a standard Brownian motion, where $B_T = 0$ a.s.
 
 >[!NOTE]
-> A $d$-dimensional Brownian bridge can be defined, for all $t\in[0,T] by the following equation:
+> A $d$-dimensional Brownian bridge can be defined, for all $t\in[0,T]$ by the following equation:
 >
 > \begin{equation*}
 > B_t = W_t - \frac{t}{T}W_T
