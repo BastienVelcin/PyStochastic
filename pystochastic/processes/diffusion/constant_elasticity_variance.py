@@ -5,13 +5,13 @@ Module CONSTANT ELASTICITY OF VARIANCE
 
 Description
 -----------
-This module provides a way to simulate a Constant elasticity of variance process with a given speed, volatility and relation parameters.
+This module provides a way to simulate a Constant elasticity of variance process with a given speed, volatility and elasticity parameters.
 
 This module provides a general class "CEV", which inherits from the methods of Process and DiffusionProcess abstract classes.
 
 Examples
 --------
->> C = CEV(speed=3,volatility=2.2,relation=0.5,initial=12,T=1,steps=1000) #CEV process with speed 3, volatility 2.2, relation 0.5 and starting point 12.
+>> C = CEV(speed=3,volatility=2.2,elasticity=0.5,initial=12,T=1,steps=1000) #CEV process with speed 3, volatility 2.2, elasticity 0.5 and starting point 12.
 >>
 >> C.simulate() #Simulate the CEV process path
 >>
@@ -28,7 +28,7 @@ class CEV(DiffusionProcess):
     CEV class
 
     An CEV process is a stochastic process that satisfies the following equation:
-            dR_t = - speed*dt+volatility * R_t^relation *dW_t,
+            dR_t = - speed*dt+volatility * R_t^elasticity *dW_t,
 
     Parameters
     ----------
@@ -36,8 +36,8 @@ class CEV(DiffusionProcess):
         Constant diffusion of the model.
     variance : float
         Constant variance parameter.
-    relation : float
-        Constant relation parameter between the price and the volatility.
+    elasticity : float
+        Constant elasticity parameter between the price and the volatility.
     initial : float
         Initial condition of the model.
     T : float
@@ -51,8 +51,8 @@ class CEV(DiffusionProcess):
         Constant diffusion of the model.
     variance : float
         Constant variance parameter.
-    relation : float
-        Constant relation parameter between the price and the volatility.
+    elasticity : float
+        Constant elasticity parameter between the price and the volatility.
     initial : float
         Initial condition of the model.
     T : float
@@ -76,7 +76,7 @@ class CEV(DiffusionProcess):
 
     Examples
     --------
-    >> C = CEV(speed=3,volatility=2.2,relation=0.5,initial=12,T=1,steps=1000)
+    >> C = CEV(speed=3,volatility=2.2,elasticity=0.5,initial=12,T=1,steps=1000)
     >> C.simulate()
     >> C.plot()
     """
@@ -84,7 +84,7 @@ class CEV(DiffusionProcess):
     def __init__(self,
                  speed=1,
                  volatility=1,
-                 relation=1,
+                 elasticity=1,
                  initial=1,
                  T = 1,
                  steps=1000):
@@ -98,18 +98,18 @@ class CEV(DiffusionProcess):
             raise ValueError(
                 "The speed parameter should be a real number."
             )
-        if not isinstance(volatility, (int, float)) or relation < 0:
+        if not isinstance(volatility, (int, float)) or elasticity < 0:
             raise ValueError(
                 "The speed parameter should be a positive real number."
             )
-        if not isinstance(relation, (int, float)) or relation < 0:
+        if not isinstance(elasticity, (int, float)) or elasticity < 0:
             raise ValueError(
-                "The relation parameter should be a positive real number."
+                "The elasticity parameter should be a positive real number."
             )
 
         self.speed = speed
         self.volatility = volatility
-        self.relation = relation
+        self.elasticity = elasticity
         self.initial = initial
         self.dim = 1
         self.is_autonomous = True
@@ -157,7 +157,7 @@ class CEV(DiffusionProcess):
             Diffusion evaluated at x and t.
         """
 
-        return self.volatility * x**self.relation
+        return self.volatility * x**self.elasticity
 
     def _simulate_exact(self, n_simulations=1, plot=False):
 

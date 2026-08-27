@@ -41,12 +41,6 @@ class Brownian(Process):
     Brownian motion class
 
     The Brownian motion (or Wiener process) is a Gaussian process that models noises and randomness mathematically.
-    For more information, please refer to :
-        - Stochastic Differential Equations: An Introduction with Applications - Bernt Øksendal
-    or for a simpler explanation:
-        - Stochastic calculus applied to some non-linear filtering problems (French version) - Bastien Velcin :
-        https://bastienvelcin.github.io/
-        - https://en.wikipedia.org/wiki/Brownian_motion#Mathematics
 
     Parameters
     ----------

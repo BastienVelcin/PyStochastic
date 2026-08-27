@@ -79,3 +79,8 @@ array([[[-0.00944504, -0.0103207 ],
         [-0.04196104, -0.0015993 ],
         [ 0.02969993,  0.01297978],
         [ 0.015343  ,  0.04356038]]], shape=(2, 1000, 2))
+```
+
+## References
+- Øksendal, B. (1992). Stochastic Differential Equations. In Universitext. Springer Berlin Heidelberg. https://doi.org/10.1007/978-3-662-02847-6
+- VELCIN, B. (2026). Calcul stochastique appliqué à quelques problèmes de filtrage non-linéaire. https://bastienvelcin.github.io/assets/memoires/memoire_filtrage_velcin.pdf

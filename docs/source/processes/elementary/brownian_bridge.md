@@ -73,3 +73,8 @@ array([[[ 0.        ],
         [ 0.        ]]], shape=(3, 501, 1))
 >>> B.variance(1)
 0.8
+```
+
+## References
+- Øksendal, B. (1992). Stochastic Differential Equations. In Universitext. Springer Berlin Heidelberg. https://doi.org/10.1007/978-3-662-02847-6
+- Mansuy, R., & Yor, M. (2008). Aspects of Brownian Motion. Springer Berlin Heidelberg. https://doi.org/10.1007/978-3-540-49966-4

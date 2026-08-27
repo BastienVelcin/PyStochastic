@@ -19,8 +19,13 @@ Let $H\in (0,1)$. A Fractional Brownian Motion of Hurst index $H$ is a Gaussian 
 
 - $B_0 = 0 ~~a.s.$ 
 - $\forall t \in \mathbb{R}_+, ~~ \mathbb{E}[B_t] = 0 ~~$ 
-- $\forall s,t \in \mathbb{R}_+, \mathbb{E}[B_t B_s] = \frac{1}{2}\left(|t|^{2H} + |s|^{2H} - |t-s|^{2H}\right)$
+- $\forall s,t \in \mathbb{R}_+, ~~ \mathbb{E}[B_t B_s] = \frac{1}{2}\left(|t|^{2H} + |s|^{2H} - |t-s|^{2H}\right)$
 - $(B_t)_{t\geq 0}$ is continuous process
+
+The Hurst index $H$ is a measure of the correlation between the process increments.
+- If $H < \frac{1}{2}$, the increments are negatively correlated.
+- If $H = \frac{1}{2}$, the increments are uncorrelated.
+- If $H > \frac{1}{2}$, the increments are positively correlated.
 
 >[!NOTE]
 > If $H=\frac{1}{2}$, the Fractional Brownian Motion is equivalent to a standard Brownian motion.
@@ -85,3 +90,9 @@ array([[0.00000000e+00, 2.39441791e-04, 2.59528137e-04, ...,
         5.95434790e-02, 5.97177202e-02, 5.97250883e-02],
        [0.00000000e+00, 6.00344993e-05, 6.16392598e-05, ...,
         6.44473691e-02, 6.46392570e-02, 6.46455027e-02]], shape=(4, 1001))
+```
+
+## References
+
+- Mandelbrot, B. B., & Van Ness, J. W. (1968). Fractional Brownian Motions, Fractional Noises and Applications. SIAM Review, 10(4), 422–437. http://www.jstor.org.bases-doc.univ-lorraine.fr/stable/2027184
+- Nourdin, I. (2012). Selected Aspects of Fractional Brownian Motion. Springer Milan. https://doi.org/10.1007/978-88-470-2823-4

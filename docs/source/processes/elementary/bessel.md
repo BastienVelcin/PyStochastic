@@ -14,7 +14,7 @@ pystochastic.processes.Bessel(order = 2, T = 1, steps = 1000)
 
 **Multidimensional support :** ❌
 
-Creates an instance of a Bessel process on the interval $[0, T]$, with a specified norm order matrix.
+Creates an instance of a Bessel process on the interval $[0, T]$, with a specified order.
 A Bessel process of order $n\in\mathbb{N}^\star$  $\left(\mathrm{BES}_t(n)\right)_{t\geq 0}$ is defined as the Euclidean norm of a standard $n$-dimensional Brownian motion:
 
 \begin{equation*}
@@ -23,16 +23,13 @@ A Bessel process of order $n\in\mathbb{N}^\star$  $\left(\mathrm{BES}_t(n)\right
 
 where $(W_t)_{t\geq 0}$ denotes a standard $n$-dimensional Brownian motion.
 
->[!NOTE]
-> A $d$-dimensional Brownian motion is said standard if $Q = \mathrm{Id}_d$.
-
 The Brownian motion is one of the fundamental objects of stochastic calculus, since it mathematically formalizes the concept of random motion.
 It appears naturally in stochastic differential equations and so, within the diffusion process definitions.
 
 ### Parameters
 
 `order` : _int_
-: Order of the Bessel process. In the previous example, the order is represented by $n$.
+: Order of the Bessel process. In the previous example, the order is represented by $n$. Must be strictly positive.
 
 `T` : _float_
 : Final time of the Bessel process simulation. Must be greater than `0`.
@@ -101,3 +98,8 @@ array([[[0.        ],
        [6.4       ],
        [4.72      ],
        [9.93333333]]))
+```
+
+## References
+
+- Øksendal, B. (1992). Stochastic Differential Equations. In Universitext. Springer Berlin Heidelberg. https://doi.org/10.1007/978-3-662-02847-6
