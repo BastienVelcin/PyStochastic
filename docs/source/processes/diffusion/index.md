@@ -8,9 +8,9 @@ dX_t = \mu(X_t, t) dt + \sigma(X_t, t) dW_t
 
 where:
 - $(X_t)_{t\geq 0}$ is a $n$-dimensional stochastic process,
-- $(W_t)_{t\geq 0}$ is a standard $d$-dimensional Brownian motion.
+- $(W_t)_{t\geq 0}$ is a standard $d$-dimensional Brownian motion,
 - $\mu : \mathbb{R}^n\times [0,+\infty) \to \mathbb{R}^n$ is a continuous mapping, called **drift**,
-- $\sigma : \mathbb{R}^n\times [0,+\infty) \to \mathbb{R}^{n\times d}$ is a mapping, called **diffusion**,
+- $\sigma : \mathbb{R}^n\times [0,+\infty) \to \mathbb{R}^{n\times d}$ is a mapping, called **diffusion**.
 
 
 ## Import line
@@ -98,7 +98,7 @@ S.path[:,200,:]
 ```
 
 > [!IMPORTANT]
-> Due to the different simulation methods, the `.simulation()` method of the `DiffusionProcess` class needs more arguments than the `.simulate()` method from the `Process` class.
+> Due to the different simulation methods, the `.simulate()` method of the `DiffusionProcess` class needs more arguments than the `.simulate()` method from the `Process` class.
 >
 
 The `DiffusionProcess` class also inherits all other methods from the [Process](<project:/processes/index.md>) class.
@@ -111,7 +111,7 @@ The `DiffusionProcess` class also inherits all other methods from the [Process](
 geometric_brownian_motion
 ornstein_uhlenbeck
 vasicek
-constant_elasticity_variance
+constant_elasticity_of_variance
 cox_ingersoll_ross
 heston
 hull_white

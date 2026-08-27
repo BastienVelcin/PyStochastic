@@ -257,10 +257,11 @@ Returns the maximum norm value of the effective process. The available norms are
 
 **Returns**
 
-_tuple_ : (np.ndarray, np.ndarray, np.ndarray)
+_tuple_ : (np.ndarray, np.ndarray, np.ndarray, np.ndarray)
 
-- The first element is the array of maximum norm for each simulation.
-- The second element is the array of time indexes where the maximum norm occurs for each simulation.
+- The first element is the array of values which reach the maximum norm for each simulation.
+- The second element is the array of maximum norms for each simulation.
+- The third element is the array of time indexes where the maximum norm occurs for each simulation.
 - The third element is the array of time values where the maximum norm occurs for each simulation.
 
 #### .hitting_time()

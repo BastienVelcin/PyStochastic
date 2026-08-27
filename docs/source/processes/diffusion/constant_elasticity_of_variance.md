@@ -1,4 +1,4 @@
-# Constant Elasticity Variance Model
+# Constant Elasticity of Variance Model
 
 ## Import line
 You can import the Bessel process class from the `processes` module as follows:
@@ -14,8 +14,8 @@ pystochastic.processes.CEV(speed=1, volatility=1, elasticity=1, initial=1, T = 1
 
 **Multidimensional support :** ❌
 
-Creates an instance of a Constant Elasticity Variance model on the interval $[0, T]$, with a speed, volatility, and elasticity parameters.
-A Constant Elasticity Variance (CEV) process $(S_t)_{t\geq0}$ is a solution of the following stochastic differential equation:
+Creates an instance of a Constant Elasticity of Variance model on the interval $[0, T]$, with a speed, volatility, and elasticity parameters.
+A Constant Elasticity of Variance (CEV) process $(S_t)_{t\geq0}$ is a solution of the following stochastic differential equation:
 
 \begin{equation*}
 dS_t = \mu S_t dt + \sigma S_t^\gamma dW_t.
@@ -51,66 +51,22 @@ It is generally used to model the price of a stock or a commodity.
 
 
 ### Attributes
-The Bessel class inherits all attributes from the [Processes](<project:/processes/index.md>) class.
+The CEV class inherits all attributes from the [Diffusion Process](<project:/processes/diffusion/index.md>) class.
 It also possesses the attributes deduced from its parameters.
 
 ### Methods
 
-The Bessel class inherits all methods from the [Processes](<project:/processes/index.md>) class.
+The CEV class inherits all methods from the [Diffusion Process](<project:/processes/diffusion/index.md>) class.
+
 ## Examples
 
 ```python
->>> BSL = Bessel(order = 5, T = 10, steps= 750)
->>> BSL.simulate(5, plot = False)
-array([[[0.        ],
-        [0.28245147],
-        [0.39893963],
-        ...,
-        [5.6968423 ],
-        [5.7301934 ],
-        [5.9047602 ]],
-       [[0.        ],
-        [0.33095952],
-        [0.62998883],
-        ...,
-        [8.81073229],
-        [9.05938807],
-        [9.02016293]],
-       [[0.        ],
-        [0.25659784],
-        [0.53961491],
-        ...,
-        [3.36714455],
-        [3.33645985],
-        [3.42682631]],
-       [[0.        ],
-        [0.3264745 ],
-        [0.4678982 ],
-        ...,
-        [3.24248475],
-        [3.16006872],
-        [3.10188941]],
-       [[0.        ],
-        [0.34346597],
-        [0.36442699],
-        ...,
-        [7.31806438],
-        [7.33390633],
-        [7.41006382]]], shape=(5, 751, 1))
->>> BSL.max()
-(array([[ 8.59509264],
-       [10.70444174],
-       [ 6.22984211],
-       [ 5.51000105],
-       [ 7.52481944]]), array([[590],
-       [435],
-       [480],
-       [354],
-       [745]]), array([[7.86666667],
-       [5.8       ],
-       [6.4       ],
-       [4.72      ],
-       [9.93333333]]))
+>>> S = CEV(speed=1, volatility=0.3, elasticity=0.7, initial=3, T = 1, steps=1000)
+>>> path = S.simulate(10)
+>>> path.shape
+(10, 1001, 1)
+>>> S.expectation(1)
+np.float64(8.154845485377136)
 ```
 
 ## References

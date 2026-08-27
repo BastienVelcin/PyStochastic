@@ -234,7 +234,8 @@ class Process(ABC):
         norms = np.linalg.norm(self.path**2, ord=order, axis=2)
         arg_max = np.argmax(norms, axis=1)
         values = (self.path[np.arange(0,self.n_simulations),arg_max,:])
-        return values, norms[arg_max], arg_max, self.t[arg_max]
+
+        return values, norms[:,arg_max], arg_max, self.t[arg_max]
 
     def hitting_time(self,value, inequality=">"):
 
