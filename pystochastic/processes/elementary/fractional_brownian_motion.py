@@ -1,17 +1,17 @@
 """
 ============================================================
-Module FRACTIONAL BROWNIAN
+Module FRACTIONAL BROWNIAN MOTION
 ============================================================
 
 Description
 -----------
-This module provides a way to simulate a Fractional Brownian motion with a given hurst index.
+This module provides a way to simulate a Fractional Brownian Motion with a given hurst index.
 
-This module provides a general class "FractionalBrownian", which inherits from the methods of Process abstract class.
+This module provides a general class "FractionalBrownianMotion", which inherits from the methods of Process abstract class.
 
 Examples
 --------
->> F = FractionalBrownian(hurst=0.7,T=1,steps=1000) #Fractional Brownian motion with hurst index 0.7
+>> F = FractionalBrownianMotion(hurst=0.7,T=1,steps=1000) #Fractional Brownian motion with hurst index 0.7
 >>
 >> F.simulate() #Simulate the Fractional Brownian motion path
 >>
@@ -22,12 +22,12 @@ import numpy as np
 from pystochastic.random import continuous
 from pystochastic.processes.process import Process
 
-class FractionalBrownian(Process):
 
+class FractionalBrownianMotion(Process):
     """
     Brownian motion class
 
-    The Fractional Brownian motion is an extension of the Brownian motion. It is a zero-mean Gaussian process which covariance function is
+    The Fractional Brownian Motion is an extension of the Brownian motion. It is a zero-mean Gaussian process which covariance function is
     given by the following equation:
                         Cov(B(t),B(s)) = |t|^2H + |s|^2H - |t-s|^2H,
     where, H is the Hurst index, which is a float between 0 and 1.
@@ -60,18 +60,17 @@ class FractionalBrownian(Process):
 
     Examples
     --------
-    >> W = Brownian(variance=np.eye(2),T=1,steps=1000)
-    >> W.simulate()
-    >> W.plot()
+    >> F = FractionalBrownianMotion(hurst=0.7,T=1,steps=1000)
+    >> F.simulate()
+    >> F.plot()
     """
 
     def __init__(self,
-                 hurst=0.5,
-                 T = 1,
-                 steps=1000):
+                 hurst= 0.5,
+                 T= 1,
+                 steps= 1000):
 
-
-        super().__init__(T = 1,
+        super().__init__(T=T,
                          steps=steps)
 
         if not 0 < hurst < 1:
@@ -85,18 +84,20 @@ class FractionalBrownian(Process):
 
     @property
     def time_matrix(self):
-        return np.repeat(np.atleast_2d(self.t),self.t.size,axis=0)
+        return np.repeat(np.atleast_2d(self.t), self.t.size, axis=0)
 
     @property
     def time_covar_matrix(self):
         epsi = 1e-10
-        return np.eye(self.t.size)* epsi +  (np.abs(self.time_matrix) ** (2 * self.hurst) + (np.abs(self.time_matrix.T)) ** (2 * self.hurst)- np.abs(self.time_matrix - self.time_matrix.T) ** (2 * self.hurst)) / 2
+        return np.eye(self.t.size) * epsi + (
+                    np.abs(self.time_matrix) ** (2 * self.hurst) + (np.abs(self.time_matrix.T)) ** (
+                        2 * self.hurst) - np.abs(self.time_matrix - self.time_matrix.T) ** (2 * self.hurst)) / 2
 
     @property
     def sqrt_time_covar_matrix(self):
         return np.linalg.cholesky(self.time_covar_matrix).T
 
-    def simulate(self,n_simulations=1,plot=False):
+    def simulate(self, n_simulations=1, plot=False):
 
         """
         Simulate method.
@@ -111,16 +112,16 @@ class FractionalBrownian(Process):
         """
         self.n_simulations = n_simulations
 
-        Z = continuous.normal(0,1,n_simulations*(self.steps+1)).reshape(self.steps+1,n_simulations)
+        Z = continuous.normal(0, 1, n_simulations * (self.steps + 1)).reshape(self.steps + 1, n_simulations)
 
-        self.path = (Z.T @ self.sqrt_time_covar_matrix)[:,:,None]
+        self.path = (Z.T @ self.sqrt_time_covar_matrix)[:, :, None]
 
         if plot:
             self.plot()
 
         return self.path
 
-    def expectation(self,t):
+    def expectation(self, t):
 
         """
         Expectation method.
@@ -144,9 +145,10 @@ class FractionalBrownian(Process):
 
         return 0
 
-    def covariance_matrix(self,t):
+    def covariance_matrix(self, t):
         pass
-    def covariance(self, t,i,j):
+
+    def covariance(self, t, i, j):
         pass
 
     def variance(self, t):
@@ -167,5 +169,5 @@ class FractionalBrownian(Process):
             Variance of the Fractional Brownian Motion path coordinates at a given time t.
         """
 
-        t_index = np.argmin(np.abs(self.t-t))
-        return self.time_covar_matrix[t_index,t_index]
+        t_index = np.argmin(np.abs(self.t - t))
+        return self.time_covar_matrix[t_index, t_index]

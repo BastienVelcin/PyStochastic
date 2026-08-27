@@ -6,7 +6,7 @@ The `processes` module provides a set of classic stochastic processes methods fo
 You can import all the distributions listed in the `continuous.py` module as follows:
 
 ```python
-from pystochastic.dist.continuous import *
+from pystochastic.processes import *
 ```
 
 ## Attributes
@@ -91,7 +91,7 @@ Returns the expectation of the effective process at time `t`. The expectation of
 \end{equation*}
 
 > [!NOTE]
-> For some processes, the expectation is not defined. In this case, PyStochastic raises an `NonImplementedError` error.
+> For some processes, the expectation is not defined. In this case, PyStochastic raises an `NotImplementedError` error.
 
 **Parameters**
 
@@ -114,7 +114,7 @@ Returns the variance of the effective process at time `t`. The expectation of a 
 \end{equation*}
 
 > [!NOTE]
-> For some processes, the variance is not defined. In this case, PyStochastic raises an `NonImplementedError` error.
+> For some processes, the variance is not defined. In this case, PyStochastic raises an `NotImplementedError` error.
 
 **Parameters**
 
@@ -360,6 +360,8 @@ _np.ndarray_
 :caption: Elementary processes
 elementary/brownian
 elementary/brownian_bridge
+elementary/fractional_brownian_motion
+elementary/bessel
 
 :maxdepth: 1
 :caption: Diffusion processes

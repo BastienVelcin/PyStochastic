@@ -33,10 +33,10 @@ Creates an instance of a $d$-dimensional Brownian Bridge on the interval $[0, T]
 
 
 `T` : _float_
-: Final time of the Brownian motion simulation. Must be greater than `0`.
+: Final time of the Brownian bridge simulation. Must be greater than `0`.
 
 `steps` : _int_
-: Number of time steps between `0` and `T` on which the Brownian motion is simulated. Must be strictly greater than 0.
+: Number of time steps between `0` and `T` on which the Brownian bridge is simulated. Must be strictly greater than 0.
 
 ### Attributes
 The Brownian Bridge class inherits all attributes from the [Processes](<project:/index.md>) class.

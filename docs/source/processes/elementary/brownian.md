@@ -17,8 +17,8 @@ pystochastic.processes.Brownian(variance = 1, T = 1, steps = 1000)
 Creates an instance of a Brownian motion process on the interval $[0, T]$, with a specified covariance matrix.
 Let $Q$ be a symmetric positive definite matrix. A $d$-dimensional $Q$-Brownian motion $(W_t)_{t\geq 0}$ is an $\mathbb{R}^d$-valued Gaussian process such that
 - $W_0 = 0 ~~a.s.$ 
-- $\forall s,t \in \mathbb{R}_+, ~~ \mathbb{E}[W_t] = 0 ~~$ and $~~ \mathbb{E}[W_s W_t^\star] = (s\wedge t)Q$
-- $(W_t)_{t\geq 0}$ is continuous process
+- $\forall s,t \in \mathbb{R}_+, ~~ \mathbb{E}[W_t] = 0 ~~$ and $~~ \mathbb{E}[W_s W_t^\star] = (s\wedge t)Q$,
+- $(W_t)_{t\geq 0}$ is continuous process.
 
 >[!NOTE]
 > A $d$-dimensional Brownian motion is said standard if $Q = \mathrm{Id}_d$.
@@ -26,7 +26,6 @@ Let $Q$ be a symmetric positive definite matrix. A $d$-dimensional $Q$-Brownian 
 The Brownian motion is one of the fundamental objects of stochastic calculus, since it mathematically formalizes the concept of random motion.
 It appears naturally in stochastic differential equations and so, within the diffusion process definitions.
 
-When
 ### Parameters
 
 `variance` : _float_ or _np.ndarray_
