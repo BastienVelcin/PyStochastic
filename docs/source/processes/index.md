@@ -3,7 +3,7 @@
 The `processes` module provides a set of classic stochastic processes methods for simulation.
 
 ## Import line
-You can import all the distributions listed in the `continuous.py` module as follows:
+You can import all the processes as follows:
 
 ```python
 from pystochastic.processes import *
@@ -25,7 +25,8 @@ This section lists all the attributes that are common to all implemented process
 ```python
 .simulate(n_simulations = 1, plot = False)
 ```
-Simulates a $d$-dimensional Brownian motion of covariance matrix `variance` on the interval $[0,T]$.
+Simulates the effective process on the interval $[0,T]$.
+
 **Parameters**
 
 `n_simulations` : _int_
@@ -37,10 +38,10 @@ Simulates a $d$-dimensional Brownian motion of covariance matrix `variance` on t
 **Returns**
 
 _np.ndarray_
-: Path of `n_simulations` Brownian motions on $[0,T]$. The final array is a three-dimensional array such that :
+: Path of `n_simulations` effective process on $[0,T]$. The final array is a three-dimensional array such that :
 - 1st dimension is the number of simulations
 - 2nd dimension is the number of time steps
-- 3rd dimension is the dimension of the Brownian motion
+- 3rd dimension is the dimension of the effective process 
 
 For example, if we run 4 simulations of a 2D standard Brownian motion on the interval $[0,1]$ with 1000 time steps with the following code:
 ```python
@@ -356,23 +357,16 @@ _np.ndarray_
 ## Implemented processes
 
 ```{toctree}
-:maxdepth: 1
+:maxdepth: 2
 :caption: Elementary processes
 elementary/brownian
 elementary/brownian_bridge
 elementary/fractional_brownian_motion
 elementary/bessel
 
-:maxdepth: 1
+:maxdepth: 2
 :caption: Diffusion processes
 diffusion/index
-diffusion/geometric_brownian_motion
-diffusion/ornstein_uhlenbeck
-diffusion/vasicek
-diffusion/cox_ingersoll_ross
-diffusion/heston
-diffusion/hull_white
-diffusion/constant_elasticity_variance
 
 :maxdepth: 1
 :caption: Jump processes

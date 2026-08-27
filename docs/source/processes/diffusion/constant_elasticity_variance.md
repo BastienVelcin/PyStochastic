@@ -38,6 +38,7 @@ It is generally used to model the price of a stock or a commodity.
 : - If `elasticity = 1`, the model is exactly the Black-Sholes model.
 : - If `elasticity > 1`, the volatility increases when the price increases.
 : - If `elasticity = 0`, the model is exactly the Bachelier model.
+
 `initial` : _float_
 : Initial value of the process at time $t=0$.
 
