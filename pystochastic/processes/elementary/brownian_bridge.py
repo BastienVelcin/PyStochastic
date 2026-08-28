@@ -119,5 +119,5 @@ class BrownianBridge(Process):
     def density(self,t,x):
         if t == 0 or t == self.T:
             return np.array([0])
-        N = Normal(mu = 0, sd = np.sqrt(t*(self.T - t)/self.T))
+        N = Normal(mu = 0, var = t*(self.T - t)/self.T)
         return N.pdf(x)

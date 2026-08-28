@@ -231,7 +231,7 @@ class Brownian(Process):
 
         if t == 0:
             return np.array([0])
-        N = Normal(mu=0,sd=np.sqrt(t))
+        N = Normal(mu=0,var = t*self.variance)
         return N.pdf(x)
 
 def brownian_motion(variance=1, T=1, steps = 1000,n_simulations=1):

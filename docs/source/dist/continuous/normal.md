@@ -10,13 +10,13 @@ from pystochastic.dist import Normal
 
 ## Description
 ```python
-pystochastic.dist.Normal(mu = 0, sd = 1)
+pystochastic.dist.Normal(mu = 0, var = 1)
 ```
 **Type :** Class
 
 Creates an instance of the Normal distribution. A normal distribution is a continuous probability distribution used to model random natural phenomena.
 
-The probability density function of the Normal distribution of mean $\mu$ and standard deviation $\sigma$ is given by:
+The probability density function of the Normal distribution of mean $\mu$ and variance $\sigma^2$ is given by:
 
 \begin{equation*}
 f(x) = \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.
@@ -28,12 +28,12 @@ f(x) = \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.
 `mu` : _float_
 : Mean parameter of the normal distribution.
 
-`sd` : _float_
+`var` : _float_
 : Standard deviation parameter of the normal distribution. Must be strictly positive.
 
 > [!WARNING]
-> The second parameter represents the standard deviation. Don't confuse it with the variance parameter of the normal distribution.
-> The call `N = Normal(mu,sigma)` generates a normal distribution with mean `mu` and variance `sigma**2`.
+> The second parameter represents the variance. Don't confuse it with the standard deviation parameter of the normal distribution.
+> The call `N = Normal(mu,sigma)` generates a normal distribution with mean `mu` and variance `sigma`.
 
 
 ### Methods
@@ -45,23 +45,23 @@ The Normal distribution inherits all methods from the [Continuous-Time Distribut
 >>> from pystochastic.dist.dist import Normal
 >>> N = Normal(-1,3)
 >>> N.sample(12)
-array([-1.54071764, -3.31218451, -0.4471541 ,  1.55421478, -2.31592963,
-       -5.1728659 , -4.38693714, -0.43997557,  3.99003161, -2.18267661,
-        0.53702751, -2.44383932])
+array([ 0.02198102,  0.47720099, -3.60885847, -1.73686551, -1.36815971,
+       -0.95119961, -3.51687189, -2.63351054, -0.88179052, -2.37367196,
+       -3.2103292 , -3.5364264 ])
 >>> N.pdf(-3)
-np.float64(0.10648266850745075)
+np.float64(0.1182550739094592)
 >>> N.cdf(0.5)
-np.float64(0.691462461274013)
+np.float64(0.8067618846143836)
 >>> N.variance()
-9
+3
 >>> N.info()
 Distribution : Normal
-Parameters : {'mu': -1, 'sd': 3}
+Parameters : {'mu': -1, 'var': 3}
 Probability density function :
-| (1/3*sqrt(2*pi)) * exp(-(x--1)^2 / 2*3^2)
+| (1/sqrt(2*3*pi)) * exp(-(x--1)^2 / 2*3)
 Cumulative distribution function :
-| (1+erf((x--1)/(3*sqrt(2))))/2
+| (1+erf((x--1)/(sqrt(6))))/2
 Support : (-inf, inf)
 Mean : -1
-Variance : 9
-Entropy : 2.5175508218727822
+Variance : 3
+Entropy : 1.9682446775387274

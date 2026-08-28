@@ -366,5 +366,6 @@ class Vasicek(DiffusionProcess):
 
         if t == 0:
             return np.array([0])
-        N = Normal(mu = np.exp(-self.speed*t)*(self.initial - self.mean) + self.mean, sd = np.sqrt(self.volatility/(np.sqrt(2*self.speed)) * np.sqrt(1-np.exp(-2*t*self.speed))))
+        N = Normal(mu = np.exp(-self.speed*t)*(self.initial - self.mean) + self.mean,
+                   var = self.volatility/2*self.speed) * (1-np.exp(-2*t*self.speed))
         return N.pdf(x)

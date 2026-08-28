@@ -109,7 +109,7 @@ def exponential(alpha=1,n=1):
 
     return (-1 / alpha)*np.log(1 - uniform(0,1,n))
 
-def normal(mean=0, sd=1,n=1):
+def normal(mean=0, var=1, n=1):
 
     """
     Normal sampling function.
@@ -120,14 +120,14 @@ def normal(mean=0, sd=1,n=1):
     ----------
     mean : float
         Mean parameter.
-    sd : float
-        Standard deviation parameter. Must be strictly positive.
+    var : float
+        Variance parameter. Must be strictly positive.
     n : int
         Number of samples. Must be a strictly positive integer.
 
     Examples
     --------
-    >> normal(mean=1,sd=3/2,n=5)
+    >> normal(mean=1,var=3/2,n=5)
     """
 
     if n < 1 or not isinstance(n, (int, np.integer)):
@@ -135,16 +135,16 @@ def normal(mean=0, sd=1,n=1):
             "The number of samples must be a strictly positive integer."
         )
 
-    if sd <= 0:
+    if var <= 0:
         raise ValueError(
-            "The standard deviation must be greater than 0."
+            "The variance must be greater than 0."
         )
 
     # U must not be equal to 0 when we implement Box-Muller, because we can't compute log(0).
     U = uniform(sys.float_info.epsilon,1,n)
     V = uniform(0,1,n)
 
-    return (np.sqrt(-2*np.log(U))*np.cos(2*np.pi*V))*sd + mean
+    return (np.sqrt(-2*np.log(U))*np.cos(2*np.pi*V))*np.sqrt(var) + mean
 
 def _gamma_frac_reject(p, size):
 

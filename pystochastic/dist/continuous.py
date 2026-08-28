@@ -307,59 +307,58 @@ class Normal(ContinuousDistribution):
     ----------
     mu : float
         Mean parameter.
-    sd : float
-        Standard deviation parameter. Must be strictly positive.
+    var : float
+        Variance parameter. Must be strictly positive.
 
     Attributes
     ----------
     mu : float
         Mean parameter.
-
-    sd : float
-        Standard deviation parameter. Must be strictly positive.
+    var : float
+        Variance parameter. Must be strictly positive.
 
     Examples
     --------
-    >> N = Normal(mu=0,sd=1)
+    >> N = Normal(mu=0,var=1)
     >> N.sample(10)
     """
 
-    def __init__(self,mu=0,sd=1):
+    def __init__(self,mu=0,var=1):
 
-        if sd <=0:
+        if var <=0:
             raise ValueError(
-                "The standard deviation must be greater than 0."
+                "The variance must be greater than 0."
             )
 
         self.mu = mu
-        self.sd = sd
+        self.var = var
 
     def pdf(self, x=None):
 
         if x is None:
             print("Probability density function :")
-            print(f"| (1/{self.sd}*sqrt(2*pi)) * exp(-(x-{self.mu})^2 / 2*{self.sd}^2)")
+            print(f"| (1/sqrt(2*{self.var}*pi)) * exp(-(x-{self.mu})^2 / 2*{self.var})")
         else:
-            return (1/(self.sd*np.sqrt(2*np.pi)))*np.exp(-(x - self.mu)**2 / (2*self.sd**2))
+            return (1/(np.sqrt(2*self.var*np.pi)))*np.exp(-(x - self.mu)**2 / (2*self.var))
 
     def cdf(self, x=None):
         if x is None:
             print("Cumulative distribution function :")
-            print(f"| (1+erf((x-{self.mu})/({self.sd}*sqrt(2))))/2")
+            print(f"| (1+erf((x-{self.mu})/(sqrt({2*self.var}))))/2")
         else:
-            return (1+scipy.special.erf((x-self.mu)/(self.sd*np.sqrt(2))))/2
+            return (1+scipy.special.erf((x-self.mu)/(np.sqrt(2*self.var))))/2
 
     def sample(self,n=1):
-        return continuous.normal(self.mu, self.sd, n)
+        return continuous.normal(self.mu, self.var, n)
 
     def mean(self):
         return self.mu
 
     def variance(self):
-        return self.sd**2
+        return self.var
 
     def entropy(self):
-        return np.log(self.sd*np.sqrt(2*np.pi*np.e))
+        return np.log(np.sqrt(2*np.pi*np.e*self.var))
 
     def support(self):
         return (-np.inf ,np.inf)
