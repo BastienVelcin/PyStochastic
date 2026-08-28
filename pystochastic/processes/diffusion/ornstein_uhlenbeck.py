@@ -5,14 +5,14 @@ Module ORNSTEIN UHLENBECK
 
 Description
 -----------
-This module provides a way to simulate an Ornstein-Uhlenbeck process with a given long-term mean, diffusion and volatility parameter.
+This module provides a way to simulate an Ornstein-Uhlenbeck process with a given speed and volatility parameters.
 
 This module provides a general class "OrnsteinUhlenbeck", which inherits from the methods of Process and
 DiffusionProcess abstract classes.
 
 Examples
 --------
->> R = OrnsteinUhlenbeck(mean=[2,1],speed=np.ones((2,2)),volatility=np.ones((2,2)),initial=[1,1],T=1,steps=1000) #Ornstein-Uhlenbeck process with mean [2,1] and diffusion and form parameter np.ones((2,2)) and starting point [1,1]
+>> R = OrnsteinUhlenbeck(speed=np.ones((2,2)),volatility=np.ones((2,2)),initial=[1,1],T=1,steps=1000) #Ornstein-Uhlenbeck process with speed and volatility parameter np.ones((2,2)) and starting point [1,1]
 >>
 >> R.simulate() #Simulate the Ornstein-Uhlenbeck process path
 >>
@@ -33,13 +33,11 @@ class OrnsteinUhlenbeck(DiffusionProcess):
     Ornstein Uhlenbeck class
 
     An Ornstein Uhlenbeck process is a stochastic process that satisfies the following equation:
-                                 dR_t = [speed(t) - mean * R_t]dt + volatility * dW_t
+                                 dR_t = -speed * R_t dt + volatility * dW_t
 
     Parameters
     ----------
-    mean : float, or list, or np.ndarray
-        Long term mean vector of the model.
-    speed : function
+    speed : float, or np.ndarray
         Matrix Function diffusion of the model. The dimension of the matrix must coincide with the dimension of the starting point and the vector drift.
     volatility : float, or np.ndarray
         Constant matrix volatility parameter. The dimension of the matrix must coincide with the dimension of the starting point and the vector drift.
@@ -52,12 +50,10 @@ class OrnsteinUhlenbeck(DiffusionProcess):
 
     Attributes
     ----------
-    mean : float, or list, or np.ndarray
-        Long term mean vector of the model.
-    volatility : float, or np.ndarray
-        Constant matrix diffusion of the model.
     speed : float, or np.ndarray
         Constant matrix shape parameter.
+    volatility : float, or np.ndarray
+        Constant matrix diffusion of the model.
     initial : float, or list, or np.ndarray
         Initial condition of the model.
     T : float
@@ -83,13 +79,12 @@ class OrnsteinUhlenbeck(DiffusionProcess):
 
     Examples
     --------
-    >> R = OrnsteinUhlenbeck(mean=[2,2],volatility=np.ones((2,2)),speed=np.ones((2,2)),initial=[1,1],T=1,steps=1000)
+    >> R = OrnsteinUhlenbeck(speed=np.ones((2,2)),volatility=np.ones((2,2)),initial=[1,1],T=1,steps=1000)
     >> R.simulate()
     >> R.plot()
     """
 
     def __init__(self,
-                 mean=0,
                  speed=1,
                  volatility=1,
                  initial=0,
@@ -101,10 +96,11 @@ class OrnsteinUhlenbeck(DiffusionProcess):
                          steps=steps)
 
         self.name = "Ornstein Uhlenbeck process"
-        self.mean = np.atleast_1d(mean)
 
         self.speed = np.atleast_1d(speed)
         self.volatility = np.atleast_1d(volatility)
+
+        self.dim = self.speed.shape[0]
 
         self.m_speed = np.atleast_2d(speed)
         self.m_volatility = np.atleast_2d(volatility)
@@ -115,12 +111,12 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         if self.speed.ndim == 1:
             self.speed = np.diag(self.speed)
 
-        self.dim = np.size(self.mean)
         self.initial = np.atleast_1d(initial)
 
-        if not(np.shape(self.speed)[0] == np.shape(self.speed)[1] == self.dim == np.shape(self.volatility)[0] == np.shape(self.volatility)[1] ==  self.initial.size):
+
+        if not(np.shape(self.speed)[0] == np.shape(self.speed)[1]  == np.shape(self.volatility)[0] == np.shape(self.volatility)[1] ==  self.initial.size):
             raise ValueError(
-                "The dimension of the mean, volatility, speed, and of the starting point must coincide."
+                "The dimension of the speed, volatility, and of the starting point must coincide."
             )
         # We check if the speed and the volatility are a scalar, a vector or a diagonal matrix.
         _speed, _speed_diag = _decompose(speed) # Form : (Scalar/Vec/Matrix, Bool)
@@ -161,9 +157,9 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         """
 
         if self._diagonal:
-            return self.speed * (self.mean - x)
+            return - self.speed * x
 
-        return self.speed @ (self.mean - x)
+        return - self.speed @ x
 
     def diffusion(self, x, t=None):
 
@@ -221,7 +217,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
 
         for i in range(1,self.steps+1):
             # The induction formula is given by R_t = (mean + R_{t-1} - mean) * exp(-speed * dt) + volatility * sqrt(1 - exp(-2 * speed * dt)) / (2 * speed)) * Z[i-1])
-            self.path[:,i,0] = (self.mean+ (self.path[:,i-1,0] - self.mean) * np.exp(-self.speed * self.dt) + self.volatility * np.sqrt((1 - np.exp(-2 * self.speed * self.dt)) / (2 * self.speed)) * Z[:,i-1])
+            self.path[:,i,0] = ((self.path[:,i-1,0]) * np.exp(-self.speed * self.dt) + self.volatility * np.sqrt((1 - np.exp(-2 * self.speed * self.dt)) / (2 * self.speed)) * Z[:,i-1])
 
         if plot:
             self.n_simulations = n_simulations
@@ -252,7 +248,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
                             initial * exp(-speed*t) + mean * (Id - exp(-volatility*t))
         """
 
-        return self.initial @ scipy.linalg.expm(- self.m_speed * t) + self.mean @ (np.eye(self.dim) - scipy.linalg.expm(- self.m_speed * t))
+        return self.initial @ scipy.linalg.expm(- self.m_speed * t) - scipy.linalg.expm(- self.m_speed * t)
 
     def covariance_matrix(self, t):
 
@@ -284,7 +280,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
             P = p.reshape(self.dim, self.dim)
 
             # We define the right-hand side of the Lyapunov equation
-            dP = -self.m_speed @ P- P @ self.m_speed.T + Q
+            dP = (-self.m_speed @ P) - (P @ self.m_speed.T) + Q
 
             # We return the flattened version of the right-hand side of the Lyapunov equation. We use the method ravel
             # to flatten the array column by column instead of row by row.
@@ -366,6 +362,6 @@ class OrnsteinUhlenbeck(DiffusionProcess):
 
         if t == 0:
             return np.array([0])
-        N = Normal(mu = np.exp(-self.speed*t)*(self.initial - self.mean) + self.mean,
+        N = Normal(mu = np.exp(-self.speed*t)*(self.initial),
                    var = self.volatility**2/(2*self.speed) * (1-np.exp(-2*t*self.speed)))
         return N.pdf(x)
