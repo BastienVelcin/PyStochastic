@@ -14,7 +14,7 @@ pystochastic.processes.CEV(speed = 1, volatility = 1, elasticity = 1, initial = 
 
 **Multidimensional support :** ❌
 
-Creates an instance of a Constant Elasticity of Variance model on the interval $[0, T]$, with specified speed, volatility, and elasticity parameters.
+Creates an instance of a Constant Elasticity of Variance model on the interval $[0, T]$, with specified speed $\theta$, volatility $\sigma$, and elasticity $\gamma$.
 A Constant Elasticity of Variance (CEV) process $(S_t)_{t\geq0}$ is a solution of the following stochastic differential equation:
 
 \begin{equation*}

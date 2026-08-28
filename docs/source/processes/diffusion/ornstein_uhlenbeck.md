@@ -14,7 +14,7 @@ pystochastic.processes.OrnsteinUhlenbeck(speed = 1, volatility = 1, initial = 0,
 
 **Multidimensional support :** ✅
 
-Creates an instance of an Ornstein-Uhlenbeck process on the interval $[0, T]$, with specified speed and volatility parameters.
+Creates an instance of an Ornstein-Uhlenbeck process on the interval $[0, T]$, with specified speed $\theta$ and volatility $\sigma$.
 An Ornstein-Uhlenbeck process $(X_t)_{t\geq0}$ is a solution of the following stochastic differential equation:
 
 \begin{equation*}

@@ -14,7 +14,7 @@ pystochastic.processes.FractionalBrownianMotion(hurst = 0.5, T = 1, steps = 1000
 
 **Multidimensional support :** ❌
 
-Creates an instance of a Fractional Brownian Motion $(B_t)_{t\geq 0}$ with a specified Hurst index on the interval $[0, T]$.
+Creates an instance of a Fractional Brownian Motion $(B_t)_{t\geq 0}$ on the interval $[0, T]$, with a specified Hurst index $H$.
 Let $H\in (0,1)$. A Fractional Brownian Motion of Hurst index $H$ is a Gaussian process that satisfies the following assertions:
 
 - $B_0 = 0 ~~a.s.$ 

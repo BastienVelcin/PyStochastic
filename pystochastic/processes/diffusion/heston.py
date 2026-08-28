@@ -5,18 +5,18 @@ Module HESTON
 
 Description
 -----------
-This module provides a way to simulate a Heston model with given parameters. Heston model is used to determine an asset price where
+This module provides a way to simulate a Heston model with given appropriate parameters. Heston model is used to determine an asset price where
 the volatility is given by a Cox-Ingersoll-Ross process.
 
 This module provides a general class "Heston", which inherits from the methods of Process and DiffusionProcess abstract classes.
 
 Examples
 --------
->> H = Heston(mean=[2,1],speed=np.ones((2,2)),speed=np.ones((2,2)),initial=[1,1],T=1,steps=1000) #Ornstein-Uhlenbeck process with mean [2,1] and diffusion and form parameter np.ones((2,2)) and starting point [1,1]
+>> H = Heston(mu = 1, long_variance = 0.9, reverting_rate = 1, variance_volatility = 0.5, correlation = 0.3, initial_price = 10, initial_variance = 0.3, T = 5, steps = 500)
 >>
->> H.simulate() #Simulate the Ornstein-Uhlenbeck process path
+>> H.simulate()
 >>
->> H.plot() #Plot the Ornstein-Uhlenbeck process path
+>> H.plot()
 """
 import numpy as np
 import plotly.graph_objects as go
@@ -60,14 +60,20 @@ class Heston(DiffusionProcess):
 
     Attributes
     ----------
-    mean : float, or np.ndarray
-        Long term mean value of the model.
-    calibration : float or function
-        Calibration function of the model
-    volatility : float or function
-        Volatility function of the model
-    initial : float
-        Initial condition of the model.
+    mu : float
+        Drift of the stock price equation.
+    initial_price : float
+        Initial value of the stock price process.
+    initial_variance : float
+        Initial value of the variance process.
+    long_variance : float
+        Long variance parameter.
+    correlation : float
+        Correlation parameter of the two Browian motions
+    reverting_rate : float
+        Rate at which the variance reverts to the long variance.
+    variance_volatility : float
+        Volatility parameter of the variance process.
     T : float
         Final time.
     steps : int
@@ -95,19 +101,19 @@ class Heston(DiffusionProcess):
 
     Examples
     --------
-    >> R = HullWhite(speed=2,mean=3,volatility=1,initial=0,T=1,steps=1000)
-    >> R.simulate()
-    >> R.plot()
+    >> H = Heston(mu = 1, long_variance = 0.9,  reverting_rate = 1, variance_volatility = 0.5, correlation = 0.3, initial_price = 10, initial_variance = 0.3, T = 5, steps = 500)
+    >> H.simulate()
+    >> H.plot()
     """
     def __init__(
             self,
             mu = 1,
-            initial_price=1,
-            initial_variance = 1,
             long_variance = 1,
-            correlation = 0,
             reverting_rate = 1,
             variance_volatility = 1,
+            correlation=0,
+            initial_price=1,
+            initial_variance=1,
             T=1,
             steps=1000):
 
@@ -138,7 +144,7 @@ class Heston(DiffusionProcess):
             raise ValueError(
                 "The variance volatility must be strictly positive."
             )
-        if not -1 < correlation <= 1:
+        if not -1 < correlation < 1:
             raise ValueError(
                 "The correlation coefficient must be strictly between -1 and 1."
             )
@@ -154,9 +160,8 @@ class Heston(DiffusionProcess):
         self.price = None
         self.var = None
         self.path = None #The volatility will be sqrt(self.variance), and stored in the path
-        self.couple = (self.price, self.vol)
         self.dim = 1 #Plot dimension
-
+        self.couple = (self.price, self.path)
         self.is_autonomous = True
     @property
     def feller_condition(self):
@@ -169,6 +174,7 @@ class Heston(DiffusionProcess):
         """
 
         return 2 * self.reverting_rate * self.long_variance >= self.variance_volatility ** 2
+
 
     def drift(self,x,t=None):
 
@@ -268,9 +274,10 @@ class Heston(DiffusionProcess):
                                                            parallel=parallel,
                                                            n_workers=n_workers,
                                                            brownian_sequence=W.increments)
-        self.price = self.couple[:, :, 0]
-        self.var = self.couple[:, :, 1]
-        self.path = np.sqrt(np.maximum(self.variance, 0))
+        self.price = self.couple[:, :, 0][:,:,None]
+        self.var = self.couple[:, :, 1][:,:,None]
+        self.path = np.sqrt(np.maximum(self.var, 0))
+
         if plot:
             fig_price = go.Figure()
             fig_vol = go.Figure()
@@ -298,8 +305,7 @@ class Heston(DiffusionProcess):
             fig_vol.show()
             fig_price.show()
 
-        return self.path
-
+        return self.couple
 
     def covariance_matrix(self,t):
         pass

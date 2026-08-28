@@ -14,7 +14,7 @@ pystochastic.processes.GeometricBrownianMotion(mu = 1, volatility = 1, initial =
 
 **Multidimensional support :** ✅
 
-Creates an instance of a Geometric Brownian Motion on the interval $[0, T]$, with specified drift and volatility parameters.
+Creates an instance of a Geometric Brownian Motion on the interval $[0, T]$, with specified drift $\mu$ and volatility $\sigma$.
 A Geometric Brownian Motion (GBM) process $(S_t)_{t\geq0}$ is a solution of the following stochastic differential equation:
 
 \begin{equation*}
@@ -43,7 +43,6 @@ dS_t = \mu S_t dt + \sigma S_t dW_t.
 ### Attributes
 The Geometric Brownian Motion class inherits all attributes from the [Diffusion Process](<project:/processes/diffusion/index.md>) class.
 It also possesses the attributes deduced from its parameters.
-
 ### Methods
 
 The Geometric Brownian Motion class inherits all methods from the [Diffusion Process](<project:/processes/diffusion/index.md>) class.

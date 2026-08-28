@@ -90,8 +90,8 @@ class CIR(DiffusionProcess):
     """
 
     def __init__(self,
-                 speed=1,
                  mean=1,
+                 speed=1,
                  volatility=1,
                  initial=0,
                  T=1,

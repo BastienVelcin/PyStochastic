@@ -14,7 +14,7 @@ pystochastic.processes.Bessel(order = 2, T = 1, steps = 1000)
 
 **Multidimensional support :** ❌
 
-Creates an instance of a Bessel process on the interval $[0, T]$, with a specified order.
+Creates an instance of a Bessel process on the interval $[0, T]$, with a specified order $n$.
 A Bessel process of order $n\in\mathbb{N}^\star$  $\left(\mathrm{BES}_t(n)\right)_{t\geq 0}$ is defined as the Euclidean norm of a standard $n$-dimensional Brownian motion:
 
 \begin{equation*}

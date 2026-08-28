@@ -1,58 +1,58 @@
-# Vacisek Model
+# Vasicek Model
 
 ## Import line
-You can import the Vacisek Model process class from the `processes` module as follows:
+You can import the Vasicek class from the `processes` module as follows:
 ```python
-from pystochastic.processes import Vacisek
+from pystochastic.processes import Vasicek
 ```
 ## Description
 
 ```python
-pystochastic.processes.Vacisek(mean = 0, speed = 1, volatility = 1, initial = 0, T = 1, steps = 1000)
+pystochastic.processes.Vasicek(mean = 0, speed = 1, volatility = 1, initial = 0, T = 1, steps = 1000)
 ```
 **Type :** Class
 
 **Multidimensional support :** ✅
 
-Creates an instance of a Vacisek Model process on the interval $[0, T]$, with specified mean, speed and volatility parameters.
-A Vacisek Model process $(X_t)_{t\geq0}$ is a solution of the following stochastic differential equation:
+Creates an instance of a Vasicek Model process on the interval $[0, T]$, with specified mean $\mu$, speed $\theta$, and volatility $\sigma$.
+A Vasicek Model process $(X_t)_{t\geq0}$ is a solution of the following stochastic differential equation:
 
 \begin{equation*}
 dX_t = \theta(\mu - X_t) dt + \sigma dW_t.
 \end{equation*}
 
 > [!NOTE]
-> The Vacisek Model process is a special case of the [Ornstein-Uhlenbeck](<project:/processes/diffusion/ornstein_uhlenbeck.md>) process, with mean parameter $\mu = 0$.
+> The Vasicek Model process is a special case of the [Ornstein-Uhlenbeck](<project:/processes/diffusion/ornstein_uhlenbeck.md>) process, with mean parameter $\mu = 0$.
 
 It is generally used to model short interest rates in financial markets.
 
 ### Parameters
 
 `mean` : _float_ or _array_like_
-: Long term mean parameter $\theta$ of the Vacisek model. It determines the mean quantity of the trajectory on the long term.
+: Long term mean parameter $\mu$ of the Vasicek model. It determines the mean quantity of the trajectory on the long term.
 
 `speed` : _float_ or _array_like_
-: Reverting speed parameter $\theta$ of the Vacisek model. It determines the speed at which the process reverts to zero. Must be strictly positive.
+: Reverting speed parameter $\theta$ of the Vasicek model. It determines the speed at which the process reverts to zero. Must be strictly positive.
 
 `volatility` : _float_ or _array_like_
-: Volatility parameter $\sigma$ of the Vacisek model. It determines the amplitude of the random fluctuations in the process. Must be strictly positive.
+: Volatility parameter $\sigma$ of the Vasicek model. It determines the amplitude of the random fluctuations in the process. Must be strictly positive.
 
 `initial` : _float_ or _array_like_
 : Initial value of the process at time $t=0$.
 
 `T` : _float_
-: Final time of the Vacisek process simulation. Must be greater than `0`.
+: Final time of the Vasicek process simulation. Must be greater than `0`.
 
 `steps` : _int_
 : Number of time steps between `0` and `T` on which the Geometric Brownian Motion is simulated. Must be strictly greater than 0.
 
 ### Attributes
-The Vacisek class inherits all attributes from the [Diffusion Process](<project:/processes/diffusion/index.md>) class.
+The Vasicek class inherits all attributes from the [Diffusion Process](<project:/processes/diffusion/index.md>) class.
 It also possesses the attributes deduced from its parameters.
 
 ### Methods
 
-The Vacisek class inherits all methods from the [Diffusion Process](<project:/processes/diffusion/index.md>) class.
+The Vasicek class inherits all methods from the [Diffusion Process](<project:/processes/diffusion/index.md>) class.
 
 ## Examples
 

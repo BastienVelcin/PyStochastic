@@ -5,17 +5,17 @@ Module HullWhite
 
 Description
 -----------
-This module provides a way to simulate a HullWhite process with a given long-term mean, diffusion and form parameter.
+This module provides a way to simulate a HullWhite process with a given reverting speed, calibration and volatility parameters.
 
 This module provides a general class "HullWhite", which inherits from the methods of Process and DiffusionProcess abstract classes.
 
 Examples
 --------
->> R = HullWhite(speed=2,mean=3,volatility=1,initial=0,T=1,steps=1000) #HullWhite process with speed 2, mean 3 and volatility 1 and starting point 0.
+>> H = HullWhite(reversion_speed=2 , calibration = lambda t : t, volatility = lambda t : 1, initial = 1, T = 1, steps = 1000) #HullWhite process with reverting speed 2, calibration function and volatility function and starting point 1.
 >>
->> R.simulate() #Simulate the HullWhite process path
+>> H.simulate() #Simulate the HullWhite process path
 >>
->> R.plot() #Plot the HullWhite process path
+>> H.plot() #Plot the HullWhite process path
 """
 
 import numpy as np
@@ -29,12 +29,12 @@ class HullWhite(DiffusionProcess):
     HullWhite class
 
     A HullWhite process is a stochastic process that satisfies the following equation:
-                                 dR_t = [calibration(t) - mean * R_t]dt + volatility(t)*dW_t
+                                 dR_t = [calibration(t) - reversion_speed * R_t]dt + volatility(t)*dW_t
 
     Parameters
     ----------
-    mean : float, or np.ndarray
-        Long term mean value of the model.
+    reversion_speed : float, or np.ndarray
+        Reverting speed value of the model.
     calibration : float or function
         Calibration function of the model
     volatility : float or function
@@ -48,8 +48,8 @@ class HullWhite(DiffusionProcess):
 
     Attributes
     ----------
-    mean : float, or np.ndarray
-        Long term mean value of the model.
+    reversion_speed : float, or np.ndarray
+        Reverting speed value of the model.
     calibration : float or function
         Calibration function of the model
     volatility : float or function
@@ -77,13 +77,13 @@ class HullWhite(DiffusionProcess):
 
     Examples
     --------
-    >> R = HullWhite(speed=2,mean=3,volatility=1,initial=0,T=1,steps=1000)
-    >> R.simulate()
-    >> R.plot()
+    >> H = HullWhite(reversion_speed=2 , calibration = lambda t : t, volatility = lambda t : 1, initial = 1, T = 1, steps = 1000)
+    >> H.simulate()
+    >> H.plot()
     """
 
     def __init__(self,
-                 mean= 1,
+                 reversion_speed= 1,
                  calibration=lambda t : t,
                  volatility=lambda t : 1,
                  initial=0,
@@ -93,11 +93,15 @@ class HullWhite(DiffusionProcess):
         super().__init__(T=T,
                          steps=steps)
 
-        self.name = "HullWhite process"
+        self.name = "Hull-White process"
 
-        if not isinstance(mean, (int, float)):
+        if not isinstance(reversion_speed, (int, float)):
             raise ValueError(
-                "The mean parameter should be a real number."
+                "The reverting speed parameter should be a real number."
+            )
+        if not reversion_speed > 0:
+            raise ValueError(
+                "The reverting speed parameter should be strictly positive."
             )
 
         if isinstance(calibration, (int, float)):
@@ -117,7 +121,7 @@ class HullWhite(DiffusionProcess):
                 "The initial value should be a real number"
             )
 
-        self.mean = mean
+        self.reversion_speed = reversion_speed
         self.calibration = calibration
         self.volatility = volatility
         self.initial = initial
@@ -144,7 +148,7 @@ class HullWhite(DiffusionProcess):
             Drift evaluated at x and t.
         """
 
-        return self.calibration(t) - (self.mean * x)
+        return self.calibration(t) - (self.reversion_speed * x)
 
     def diffusion(self,x,t=None):
 
@@ -193,7 +197,7 @@ class HullWhite(DiffusionProcess):
         if t == 0:
             return np.array([0])
         x = np.asarray(x)
-        int1 = scipy.integrate.quad(lambda s : np.exp(self.mean * s)*self.calibration(s), 0, t)[0]
-        int2 = scipy.integrate.quad(lambda s : np.exp(2 * self.mean * s)*self.volatility(s)**2, 0, t)[0]
-        N = Normal(mu = np.exp(-self.mean * t) * (self.initial + int1), var = np.exp(-2*self.mean*t)*int2)
+        int1 = scipy.integrate.quad(lambda s : np.exp(self.reversion_speed * s)*self.calibration(s), 0, t)[0]
+        int2 = scipy.integrate.quad(lambda s : np.exp(2 * self.reversion_speed * s)*self.volatility(s)**2, 0, t)[0]
+        N = Normal(mu = np.exp(-self.reversion_speed * t) * (self.initial + int1), var = np.exp(-2*self.reversion_speed*t)*int2)
         return N.pdf(x)
