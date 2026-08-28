@@ -16,12 +16,12 @@ pystochastic.processes.Heston(mu = 1, long_variance = 1, reverting_rate = 1, vol
 
 Creates an instance of a Heston Model process on the interval $[0, T]$, with specified long-term variance $\theta$, reveting rate $\kappa$, volatility of variance $\xi$, and correlation coefficient $\rho$.
 A Heston Model process $(S_t, \nu_t)_{t\geq0}$ is a solution of the following stochastic differential equation system:
-\begin{equation}
+\begin{equation*}
     \left\{ \begin{array}{l}
         dS_t = \mu S_t dt + \sqrt{\nu_t} S_t dW_t^{(1)}\\
-        d\nu_t = \kappa (\theta - \nu_t) dt + \xi \sqrt{nu_t} dW_t^{(2)} \\
+        d\nu_t = \kappa (\theta - \nu_t) dt + \xi \sqrt{\nu_t} dW_t^{(2)} \\
     \end{array} \right.
-\end{equation}
+\end{equation*}
 
 
 where $W_t^{(1)}$ and $W_t^{(2)}$ are two unidimensional standard Brownian motions, with a correlation coefficient $\rho$.
