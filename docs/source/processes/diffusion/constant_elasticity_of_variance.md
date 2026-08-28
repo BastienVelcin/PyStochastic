@@ -8,21 +8,23 @@ from pystochastic.processes import CEV
 ## Description
 
 ```python
-pystochastic.processes.CEV(speed=1, volatility=1, elasticity=1, initial=1, T = 1, steps=1000)
+pystochastic.processes.CEV(speed = 1, volatility = 1, elasticity = 1, initial = 1, T = 1, steps = 1000)
 ```
 **Type :** Class
 
 **Multidimensional support :** ❌
 
-Creates an instance of a Constant Elasticity of Variance model on the interval $[0, T]$, with a speed, volatility, and elasticity parameters.
+Creates an instance of a Constant Elasticity of Variance model on the interval $[0, T]$, with specified speed, volatility, and elasticity parameters.
 A Constant Elasticity of Variance (CEV) process $(S_t)_{t\geq0}$ is a solution of the following stochastic differential equation:
 
 \begin{equation*}
 dS_t = \mu S_t dt + \sigma S_t^\gamma dW_t.
 \end{equation*}
 
-The CEV process is an extension of the [Geometric Brownian Motion](<project:/processes/diffusion/geometric_brownian_motion.md>) ($\gamma = 1$), and of the
-[Ornstein-Uhlenbeck](<project:/processes/diffusion/ornstein_uhlenbeck.md>) process ($\gamma = 0$).
+> [!NOTE]
+>The CEV process is an extension of the [Geometric Brownian Motion](<project:/processes/diffusion/geometric_brownian_motion.md>) ($\gamma = 1$), and of the
+>[Ornstein-Uhlenbeck](<project:/processes/diffusion/ornstein_uhlenbeck.md>) process ($\gamma = 0$).
+
 It is generally used to model the price of a stock or a commodity.
 ### Parameters
 

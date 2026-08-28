@@ -31,7 +31,6 @@ Creates an instance of a $d$-dimensional Brownian Bridge on the interval $[0, T]
 `dim` : _int_
 : Dimension of the Brownian bridge. Must be strictly a strictly positive integer.
 
-
 `T` : _float_
 : Final time of the Brownian bridge simulation. Must be greater than `0`.
 

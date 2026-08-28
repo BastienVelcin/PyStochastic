@@ -28,7 +28,7 @@ It appears naturally in stochastic differential equations and so, within the dif
 
 ### Parameters
 
-`variance` : _float_ or _np.ndarray_
+`variance` : _float_ or _array_like_
 : Variance-covariance matrix of the Brownian motion. In the previous example, it is represented by $Q$.
 
 `T` : _float_

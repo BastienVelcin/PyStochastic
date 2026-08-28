@@ -8,13 +8,13 @@ from pystochastic.processes import GeometricBrownianMotion
 ## Description
 
 ```python
-pystochastic.processes.GeometricBrownianMotion(mu=1, volatility=1, initial=1, T = 1, steps=1000)
+pystochastic.processes.GeometricBrownianMotion(mu = 1, volatility = 1, initial = 1, T = 1, steps = 1000)
 ```
 **Type :** Class
 
 **Multidimensional support :** ✅
 
-Creates an instance of a Geometric Brownian Motion on the interval $[0, T]$, with a specified drift and volatility parameters.
+Creates an instance of a Geometric Brownian Motion on the interval $[0, T]$, with specified drift and volatility parameters.
 A Geometric Brownian Motion (GBM) process $(S_t)_{t\geq0}$ is a solution of the following stochastic differential equation:
 
 \begin{equation*}
@@ -25,13 +25,13 @@ dS_t = \mu S_t dt + \sigma S_t dW_t.
 > The Geometric Brownian Motion process is a special case of the [Constant Elasticity of Variance (CEV)](<project:/processes/diffusion/constant_elasticity_of_variance.md>) process, with elasticity parameter $\gamma = 1$.
 ### Parameters
 
-`mu` : _float_
+`mu` : _float_ or _array_like_
 : Drift parameter $\mu$ of the Geometric Brownian Motion. It determines the average evolution of the process.
 
-`volatility` : _float_
+`volatility` : _float_ or _array_like_
 : Volatility parameter $\sigma$ of the Geometric Brownian Motion. It determines the amplitude of the random fluctuations in the process. Must be strictly positive.
 
-`initial` : _float_
+`initial` : _float_ or _array_like_
 : Initial value of the process at time $t=0$.
 
 `T` : _float_
