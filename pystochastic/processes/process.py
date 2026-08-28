@@ -656,4 +656,6 @@ class Process(ABC):
         return quad_var
 
     def density(self, t, x):
-        pass
+        raise NotImplementedError(
+            "The density function is not implemented for this process yet."
+        )
