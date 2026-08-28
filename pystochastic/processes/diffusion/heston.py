@@ -152,9 +152,9 @@ class Heston(DiffusionProcess):
         self.reverting_rate = reverting_rate
         self.variance_volatility = variance_volatility
         self.price = None
-        self.variance = None
-        self.vol = None #The volatility will be sqrt(self.variance)
-        self.path = (self.price, self.variance)
+        self.var = None
+        self.path = None #The volatility will be sqrt(self.variance), and stored in the path
+        self.couple = (self.price, self.vol)
         self.dim = 1 #Plot dimension
 
         self.is_autonomous = True
@@ -259,7 +259,7 @@ class Heston(DiffusionProcess):
         W = Brownian(variance = covariance_matrix, T = self.T, steps = self.steps)
         W.simulate(n_simulations = n_simulations)
 
-        self.path = EulerMaruyama(drift=self.drift,
+        self.couple = EulerMaruyama(drift=self.drift,
                                   diffusion=self.diffusion,
                                   initial=np.array([self.initial_price, self.initial_variance]),
                                   T = self.T,
@@ -268,9 +268,9 @@ class Heston(DiffusionProcess):
                                                            parallel=parallel,
                                                            n_workers=n_workers,
                                                            brownian_sequence=W.increments)
-        self.price = self.path[:, :, 0]
-        self.variance = self.path[:, :, 1]
-        self.vol = np.sqrt(np.maximum(self.variance, 0))
+        self.price = self.couple[:, :, 0]
+        self.var = self.couple[:, :, 1]
+        self.path = np.sqrt(np.maximum(self.variance, 0))
         if plot:
             fig_price = go.Figure()
             fig_vol = go.Figure()
@@ -281,7 +281,7 @@ class Heston(DiffusionProcess):
                                                line=dict(width=2),
                                                name=f"Path {sim+1}"))
                 fig_vol.add_trace(go.Scatter(x=self.t,
-                                             y=self.vol[sim, :],
+                                             y=self.path[sim, :],
                                              mode="lines",
                                              line=dict(width=2),
                                              name=f"Path {sim+1}"))

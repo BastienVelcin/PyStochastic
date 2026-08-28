@@ -226,7 +226,7 @@ class Brownian(Process):
 
         if self.dim > 1:
             raise ValueError(
-                "The density is only defined implemented for 1D processes yet."
+                "The density is only implemented for 1D processes yet."
             )
 
         if t == 0:

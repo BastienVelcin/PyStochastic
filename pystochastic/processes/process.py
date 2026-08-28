@@ -327,6 +327,8 @@ class Process(ABC):
                 )
                 fig.show()
 
+
+
         elif self.dim == 2:
 
             fig = go.Figure()

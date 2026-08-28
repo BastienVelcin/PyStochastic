@@ -117,6 +117,12 @@ class BrownianBridge(Process):
         return t*(self.T - t)/self.T if i == j else 0
 
     def density(self,t,x):
+
+        if self.dim > 1:
+            raise ValueError(
+                "The density is only implemented for 1D processes yet."
+            )
+
         if t == 0 or t == self.T:
             return np.array([0])
         N = Normal(mu = 0, var = t*(self.T - t)/self.T)

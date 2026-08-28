@@ -176,9 +176,10 @@ class FractionalBrownianMotion(Process):
 
         if self.dim > 1:
             raise ValueError(
-                "The density is only defined implemented for 1D processes yet."
+                "The density is only implemented for 1D processes yet."
             )
 
         if t == 0:
             return np.array([0])
-        return (1/np.sqrt(2*np.pi*t**(self.hurst/2))) * np.exp( -x**2 /(2*t**(self.hurst/2)))
+        N = Normal(mu=0, var=t ** (2 * self.hurst))
+        return N.pdf(x)

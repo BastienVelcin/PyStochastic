@@ -19,6 +19,8 @@ Examples
 """
 
 import numpy as np
+import scipy
+
 from pystochastic.random.setseed import *
 from pystochastic.processes.diffusion.diffusion_process import DiffusionProcess
 
@@ -28,9 +30,7 @@ class CIR(DiffusionProcess):
     CIR class
 
     A Cox-Ingersoll-Ross process is a unidimensional stochastic process that satisfies the following equation:
-                                 dR_t = a*(b - R_t)dt + volatility*sqrt(R_t)dW_t,
-    For more information, please refer to :
-        - https://en.wikipedia.org/wiki/Cox%E2%80%93Ingersoll%E2%80%93Ross_model
+                                 dR_t = speed*(mean - R_t)dt + volatility*sqrt(R_t)dW_t,
 
     Parameters
     ----------
@@ -233,3 +233,20 @@ class CIR(DiffusionProcess):
 
     def covariance(self,t,i,j):
         return self.variance(t)
+
+    def density(self, t, x):
+
+        if t <= 0:
+            return np.array([0])
+
+        x = np.asarray(x)
+
+        nu = (4 * self.speed * self.mean) / (self.volatility ** 2)
+
+        c = ((self.volatility ** 2) * (1 - np.exp(-self.speed * t)) / (4 * self.speed))
+
+        factor = (4 * self.speed * np.exp(-self.speed * t) / ((self.volatility ** 2) * (1 - np.exp(-self.speed * t))))
+
+        noncentrality = factor * self.initial
+
+        return scipy.stats.ncx2.pdf(x / c,df=nu,nc=noncentrality) / c

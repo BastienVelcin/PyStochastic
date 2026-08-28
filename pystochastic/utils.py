@@ -57,5 +57,3 @@ def _decompose(value):
 
     # If not, we return true
     return value, False
-
-

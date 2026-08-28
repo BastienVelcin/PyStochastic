@@ -19,7 +19,9 @@ Examples
 """
 
 import numpy as np
+import scipy
 from pystochastic.processes.diffusion.diffusion_process import DiffusionProcess
+from pystochastic.dist import Normal
 
 class HullWhite(DiffusionProcess):
 
@@ -27,7 +29,7 @@ class HullWhite(DiffusionProcess):
     HullWhite class
 
     A HullWhite process is a stochastic process that satisfies the following equation:
-                                 dR_t = [calibration(t) + mean * R_t]dt + volatility(t)*dW_t
+                                 dR_t = [calibration(t) - mean * R_t]dt + volatility(t)*dW_t
 
     Parameters
     ----------
@@ -186,3 +188,12 @@ class HullWhite(DiffusionProcess):
         raise NotImplementedError(
             "There is no explicit formula for the variance of the Hull-White process."
         )
+
+    def density(self,t,x):
+        if t == 0:
+            return np.array([0])
+        x = np.asarray(x)
+        int1 = scipy.integrate.quad(lambda s : np.exp(self.mean * s)*self.calibration(s), 0, t)[0]
+        int2 = scipy.integrate.quad(lambda s : np.exp(2 * self.mean * s)*self.volatility(s)**2, 0, t)[0]
+        N = Normal(mu = np.exp(-self.mean * t) * (self.initial + int1), var = np.exp(-2*self.mean*t)*int2)
+        return N.pdf(x)

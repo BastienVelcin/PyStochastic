@@ -19,6 +19,8 @@ Examples
 """
 
 import numpy as np
+import scipy
+
 from pystochastic.processes.diffusion.diffusion_process import DiffusionProcess
 from pystochastic.random.setseed import *
 
@@ -157,7 +159,7 @@ class CEV(DiffusionProcess):
             Diffusion evaluated at x and t.
         """
 
-        return self.volatility * np.power(x,self.elasticity)
+        return self.volatility * np.power(np.max(x,0),self.elasticity)
 
     def _simulate_exact(self, n_simulations=1, plot=False):
 
