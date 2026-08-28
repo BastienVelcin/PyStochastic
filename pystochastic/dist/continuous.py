@@ -301,7 +301,7 @@ class Normal(ContinuousDistribution):
     """
     Normal probability distribution.
 
-    The Normal distribution is parameterized by a mean parameter ``mu`` and a standard deviation parameter ``sd``.
+    The Normal distribution is parameterized by a mean parameter ``mu`` and a variance parameter ``var``.
 
     Parameters
     ----------
