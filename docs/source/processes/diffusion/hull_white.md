@@ -34,7 +34,7 @@ It is generally used to model short interest rates in financial markets.
 `volatility` : _float_ or _function_
 : Volatility parameter $\sigma$ of the Hull-White model. It determines the amplitude of the random fluctuations in the process.
 
-`initial` : _float_ or _array_like_
+`initial` : _float_
 : Initial value of the process at time $t=0$.
 
 `T` : _float_
