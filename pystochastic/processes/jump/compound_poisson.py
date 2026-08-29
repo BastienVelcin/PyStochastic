@@ -81,8 +81,9 @@ class CompoundPoisson(JumpProcess):
 
         super().__init__(T = T,
                          steps = steps)
+        self.dim = 1
 
-        self.name = f"Compound Poisson process with {type(distribution).__name__} distribution of parameters {distribution.__dict__}"
+        self.name = "Compound Poisson process"
 
         if intensity <= 0:
             raise ValueError(
@@ -117,7 +118,7 @@ class CompoundPoisson(JumpProcess):
         N = PoissonProcess(intensity=self.intensity,T=self.T, steps=self.steps)
         N.simulate(n_simulations=n_simulations)
 
-        max_val_sim = np.max(N.path[:,-1]).astype(int)
+        max_val_sim = np.max(N.path[:,-1,0]).astype(int)
 
         #If the Poisson process is a constant zero process, we return the path which is constant zero.
         if max_val_sim == 0:
@@ -137,7 +138,7 @@ class CompoundPoisson(JumpProcess):
         jump_sums = np.concatenate([np.zeros((n_simulations, 1)),jump_sums,],axis=1,)
 
         # For each time, we take the cumulative sum of the simulated distribution at the corresponding time of the Poisson process
-        self.path = np.take_along_axis(jump_sums,N.path,axis=1)
+        self.path = np.take_along_axis(jump_sums,N.path[:,:,0],axis=1)[:,:,None]
 
         if plot:
             self.plot()

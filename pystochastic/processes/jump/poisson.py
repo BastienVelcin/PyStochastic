@@ -25,6 +25,7 @@ Examples
 import numpy as np
 import plotly.graph_objects as go
 from pystochastic.random import discrete
+from pystochastic.dist import Poisson
 from pystochastic.processes.jump.jump_process import JumpProcess
 
 class PoissonProcess(JumpProcess):
@@ -114,10 +115,10 @@ class PoissonProcess(JumpProcess):
             Path of the simulated Poisson process of the form ``(n_simulations, steps + 1)``.
         """
 
-        self.path = np.zeros((n_simulations, self.steps + 1))
+        self.path = np.zeros((n_simulations, self.steps + 1, 1))
 
         # The increments of a Poisson process follows : N_t_{i+1} - N_t_i ~ Poisson(intensity*dt)
-        increments = discrete.poisson(self.intensity * self.dt, n_simulations * self.steps).reshape((n_simulations, self.steps))
+        increments = discrete.poisson(self.intensity * self.dt, n_simulations * self.steps).reshape((n_simulations, self.steps, 1))
 
         # We compute N_t with cumsum
 
@@ -136,3 +137,9 @@ class PoissonProcess(JumpProcess):
 
     def variance(self,t):
         return self.intensity * t
+
+    def density(self,t,x):
+        if t == 0:
+            return np.array([0])
+        P = Poisson(lam  = t*self.intensity)
+        return P.pmf(np.floor(x))

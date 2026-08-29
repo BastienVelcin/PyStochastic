@@ -41,10 +41,10 @@ It is generally used to model short interest rates in financial markets.
 : Initial value of the process at time $t=0$.
 
 `T` : _float_
-: Final time of the Cox-Ingersoll-Ross process simulation. Must be greater than `0`.
+: Final time of the Cox-Ingersoll-Ross model simulation. Must be greater than `0`.
 
 `steps` : _int_
-: Number of time steps between `0` and `T` on which the Geometric Brownian Motion is simulated. Must be strictly greater than 0.
+: Number of time steps between `0` and `T` on which the Cox-Ingersoll-Ross model is simulated. Must be strictly greater than 0.
 
 ### Attributes
 The Cox-Ingersoll-Ross class inherits all attributes from the [Diffusion Process](<project:/processes/diffusion/index.md>) class.

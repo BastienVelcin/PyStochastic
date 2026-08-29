@@ -361,18 +361,13 @@ _np.ndarray_
 ```{toctree}
 :maxdepth: 2
 :caption: Elementary processes
-elementary/brownian
-elementary/brownian_bridge
-elementary/fractional_brownian_motion
-elementary/bessel
+elementary/index
 
 :maxdepth: 2
 :caption: Diffusion processes
 diffusion/index
 
-:maxdepth: 1
+:maxdepth: 2
 :caption: Jump processes
 jump/index
-jump/poisson
-jump/compound_poisson
 ```

@@ -1,4 +1,4 @@
-# Diffusion Process class
+# Diffusion Processes
 
 The `DiffusionProcess` module provides an abstract class for all diffusion processes. A diffusion process is a stochastic process that is defined as a solution of a stochastic differential equation of the following form:
 
@@ -22,7 +22,7 @@ from pystochastic.processes.diffusion import *
 
 
 ## Attributes
-This section lists all the attributes that are common to all implemented diffuprocesses.
+This section lists all the attributes that are common to all implemented diffusion processes.
 
 `T` : _float_
 : Final time of the process. The process is simulated on the interval $[0,T]$.

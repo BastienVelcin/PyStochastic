@@ -1,4 +1,4 @@
-# Ornstein-Uhlenbeck process
+# Ornstein-Uhlenbeck Process
 
 ## Import line
 You can import the Ornstein-Uhlenbeck process class from the `processes` module as follows:
@@ -41,7 +41,7 @@ It is generally used to model interest rates in financial markets.
 : Final time of the Ornstein-Uhlenbeck process simulation. Must be greater than `0`.
 
 `steps` : _int_
-: Number of time steps between `0` and `T` on which the Geometric Brownian Motion is simulated. Must be strictly greater than 0.
+: Number of time steps between `0` and `T` on which the Ornstein-Uhlenbeck process is simulated. Must be strictly greater than 0.
 
 ### Attributes
 The Ornstein-Uhlenbeck class inherits all attributes from the [Diffusion Process](<project:/processes/diffusion/index.md>) class.

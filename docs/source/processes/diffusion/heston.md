@@ -24,7 +24,7 @@ A Heston Model process $(S_t, \nu_t)_{t\geq0}$ is a solution of the following st
 \end{equation*}
 
 
-where $W_t^{(1)}$ and $W_t^{(2)}$ are two unidimensional standard Brownian motions, with a correlation coefficient $\rho$.
+where $\left(W_t^{(1)}\right)_{t\geq 0}$ and $\left(W_t^{(2)}\right)_{t\geq 0}$ are two unidimensional standard Brownian motions, with a correlation coefficient $\rho$.
 It is generally used to model short interest rates in financial markets.
 The sub-process $(S_t)_{t\geq0}$ represents the asset price, and the sub-process $(\sqrt{\nu_t})_{t\geq0}$ represents the volatility of the asset price.
 
@@ -55,10 +55,10 @@ The sub-process $(S_t)_{t\geq0}$ represents the asset price, and the sub-process
 : Initial value of the variance process at time $t=0$.
 
 `T` : _float_
-: Final time of the Cox-Ingersoll-Ross process simulation. Must be greater than `0`.
+: Final time of the Heston model simulation. Must be greater than `0`.
 
 `steps` : _int_
-: Number of time steps between `0` and `T` on which the Geometric Brownian Motion is simulated. Must be strictly greater than 0.
+: Number of time steps between `0` and `T` on which the Heston model is simulated. Must be strictly greater than 0.
 
 ### Attributes
 The Heston class inherits all attributes from the [Diffusion Process](<project:/processes/diffusion/index.md>) class.
