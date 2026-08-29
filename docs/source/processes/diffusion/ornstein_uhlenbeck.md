@@ -22,7 +22,7 @@ dX_t = -\theta X_t dt + \sigma dW_t.
 \end{equation*}
 
 > [!NOTE]
-> The Ornstein-Uhlenbeck process is a special case of the [Constant Elasticity of Variance (CEV)](<project:/processes/diffusion/constant_elasticity_of_variance.md>) process, with elasticity parameter $\gamma = 0$.
+> The Ornstein-Uhlenbeck process is a special case of the [Vasicek](<project:/processes/diffusion/vasicek.md>) model, with mean parameter $\mu = 0$.
 
 It is generally used to model interest rates in financial markets.
 

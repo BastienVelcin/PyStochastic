@@ -159,7 +159,7 @@ class CEV(DiffusionProcess):
             Diffusion evaluated at x and t.
         """
 
-        return self.volatility * np.power(np.max(x,0),self.elasticity)
+        return self.volatility * np.power(np.maximum(x,0),self.elasticity)
 
     def _simulate_exact(self, n_simulations=1, plot=False):
 

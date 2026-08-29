@@ -21,9 +21,6 @@ A Vasicek Model process $(X_t)_{t\geq0}$ is a solution of the following stochast
 dX_t = \theta(\mu - X_t) dt + \sigma dW_t.
 \end{equation*}
 
-> [!NOTE]
-> The Vasicek Model process is a special case of the [Ornstein-Uhlenbeck](<project:/processes/diffusion/ornstein_uhlenbeck.md>) process, with mean parameter $\mu = 0$.
-
 It is generally used to model short interest rates in financial markets.
 
 ### Parameters
