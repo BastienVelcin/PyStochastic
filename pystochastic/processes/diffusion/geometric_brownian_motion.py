@@ -89,10 +89,15 @@ class GeometricBrownianMotion(DiffusionProcess):
                  T=1,
                  steps=1000):
 
-        super().__init__(T = T,
-                         steps=steps)
+        if initial is None:
+            initial = np.ones(np.size(mu))
+        self.initial = np.atleast_1d(initial)
 
-        self.name = "Geometric Brownian Motion"
+        super().__init__(T = T,
+                         steps = steps,
+                         dim = np.size(self.initial),
+                         name = "Geometric Brownian Motion")
+
         self.is_autonomous = True
 
         self.mu = np.atleast_1d(mu)
@@ -103,11 +108,6 @@ class GeometricBrownianMotion(DiffusionProcess):
         if self.volatility.ndim == 1:
             self.volatility = np.diag(self.volatility)
 
-        if initial is None:
-            initial = np.ones(np.size(mu))
-
-        self.initial = np.atleast_1d(initial)
-        self.dim = np.size(self.initial)
 
         if self.volatility.ndim == 1 and not(np.shape(self.volatility) == self.dim == np.size(self.mu)):
             raise ValueError(

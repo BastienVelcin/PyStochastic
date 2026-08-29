@@ -8,14 +8,17 @@ class Process(ABC):
     def __init__(
             self,
             T = 1,
-            steps=1000):
+            steps=1000,
+            dim = 1,
+            name = ""):
 
         self.T = T
     
         self.steps = steps
         self.n_simulations = None
         self.path = None
-        self.dim = 1
+        self.dim = dim
+        self.name = name
 
         if not 0 < T:
             raise ValueError(
@@ -139,9 +142,9 @@ class Process(ABC):
                     row=1,
                     col=1)
 
-                initial_values = paths[:, -1]
+                final_values = paths[:, -1]
 
-                fig.add_trace(go.Histogram(y=initial_values,orientation="h",
+                fig.add_trace(go.Histogram(y=final_values,orientation="h",
                                            nbinsy=30,
                                            name="Histogram",
                                            histnorm="probability density",
@@ -156,7 +159,7 @@ class Process(ABC):
 
                 # We want to know if the density is known for the process.
                 try:
-                    x_density = np.linspace(np.min(initial_values),np.max(initial_values),300)
+                    x_density = np.linspace(np.min(final_values),np.max(final_values),300)
 
                     density_values = self.density(self.t[-1],x_density)
 
@@ -170,7 +173,7 @@ class Process(ABC):
                                              line=dict(width=3),
                                              name="Density",
                                              marker=dict(color='#ff4b7d'),
-                                             howlegend=True),
+                                             showlegend=True),
                                   row=1,
                                   col=2)
 
@@ -354,10 +357,12 @@ class Process(ABC):
                 "The maximum value can only be computed in 1D. Please refer to the max_norm function."
             )
 
-        argmax = np.argmax(self.path, axis=1)
+        path = self.path[:, :, 0]
+
+        argmax = np.argmax(path, axis=1)
 
         # RETURN FORM: (max_value, time_index, time)
-        return np.max(self.path, axis=1), argmax, self.t[argmax]
+        return np.max(path, axis=1), argmax, self.t[argmax]
 
     def min(self):
 
@@ -387,10 +392,12 @@ class Process(ABC):
                 "The minimum value can only be computed in 1D."
             )
 
-        argmin = np.argmin(self.path, axis=1)
+        path = self.path[:, :, 0]
+
+        argmin = np.argmin(path, axis=1)
 
         # RETURN FORM: (max_value, time_index, time)
-        return np.min(self.path, axis=1), argmin, self.t[argmin]
+        return np.min(path, axis=1), argmin, self.t[argmin]
 
 
     def max_norm(self, order=2):
@@ -403,8 +410,10 @@ class Process(ABC):
 
         Parameters
         ----------
-        order : int
+        order : int or float or np.inf
             Order of the norm. If order = p, then || (x_1 , ... x,n) || = (x_1^p + ... x_n^p)^(1/p).
+            If order = np.inf, then || (x_1 , ... x,n) || = max_i |x_i|.
+            Must be strictly positive.
 
         Returns
         -------
@@ -417,7 +426,12 @@ class Process(ABC):
                 "The path has not been simulated yet. Please run the simulate method first."
             )
 
-        norms = np.linalg.norm(self.path**2, ord=order, axis=2)
+        if not isinstance(order, (int, float)) or order < 1:
+            raise ValueError(
+                "The order must be a strictly positive integer."
+            )
+
+        norms = np.linalg.norm(self.path, ord=order, axis=2)
         arg_max = np.argmax(norms, axis=1)
         values = (self.path[np.arange(0,self.n_simulations),arg_max,:])
 
@@ -486,9 +500,10 @@ class Process(ABC):
             Value at which we want to get the hitting time.
         inequality: {"<", ">"}
             Direction of the inequality
-        order: int
+        order: int or float or np.inf
             Order of the desired norm. If order = p, then || (x_1 , ... x,n) || = (x_1^p + ... x_n^p)^(1/p).
-            Must be a strictly positive integer.
+            If order = np.inf, then || (x_1 , ... x,n) || = max_i |x_i|.
+            Must be strictly positive.
 
         Returns
         -------
@@ -506,7 +521,7 @@ class Process(ABC):
                 "The inequality must be either '<' or '>'"
             )
 
-        if not isinstance(order, int) and not order >= 1:
+        if not isinstance(order, (int, float)) or order < 1:
             raise ValueError(
                 "The order must be a strictly positive integer."
             )
@@ -534,22 +549,23 @@ class Process(ABC):
         """
         Quadratic Variation method
 
-        The quadratic variation method returns an approximation of the first time at which the process reaches a given value.
-        The methods support both the inequality ">" and "<".
+        The quadratic variation method returns an approximation of the quadratic variation at a specified time t.
 
         Parameters
         ----------
-        value: float
-            Value at which we want to get the hitting time.
-        mean: bool
-            Specify if the quadratic variation should be computed at the mean of the quadratic variation estimation of all simulated processes.
+        t : float or None
+            Time at which we want to get the quadratic variation. If None, we compute the quadratic variation along [0,T].
+            Must be between [0,T] if not None.
+        mean : bool
+            If few simulations are made, we can approximate the quadratic variation of the current process by computing the
+            mean of all quadratic variation estimation.
         plot : bool
             Specify if the path should be plotted.
 
         Returns
         -------
         np.ndarray
-            Estimation of the hitting time for each simulation, or average quadratic variation estimation.
+            Estimation of the quadratic variation.
         """
 
         if self.dim != 1:
@@ -560,6 +576,11 @@ class Process(ABC):
         if self.path is None:
             raise ValueError(
                 "The path has not been simulated yet. Please run the simulate method first."
+            )
+
+        if not 0 <= t <= self.T:
+            raise ValueError(
+                f"The time must be between {0} and {self.T}."
             )
 
         if t is None:

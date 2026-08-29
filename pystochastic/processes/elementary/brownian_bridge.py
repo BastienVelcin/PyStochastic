@@ -65,9 +65,9 @@ class BrownianBridge(Process):
                  steps=1000):
 
         super().__init__(T = T,
-                         steps = steps)
-        self.name = "Brownian Bridge"
-        self.dim = dim
+                         steps = steps,
+                         dim = dim,
+                         name = "Brownian Bridge" )
 
     def simulate(self,n_simulations=1,plot=False):
 

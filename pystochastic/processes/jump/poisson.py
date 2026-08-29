@@ -84,9 +84,9 @@ class PoissonProcess(JumpProcess):
                  steps=1000):
 
         super().__init__(T = T,
-                         steps = steps)
-
-        self.name = "Poisson process"
+                         steps = steps,
+                         dim = 1,
+                         name = "Poisson process")
 
         if intensity <= 0:
             raise ValueError(
@@ -94,7 +94,6 @@ class PoissonProcess(JumpProcess):
             )
 
         self.intensity = intensity
-        self.dim = 1
 
 
     def simulate(self,n_simulations=1,plot=False):

@@ -118,7 +118,9 @@ class Heston(DiffusionProcess):
             steps=1000):
 
         super().__init__(T = T,
-                         steps = steps)
+                         steps = steps,
+                         dim = 1,
+                         name = "Heston model")
 
         if initial_price < 0:
             raise ValueError(
@@ -149,7 +151,6 @@ class Heston(DiffusionProcess):
                 "The correlation coefficient must be strictly between -1 and 1."
             )
 
-        self.name = "Heston process"
         self.mu = mu
         self.initial_price = initial_price
         self.initial_variance = initial_variance
@@ -160,7 +161,6 @@ class Heston(DiffusionProcess):
         self.price = None
         self.var = None
         self.path = None #The volatility will be sqrt(self.variance), and stored in the path
-        self.dim = 1 #Plot dimension
         self.couple = (self.price, self.path)
         self.is_autonomous = True
     @property

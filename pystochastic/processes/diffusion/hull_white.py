@@ -91,9 +91,9 @@ class HullWhite(DiffusionProcess):
                  steps=1000):
 
         super().__init__(T=T,
-                         steps=steps)
-
-        self.name = "Hull-White process"
+                         steps=steps,
+                         dim = 1,
+                         name="Hull-White model")
 
         if not isinstance(reversion_speed, (int, float)):
             raise ValueError(
@@ -125,7 +125,6 @@ class HullWhite(DiffusionProcess):
         self.calibration = calibration
         self.volatility = volatility
         self.initial = initial
-        self.dim = 1
         self.is_autonomous = False
 
     def drift(self,x,t=None):

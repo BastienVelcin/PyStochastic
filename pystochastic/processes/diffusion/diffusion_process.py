@@ -75,7 +75,10 @@ class DiffusionProcess(Process,ABC):
         """
         self.n_simulations = n_simulations
 
-        if not self.is_autonomous and method != "euler-maruyama":
+        if method == "exact":
+            self.path = self._simulate_exact(n_simulations=n_simulations,plot= plot)
+
+        elif not self.is_autonomous and method != "euler-maruyama":
             print("Because the process SDE is not autonomous, the Euler-Maruyama method is used by default.")
             method = "euler-maruyama"
 
@@ -116,8 +119,7 @@ class DiffusionProcess(Process,ABC):
                                    self.T,
                                    self.steps).solve(n_simulations, plot=plot)
 
-        elif method == "exact":
-            self.path = self._simulate_exact(n_simulations=n_simulations,plot= plot)
+
         else:
             raise ValueError(
                 "The method must be either 'euler-maruyama', 'milstein', 'runge-kutta' or 'exact'."

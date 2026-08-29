@@ -75,11 +75,14 @@ class Bessel(Process):
                  T=1,
                  steps=1000):
 
-        super().__init__(T=T,
-                         steps=steps)
-        self.initial = 0
         self.order = order
-        self.name = f"Bessel process of order {self.order}"
+
+        super().__init__(T=T,
+                         steps=steps,
+                         dim = 1,
+                         name = f"Bessel process of order {self.order}")
+
+        self.initial = 0
         self.dim = 1
 
 

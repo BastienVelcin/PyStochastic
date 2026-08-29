@@ -98,20 +98,20 @@ class CIR(DiffusionProcess):
                  steps=1000):
 
         super().__init__(T = T,
-                         steps=steps)
+                         steps=steps,
+                         dim = 1,
+                         name = "Cox-Ingersoll-Ross process")
 
         self.speed = speed
         self.mean = mean
         self.volatility = volatility
         self.initial = initial
-        self.name = "Cox-Ingersoll-Ross process"
 
         if (self.speed <= 0) or (self.mean < 0) or (self.volatility <= 0) or (self.initial < 0):
             raise ValueError(
                 "The model parameters must satisfy a > 0, b >= 0, volatility > 0 and initial >= 0."
             )
 
-        self.dim = 1
         self.is_autonomous = True
 
     @property

@@ -98,12 +98,13 @@ class Vasicek(DiffusionProcess):
                  T = 1,
                  steps=1000):
 
-        super().__init__(T = T,
-                         steps=steps)
-
-        self.name = "Vasicek process"
-        self.is_autonomous = True
         self.mean = np.atleast_1d(mean)
+        super().__init__(T = T,
+                         steps=steps,
+                         dim = self.mean.size,
+                         name = "Vasicek process")
+
+        self.is_autonomous = True
 
         self.speed = np.atleast_1d(speed)
         self.volatility = np.atleast_1d(volatility)
@@ -118,7 +119,7 @@ class Vasicek(DiffusionProcess):
         if self.volatility.ndim == 1:
             self.volatility = np.diag(self.volatility)
 
-        self.dim = self.mean.size
+
         self.initial = np.atleast_1d(initial)
 
         if not(np.shape(self.speed)[0] == np.shape(self.speed)[1] == self.dim == np.shape(self.volatility)[0] == np.shape(self.volatility)[1]  == self.initial.size):

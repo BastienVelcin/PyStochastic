@@ -91,16 +91,13 @@ class OrnsteinUhlenbeck(DiffusionProcess):
                  T = 1,
                  steps=1000):
 
-
-        super().__init__(T = T,
-                         steps=steps)
-
-        self.name = "Ornstein Uhlenbeck process"
-
         self.speed = np.atleast_1d(speed)
         self.volatility = np.atleast_1d(volatility)
 
-        self.dim = self.speed.shape[0]
+        super().__init__(T = T,
+                         steps=steps,
+                         dim = self.speed.shape[0],
+                         name = "Ornstein Uhlenbeck process")
 
         self.m_speed = np.atleast_2d(speed)
         self.m_volatility = np.atleast_2d(volatility)

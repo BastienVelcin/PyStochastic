@@ -80,10 +80,9 @@ class CompoundPoisson(JumpProcess):
                  steps=1000):
 
         super().__init__(T = T,
-                         steps = steps)
-        self.dim = 1
-
-        self.name = "Compound Poisson process"
+                         steps = steps,
+                         dim = 1,
+                         name = "Compound Poisson process")
 
         if intensity <= 0:
             raise ValueError(

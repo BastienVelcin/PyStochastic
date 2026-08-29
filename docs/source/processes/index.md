@@ -249,12 +249,16 @@ _tuple_ : (np.ndarray, np.ndarray, np.ndarray)
 ```python
 .max_norm(order = 2)
 ```
-Returns the maximum norm value of the effective process. The available norms are p-norms for $1 \leq p < +\infty$.
+Returns the maximum norm value of the effective process. The available norms are p-norms for $1 \leq p \leq +\infty$.
 
 **Parameters**
 
-`order` : _int_
-: Order of the norm. If `order = p`, then the norm is defined by : $||x||_p = \sqrt[p]{\sum_{i=1}^d x_i^p}$.
+`order` : _int_, _float_ or _np.inf_
+: Order of the norm. If `order = p < +\infty`, then the norm is defined by : $||x||_p = \sqrt[p]{\sum_{i=1}^d x_i^p}$.
+: If `order = p = +\infty` then the norm is defined by : $||x||_p = \max_{1\leq i \leq d} |x_i| $.
+
+> [!NOTE]
+> The infinity value can be represented by `np.inf`.
 
 **Returns**
 
@@ -314,8 +318,12 @@ depending on the value of the `inequality` parameter.
 `inequality` : _str_ in {"<", ">"}
 : Inequality direction.
 
-`order` : _int_
-: Order of the norm. If `order = p`, then the norm is defined by : $||x||_p = \sqrt[p]{\sum_{i=1}^d x_i^p}$.
+`order` : _int_, _float_ or _np.inf_
+: Order of the norm. If `order = p < ∞`, then the norm is defined by : $||x||_p = \sqrt[p]{\sum_{i=1}^d x_i^p}$.
+: If `order = p = +∞` then the norm is defined by : $||x||_p = \max_{1\leq i \leq d} |x_i| $.
+
+> [!NOTE]
+> The infinity value can be represented by `np.inf`.
 
 **Returns**
 
@@ -360,14 +368,11 @@ _np.ndarray_
 
 ```{toctree}
 :maxdepth: 2
-:caption: Elementary processes
 elementary/index
 
 :maxdepth: 2
-:caption: Diffusion processes
 diffusion/index
 
 :maxdepth: 2
-:caption: Jump processes
 jump/index
 ```

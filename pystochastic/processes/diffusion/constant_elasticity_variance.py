@@ -92,9 +92,9 @@ class CEV(DiffusionProcess):
                  steps=1000):
 
         super().__init__(T = T,
-                         steps=steps)
-
-        self.name = "CEV process"
+                         steps=steps,
+                         dim = 1,
+                         name = "Constant Elasticity of Variance process")
 
         if not isinstance(speed, (int, float)):
             raise ValueError(
@@ -113,7 +113,6 @@ class CEV(DiffusionProcess):
         self.volatility = volatility
         self.elasticity = elasticity
         self.initial = initial
-        self.dim = 1
         self.is_autonomous = True
 
     def drift(self, x, t=None):

@@ -70,17 +70,17 @@ class FractionalBrownianMotion(Process):
                  T= 1,
                  steps= 1000):
 
+        self.hurst = hurst
+
         super().__init__(T=T,
-                         steps=steps)
+                         steps=steps,
+                         dim = 1,
+                         name = f"{self.hurst}-Fractional Brownian Motion")
 
         if not 0 < hurst < 1:
             raise ValueError(
                 "The Hurst index must be a float strictly between 0 and 1."
             )
-
-        self.hurst = hurst
-        self.name = f"Fractional Brownian Motion with Hurst index {self.hurst}"
-        self.dim = 1
 
     @property
     def time_matrix(self):

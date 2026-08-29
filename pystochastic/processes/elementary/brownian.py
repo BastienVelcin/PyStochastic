@@ -83,18 +83,18 @@ class Brownian(Process):
                  T=1,
                  steps=1000):
 
-        super().__init__(T=T,
-                         steps=steps)
-
-        self.name = "Brownian Motion"
         self.variance = np.atleast_2d(variance)
+
+        super().__init__(T=T,
+                         steps=steps,
+                         dim = np.shape(self.variance)[0],
+                         name = "Brownian Motion")
 
         if not is_pos_def(self.variance):
             raise ValueError(
                 "The covariance matrix is not positive-definite."
             )
 
-        self.dim = np.shape(self.variance)[0]
         self.sim = None
         self.increments =None
 
