@@ -132,12 +132,22 @@ class PoissonProcess(JumpProcess):
 
 
     def expectation(self,t):
+
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
         return self.intensity*t
 
     def variance(self,t):
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
         return self.intensity * t
 
     def density(self,t,x):
+
         if t == 0:
             return np.array([0])
         P = Poisson(lam  = t*self.intensity)

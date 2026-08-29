@@ -145,11 +145,23 @@ class CompoundPoisson(JumpProcess):
         return self.path
 
     def expectation(self,t):
+
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
+
         if self.distribution.mean() is not None or self.distribution.mean() != np.inf:
             return self.intensity * t * self.distribution.mean()
         return None
 
     def variance(self,t):
+
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
+
         if self.distribution.variance() is not None or self.distribution.variance() != np.inf:
             moment2 = self.distribution.variance() + self.distribution.mean()**2
             return self.intensity * t * moment2

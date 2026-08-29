@@ -254,6 +254,11 @@ class Vasicek(DiffusionProcess):
                             initial * exp(-speed*t) + mean * (Id - exp(-volatility*t))
         """
 
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
+
         return self.mean + scipy.linalg.expm(-self.m_speed * t) @ (self.initial - self.mean)
 
     def covariance_matrix(self, t):
@@ -275,6 +280,11 @@ class Vasicek(DiffusionProcess):
         np.ndarray
             Covariance matrix of the Ornstein-Uhlenbeck process at a time t.
         """
+
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
 
         Q = self.m_volatility @ self.m_volatility.T
 
@@ -331,6 +341,11 @@ class Vasicek(DiffusionProcess):
         This method is using the covariance matrix method, which solves the Lyapunov equation.
         """
 
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
+
         return self.covariance_matrix(t)[i,j]
 
     def variance(self,t):
@@ -356,6 +371,11 @@ class Vasicek(DiffusionProcess):
         This method is using the covariance matrix method, which solves the Lyapunov equation.
         """
 
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
+
         return np.diag(self.covariance_matrix(t))
 
     def density(self,t,x):
@@ -363,6 +383,11 @@ class Vasicek(DiffusionProcess):
         if self.dim > 1:
             raise ValueError(
                 "The density is only implemented for 1D processes yet."
+            )
+
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
             )
 
         if t == 0:

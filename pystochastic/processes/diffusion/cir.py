@@ -191,9 +191,9 @@ class CIR(DiffusionProcess):
         The expectation of the CIR path at every time t with a fixed initial is given by initial * exp(-speed*t) + b*(1-exp(-speed*t))
         """
 
-        if not 0 <= t <= self.T:
+        if t < 0:
             raise ValueError(
-                "The time must be between 0 and T."
+                "The time parameter must be positive."
             )
 
         return self.initial * np.exp(-self.speed * t) + self.mean*(1-np.exp(-self.speed * t))
@@ -221,9 +221,9 @@ class CIR(DiffusionProcess):
         initial * volatility^2/a * (exp(-a*t)-exp(-2*a*t)) + (b*volatility^2)/(2*a) * (1-exp(-a*t))^2
         """
 
-        if not 0 <= t <= self.T:
+        if t < 0:
             raise ValueError(
-                "The time must be between 0 and T."
+                "The time parameter must be positive."
             )
 
         return self.initial * (self.volatility**2 / self.speed) * (np.exp(-self.speed*t)-np.exp(-2 * self.speed * t)) + (self.mean * self.volatility**2)/(2*self.speed) * (1-np.exp(-self.speed*t))**2
@@ -235,6 +235,11 @@ class CIR(DiffusionProcess):
         return self.variance(t)
 
     def density(self, t, x):
+
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
 
         if t <= 0:
             return np.array([0])

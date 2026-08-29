@@ -147,6 +147,11 @@ class Bessel(Process):
                 "The density is only implemented for 1D processes yet."
             )
 
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
+
         if t == 0:
             return np.array([0])
         return 1/(2**((self.order/2)-1)*scipy.special.gamma(self.order/2) * np.sqrt(t)) * (x/np.sqrt(t))**(self.order-1) * np.exp(-x**2 /(2*t))

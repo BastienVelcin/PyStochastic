@@ -190,6 +190,11 @@ class CEV(DiffusionProcess):
                             initial * exp(-speed*t) + mean * (Id - exp(-volatility*t))
         """
 
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
+
         return self.initial * np.exp(self.speed * t)
 
     def covariance_matrix(self, t):

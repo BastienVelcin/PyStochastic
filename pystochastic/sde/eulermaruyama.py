@@ -33,10 +33,10 @@ from pystochastic.processes import Brownian
 from pystochastic.utils import default_drift, default_diffusion, _decompose
 
 
-def _is_vectorizable_diffusion(f, initial):
+def _is_vectorizable(f, initial):
 
     """
-    Is Diagonal Form function
+    Is vectoziable diffusion function
 
     Tests if f(initial,0) returns a scalar or a vector (diagonal diffusion,
     vectorisable on all simulations at once), or a full (dim,dim) matrix, which requires
@@ -249,9 +249,20 @@ class EulerMaruyama:
                 "The final time must be strictly greater than 0."
             )
 
+        if steps <= 0 or not isinstance(steps, (int, np.integer)):
+            raise ValueError(
+                "The number of steps must be a strictly positive integer."
+            )
+
         self.drift = drift
         self.diffusion = diffusion
         self.initial = np.atleast_1d(initial)
+
+        if not self.initial.ndim == 1:
+            raise ValueError(
+                "The initial condition must be a 1D array-like."
+            )
+
         self.T = T
         self.steps = steps
         self.n_simulations = None
@@ -259,7 +270,7 @@ class EulerMaruyama:
         self.t = np.linspace(0, T, steps + 1)
         self.dt = T / steps
 
-    def solve(self, n_simulations = 1, plot=True, parallel=False, n_workers=None, brownian_sequence = None):
+    def solve(self, n_simulations = 1, plot=True, parallel=False, n_workers=None, brownian_increments = None):
 
         """
         Solve method.
@@ -278,7 +289,7 @@ class EulerMaruyama:
             faster than any parallelization could offer.
         n_workers : int
             Number of worker processes. Defaults to the number of available cores.
-        brownian_sequence : np.ndarray
+        brownian_increments : np.ndarray
             Paths of n_simulations dim-dimensional Brownian increments. Useful when the Brownian increments are already computed.
 
         Returns
@@ -287,22 +298,30 @@ class EulerMaruyama:
             Simulated path of shape (n_simulations, steps+1, dim).
         """
 
+        if n_simulations <= 0 or not isinstance(n_simulations, (int, np.integer)):
+            raise ValueError(
+                "The number of steps must be a strictly positive integer."
+            )
 
         self.n_simulations = n_simulations
 
         # We compute the different brownian path and increments that will be used in the simulation.
-        if brownian_sequence is None:
+        if brownian_increments is None:
             W = Brownian(np.eye(self.dim), self.T, self.steps)
             W.simulate(self.n_simulations)
             dW = W.increments
         else:
-            dW = brownian_sequence
+            if not dW.shape == (self.n_simulations, self.steps, self.dim):
+                raise ValueError(
+                    "The brownian sequence must have the same shape as the number of simulations."
+                )
+            dW = brownian_increments
 
         # We define the list of arguments that will be passed to the simulation functions.
         args = (self.drift, self.diffusion, self.initial, self.t, self.dt, self.steps, self.dim, dW)
 
         #If the diffusion is diagonal, we use the vectorized method. Otherwise, we use the sequential method.
-        if _is_vectorizable_diffusion(self.diffusion, self.initial):
+        if _is_vectorizable(self.diffusion, self.initial) and _is_vectorizable(self.drift, self.initial) :
             Y = _simulate_vectorized(*args)
 
         # SEQUENTIAL METHOD :
@@ -318,6 +337,7 @@ class EulerMaruyama:
                 n_workers = cpu_count()
 
             # We split the increments into chunks, and pass each chunk to a worker process.
+            n_workers = min(n_workers, n_simulations) #The parallelisation have no interest for small number of simulations.
             chunks = np.array_split(dW, n_workers, axis=0)
 
             worker_args = [(self.drift, self.diffusion, self.initial, self.t, self.dt,

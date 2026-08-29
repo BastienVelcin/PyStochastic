@@ -101,19 +101,43 @@ class BrownianBridge(Process):
         return self.path
 
     def expectation(self,t):
+
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
+
         return 0
 
     def variance(self,t):
+
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
+
         if self.dim == 1:
             return t*(self.T - t)/self.T
         return np.diag(t*(self.T - t)/self.T*np.eye(self.dim))
 
     def covariance_matrix(self,t):
+
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
+
         if self.dim == 1:
             return t*(self.T - t)/self.T
         return t*(self.T - t)/self.T*np.eye(self.dim)
 
     def covariance(self,t,i,j):
+
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
+
         return t*(self.T - t)/self.T if i == j else 0
 
     def density(self,t,x):
@@ -123,6 +147,10 @@ class BrownianBridge(Process):
                 "The density is only implemented for 1D processes yet."
             )
 
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
         if t == 0 or t == self.T:
             return np.array([0])
         N = Normal(mu = 0, var = t*(self.T - t)/self.T)

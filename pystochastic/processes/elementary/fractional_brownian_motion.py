@@ -21,7 +21,7 @@ Examples
 import numpy as np
 from pystochastic.random import continuous
 from pystochastic.processes.process import Process
-
+from pystochastic.dist import Normal
 
 class FractionalBrownianMotion(Process):
     """
@@ -169,6 +169,11 @@ class FractionalBrownianMotion(Process):
             Variance of the Fractional Brownian Motion path coordinates at a given time t.
         """
 
+        if not 0 < t <= self.T:
+            raise ValueError(
+                f"The time must be strictly between {0} and {self.T}."
+            )
+
         t_index = np.argmin(np.abs(self.t - t))
         return self.time_covar_matrix[t_index, t_index]
 
@@ -177,6 +182,11 @@ class FractionalBrownianMotion(Process):
         if self.dim > 1:
             raise ValueError(
                 "The density is only implemented for 1D processes yet."
+            )
+
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
             )
 
         if t == 0:

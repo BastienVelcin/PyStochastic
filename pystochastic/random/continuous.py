@@ -161,9 +161,9 @@ def _gamma_frac_reject(p, size):
     out = np.empty(0)
     while out.size < size:
         m = size - out.size
-        U0 = np.random.uniform(0, 1, m)
-        U1 = np.random.uniform(0, 1, m)
-        W  = np.random.uniform(0, 1, m)
+        U0 = uniform(0,1,m)
+        U1 = uniform(0,1,m)
+        W  = uniform(0,1,m)
         branch1 = U0 <= t
 
         X = np.where(branch1, U1**(1/p), 1 - np.log(U1))

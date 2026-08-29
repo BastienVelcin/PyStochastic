@@ -211,6 +211,11 @@ class GeometricBrownianMotion(DiffusionProcess):
         The expectation of the GBM path at every time t with a fixed initial is given by initial * exp(mu*t)
         """
 
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
+
         return self.initial * np.exp(self.mu * t)
 
     def covariance(self,t, i,j):
@@ -241,6 +246,11 @@ class GeometricBrownianMotion(DiffusionProcess):
             S_{0,i} * S_{0,j} * exp((mu_{i} + mu_{j})*t) * (exp((volatility*volatility^T)_{ij}*t) - 1).
         """
 
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
+
         return self.initial[i]*self.initial[j]*np.exp((self.mu[i]+self.mu[j])*t)*(np.exp((self.m_volatility*self.m_volatility.T)[i,j] * t)-1)
 
     def covariance_matrix(self,t):
@@ -261,6 +271,10 @@ class GeometricBrownianMotion(DiffusionProcess):
             Covariance matrix of the GBM at a time t.
         """
 
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
 
         covar = np.zeros((self.dim,self.dim))
 
@@ -288,6 +302,11 @@ class GeometricBrownianMotion(DiffusionProcess):
             Variance of the GBM path coordinates at a given time t.
         """
 
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
+
         return np.array([self.covariance(t,i,i) for i in range(self.dim)])
 
     def density(self,t,x):
@@ -295,6 +314,11 @@ class GeometricBrownianMotion(DiffusionProcess):
         if self.dim > 1:
             raise ValueError(
                 "The density is only defined implemented for 1D processes yet."
+            )
+
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
             )
 
         if t == 0:

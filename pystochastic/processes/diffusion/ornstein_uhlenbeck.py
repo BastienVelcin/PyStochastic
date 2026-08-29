@@ -245,6 +245,11 @@ class OrnsteinUhlenbeck(DiffusionProcess):
                             initial * exp(-speed*t) + mean * (Id - exp(-volatility*t))
         """
 
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
+
         return self.initial @ scipy.linalg.expm(- self.m_speed * t) - scipy.linalg.expm(- self.m_speed * t)
 
     def covariance_matrix(self, t):
@@ -266,6 +271,11 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         np.ndarray
             Covariance matrix of the Ornstein-Uhlenbeck process at a time t.
         """
+
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
 
         Q = self.m_volatility @ self.m_volatility.T
 
@@ -322,6 +332,10 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         This method is using the covariance matrix method, which solves the Lyapunov equation.
         """
 
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
 
         return self.covariance_matrix(t)[i,j]
 
@@ -355,6 +369,11 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         if self.dim > 1:
             raise ValueError(
                 "The density is only implemented for 1D processes yet."
+            )
+
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
             )
 
         if t == 0:

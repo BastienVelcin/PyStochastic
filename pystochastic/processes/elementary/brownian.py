@@ -121,8 +121,6 @@ class Brownian(Process):
         self.path = self.sim[0]
         self.increments = self.sim[1]
 
-
-
         if plot:
             self.plot()
         return self.path
@@ -137,7 +135,7 @@ class Brownian(Process):
         Parameters
         ----------
         t : float
-            Time at which the expectation is evaluated. Must be between 0 and T.
+            Time at which the expectation is evaluated.
 
         Returns
         -------
@@ -148,6 +146,11 @@ class Brownian(Process):
         -----
         The expectation of the Brownian motion at every time t is always 0, since W_t ~ N(0,t*Q), where Q is the covariance matrix.
         """
+
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
 
         return 0
 
@@ -161,7 +164,7 @@ class Brownian(Process):
         Parameters
         ----------
         t : float
-            Time at which the covariance matrix is evaluated. Must be between 0 and T.
+            Time at which the covariance matrix is evaluated.
 
         Returns
         -------
@@ -172,6 +175,11 @@ class Brownian(Process):
         -----
         The covariance matrix of the Brownian motion at every time t is always t*Q, since W_t ~ N(0,t*Q), where Q is the Brownian matrix parameter
         """
+
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
 
         return t*self.variance
 
@@ -199,6 +207,11 @@ class Brownian(Process):
             Covariance between the i-th and j-th coordinates.
         """
 
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
+
         return self.covariance_matrix(t)[i,j]
 
 
@@ -220,13 +233,21 @@ class Brownian(Process):
             Variance of the Brownian Motion path coordinates at a given time t.
         """
 
+
         return np.array([self.covariance(t,i,i) for i in range(self.dim)])
 
     def density(self,t,x):
 
+
+
         if self.dim > 1:
             raise ValueError(
                 "The density is only implemented for 1D processes yet."
+            )
+
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
             )
 
         if t == 0:

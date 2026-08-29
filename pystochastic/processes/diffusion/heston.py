@@ -273,7 +273,7 @@ class Heston(DiffusionProcess):
                                                            plot=False,
                                                            parallel=parallel,
                                                            n_workers=n_workers,
-                                                           brownian_sequence=W.increments)
+                                                           brownian_increments=W.increments)
         self.price = self.couple[:, :, 0][:,:,None]
         self.var = self.couple[:, :, 1][:,:,None]
         self.path = np.sqrt(np.maximum(self.var, 0))
@@ -309,9 +309,18 @@ class Heston(DiffusionProcess):
 
     def covariance_matrix(self,t):
         pass
+
     def covariance(self,t,i,j):
         pass
+
     def expectation(self,t):
-        pass
+
+        raise NotImplementedError(
+            "There is no explicit formula for the expectation of the Hull-White process."
+        )
+
     def variance(self,t):
-        pass
+
+        raise NotImplementedError(
+            "There is no explicit formula for the variance of the Hull-White process."
+        )

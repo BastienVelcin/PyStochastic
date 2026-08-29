@@ -193,6 +193,12 @@ class HullWhite(DiffusionProcess):
         )
 
     def density(self,t,x):
+
+        if t < 0:
+            raise ValueError(
+                "The time parameter must be positive."
+            )
+
         if t == 0:
             return np.array([0])
         x = np.asarray(x)
