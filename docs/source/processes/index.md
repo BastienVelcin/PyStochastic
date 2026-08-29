@@ -1,4 +1,4 @@
-# Processes Module
+# Stochastic Processes
 
 The `processes` module provides a set of classic stochastic processes methods for simulation.
 

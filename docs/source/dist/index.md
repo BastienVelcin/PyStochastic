@@ -1,4 +1,4 @@
-# Dist Module
+# Distributions
 
 The dist module provides a set of classic discrete and continuous probability distributions, with
 a common interface. This page explores all the distributions available and their properties.
