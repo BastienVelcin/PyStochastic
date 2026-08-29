@@ -32,5 +32,5 @@ The `JumpProcess` class inherits all methods from the [Process](<project:/proces
 :maxdepth: 1
 :caption: Jump processes
 poisson
-compounded_poisson
+compound_poisson
 ```
