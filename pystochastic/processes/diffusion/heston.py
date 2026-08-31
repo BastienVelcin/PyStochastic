@@ -88,12 +88,10 @@ class Heston(DiffusionProcess):
         Time step length.
     price : np.ndarray
         Path of the simulated stock price.
-    variance : np.ndarray
+    var : np.ndarray
         Path of the simulated variance.
-    vol : np.ndarray
-        Path of the simulated volatility.
     path : np.ndarray
-        Path of the simulated process.
+        Path of the simulated volatility.
     name : str
         Name of the process
     is_autonomous : bool
@@ -122,9 +120,9 @@ class Heston(DiffusionProcess):
                          dim = 1,
                          name = "Heston model")
 
-        if initial_price < 0:
+        if initial_price <= 0:
             raise ValueError(
-                "The initial price must be positive."
+                "The initial price must be strictly positive."
             )
         if initial_variance <= 0:
             raise ValueError(
@@ -138,17 +136,13 @@ class Heston(DiffusionProcess):
             raise ValueError(
                 "The reverting rate must be strictly positive."
             )
-        if mu < 0:
-            raise ValueError(
-                "The stock price drift must be positive."
-            )
         if variance_volatility <= 0:
             raise ValueError(
                 "The variance volatility must be strictly positive."
             )
-        if not -1 < correlation < 1:
+        if not -1 <= correlation <= 1:
             raise ValueError(
-                "The correlation coefficient must be strictly between -1 and 1."
+                "The correlation coefficient must be between -1 and 1."
             )
 
         self.mu = mu
@@ -161,7 +155,7 @@ class Heston(DiffusionProcess):
         self.price = None
         self.var = None
         self.path = None #The volatility will be sqrt(self.variance), and stored in the path
-        self.couple = (self.price, self.path)
+        self.couple = None
         self.is_autonomous = True
 
     @property
@@ -238,7 +232,7 @@ class Heston(DiffusionProcess):
         """
         Simulate method.
 
-        Simulate a Heston model path with the Euler-Maruyama method.
+        Simulate a Heston model path with the truncated Euler-Maruyama method.
 
         Parameters
         ----------
@@ -277,6 +271,8 @@ class Heston(DiffusionProcess):
                                                            brownian_increments=W.increments)
         self.price = self.couple[:, :, 0][:,:,None]
         self.var = self.couple[:, :, 1][:,:,None]
+
+        # WARNING: Due to some approximation with the Euler-Maruyama method, the variance can be negative, so we need to truncate the variance with max(V_t, 0)
         self.path = np.sqrt(np.maximum(self.var, 0))
 
         if plot:
@@ -300,7 +296,7 @@ class Heston(DiffusionProcess):
                                     template="plotly_white")
             fig_vol.update_layout(title=f"Volatility evolution",
                                     xaxis_title="t",
-                                    yaxis_title="Volatility $\nu_t$",
+                                    yaxis_title="Volatility $\sqrt{\nu_t}$",
                                     template="plotly_white")
 
             fig_vol.show()

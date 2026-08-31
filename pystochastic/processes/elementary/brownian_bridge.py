@@ -26,14 +26,14 @@ from pystochastic.dist import Normal
 class BrownianBridge(Process):
 
     """
-    Brownian motion class
+    Brownian Bridge class
 
-    The Brownian bridge is a standard Brownian motion which terminal value is equal to 0.
+    The Brownian bridge is a standard Brownian Bridge which terminal value is equal to 0.
 
     Parameters
     ----------
     dim : int
-        Dimension of the brownian motion. The dimension must coincide with the dimension of the covariance matrix. Must be a strictly positive integer.
+        Dimension of the brownian Bridge. The dimension must coincide with the dimension of the covariance matrix. Must be a strictly positive integer.
     T : float
         Final time. Must be strictly greater than 0.
     steps : int
@@ -42,15 +42,15 @@ class BrownianBridge(Process):
     Attributes
     ----------
     dim : int
-        Dimension of the brownian motion.
+        Dimension of the brownian Bridge.
     T : float
         Final time.
     steps : int
         Number of time steps.
     path : np.ndarray
-        Path of the simulated Brownian motion.
+        Path of the simulated Brownian Bridge.
     t : np.ndarray
-        Time interval on which we want to simulate the Brownian motion.
+        Time interval on which we want to simulate the Brownian Bridge.
     name : str
         Name of the process
 

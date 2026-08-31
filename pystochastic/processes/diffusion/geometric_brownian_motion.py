@@ -112,7 +112,7 @@ class GeometricBrownianMotion(DiffusionProcess):
         self.volatility = np.atleast_1d(volatility)
         self.m_volatility = np.atleast_2d(volatility)
 
-        if self.volatility.ndim == 1:
+        if self.volatility.shape[0] == 1:
             self.volatility = np.diag(self.volatility)
 
 

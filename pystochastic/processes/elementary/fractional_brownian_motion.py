@@ -26,11 +26,11 @@ from pystochastic.dist import Normal
 
 class FractionalBrownianMotion(Process):
     """
-    Brownian motion class
+    Fractional Brownian motion class
 
     The Fractional Brownian Motion is an extension of the Brownian motion. It is a zero-mean Gaussian process which covariance function is
     given by the following equation:
-                        Cov(B(t),B(s)) = |t|^2H + |s|^2H - |t-s|^2H,
+                        Cov(B(t),B(s)) = (|t|^2H + |s|^2H - |t-s|^2H)/2,
     where, H is the Hurst index, which is a float between 0 and 1.
 
     Parameters
@@ -51,11 +51,11 @@ class FractionalBrownianMotion(Process):
     steps : int
         Number of time steps.
     path : np.ndarray
-        Path of the simulated Brownian motion.
+        Path of the simulated Fractional Brownian motion.
     t : np.ndarray
-        Time interval on which we want to simulate the Brownian motion.
+        Time interval on which we want to simulate the Fractional Brownian motion.
     dim : int
-        Dimension of the brownian motion.
+        Dimension of the Fractional Brownian motion.
     name : str
         Name of the process
 
@@ -78,6 +78,11 @@ class FractionalBrownianMotion(Process):
                          dim = 1,
                          name = f"{self.hurst}-Fractional Brownian Motion")
 
+        if not isinstance(hurst, (float, int, np.floating, np.integer)):
+            raise ValueError(
+                "The Hurst index must be a float strictly between 0 and 1."
+            )
+
         if not 0 < hurst < 1:
             raise ValueError(
                 "The Hurst index must be a float strictly between 0 and 1."
@@ -95,7 +100,7 @@ class FractionalBrownianMotion(Process):
                         2 * self.hurst) - np.abs(self.time_matrix - self.time_matrix.T) ** (2 * self.hurst)) / 2
 
     @property
-    def sqrt_time_covar_matrix(self):
+    def cholesky_time_covar_matrix(self):
         return np.linalg.cholesky(self.time_covar_matrix).T
 
     def simulate(self, n_simulations=1, plot=False):
@@ -115,7 +120,7 @@ class FractionalBrownianMotion(Process):
 
         Z = continuous.normal(0, 1, n_simulations * (self.steps + 1)).reshape(self.steps + 1, n_simulations)
 
-        self.path = (Z.T @ self.sqrt_time_covar_matrix)[:, :, None]
+        self.path = (Z.T @ self.cholesky_time_covar_matrix)[:, :, None]
 
         if plot:
             self.plot()
@@ -166,13 +171,7 @@ class FractionalBrownianMotion(Process):
             Variance of the Fractional Brownian Motion path coordinates at a given time t.
         """
 
-        if not 0 < t <= self.T:
-            raise ValueError(
-                f"The time must be strictly between {0} and {self.T}."
-            )
-
-        t_index = np.argmin(np.abs(self.t - t))
-        return self.time_covar_matrix[t_index, t_index]
+        return t**(2*self.hurst) * np.ones(self.steps)
 
     def density(self,t,x):
 

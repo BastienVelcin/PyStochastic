@@ -5,7 +5,7 @@ Module BESSEL
 
 Description
 -----------
-This module provides a way to simulate a Bessel process with a given order.
+This module provides a way to simulate a Bessel process with a given order and initializing at 0.
 
 This module provides a general class "Bessel", which inherits from the methods of Process and DiffusionProcess abstract classes.
 
@@ -37,7 +37,7 @@ class Bessel(Process):
     Parameters
     ----------
     order : int
-        Order of the Bessel process.
+        Order of the Bessel process. Must be a strictly positive integer.
     T : float
         Final time. Must be strictly greater than 0.
     steps : int
@@ -75,6 +75,16 @@ class Bessel(Process):
                  order=1,
                  T=1,
                  steps=1000):
+
+        if order < 1:
+            raise ValueError(
+                "The order of the Bessel process must be a strictly positive integer."
+            )
+
+        if not isinstance(order, (int, np.integer)):
+            raise ValueError(
+                "The order of the Bessel process must be a strictly positive integer."
+            )
 
         self.order = order
 
@@ -136,4 +146,4 @@ class Bessel(Process):
 
         if t == 0:
             return np.array([0])
-        return 1/(2**((self.order/2)-1)*scipy.special.gamma(self.order/2) * np.sqrt(t)) * (x/np.sqrt(t))**(self.order-1) * np.exp(-x**2 /(2*t))
+        return 1/(2**((self.order/2)-1)*scipy.special.gamma(self.order/2) * np.sqrt(t)) * (x/np.sqrt(t))**(self.order-1) * np.exp(-x**2 /(2*t)) if x > 0 else np.array([0])

@@ -16,6 +16,10 @@ Examples
 >> C.simulate() #Simulate the CEV process path
 >>
 >> C.plot() #Plot the CEV process path
+
+Notes
+-----
+The CEV process is simulated with the truncated Euler-Maruyama method.
 """
 
 import numpy as np
@@ -29,14 +33,14 @@ class CEV(DiffusionProcess):
     CEV class
 
     An CEV process is a stochastic process that satisfies the following equation:
-            dR_t = - speed*dt+volatility * R_t^elasticity *dW_t,
+            dR_t = - speed * R_t * dt+volatility * R_t^elasticity *dW_t,
 
     Parameters
     ----------
     speed : float
         Constant diffusion of the model.
-    variance : float
-        Constant variance parameter.
+    volatility : float
+        Constant volatility parameter.
     elasticity : float
         Constant elasticity parameter between the price and the volatility.
     initial : float
@@ -50,8 +54,8 @@ class CEV(DiffusionProcess):
     ----------
     speed : float
         Constant diffusion of the model.
-    variance : float
-        Constant variance parameter.
+    volatility : float
+        Constant volatility parameter.
     elasticity : float
         Constant elasticity parameter between the price and the volatility.
     initial : float
@@ -99,7 +103,7 @@ class CEV(DiffusionProcess):
             raise ValueError(
                 "The speed parameter should be a real number."
             )
-        if not isinstance(volatility, (int, float)) or elasticity < 0:
+        if not isinstance(volatility, (int, float)) or volatility < 0:
             raise ValueError(
                 "The speed parameter should be a positive real number."
             )
@@ -180,7 +184,7 @@ class CEV(DiffusionProcess):
         Notes
         -----
         The expectation of the CEV process at every time t with a fixed initial is given by
-                            initial * exp(-speed*t) + mean * (Id - exp(-volatility*t))
+                            initial * exp(-speed*t)
         """
 
         t = _validate_t(t)
