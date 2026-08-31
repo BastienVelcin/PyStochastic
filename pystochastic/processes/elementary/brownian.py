@@ -34,6 +34,7 @@ import numpy as np
 from pystochastic.random import continuous
 from pystochastic.utils import is_pos_def
 from pystochastic.processes.process import Process
+from pystochastic.processes.process import _validate_t
 from pystochastic.dist import Normal
 
 class Brownian(Process):
@@ -147,10 +148,7 @@ class Brownian(Process):
         The expectation of the Brownian motion at every time t is always 0, since W_t ~ N(0,t*Q), where Q is the covariance matrix.
         """
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         return 0
 
@@ -176,10 +174,7 @@ class Brownian(Process):
         The covariance matrix of the Brownian motion at every time t is always t*Q, since W_t ~ N(0,t*Q), where Q is the Brownian matrix parameter
         """
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         return t*self.variance
 
@@ -207,9 +202,16 @@ class Brownian(Process):
             Covariance between the i-th and j-th coordinates.
         """
 
-        if t < 0:
+        t = _validate_t(t)
+
+        if not 0 <= i < self.dim or not isinstance(i, (int, np.integer)):
             raise ValueError(
-                "The time parameter must be positive."
+                "The first coordinate must be an integer between 0 and the dimension (excluded)."
+            )
+
+        if not 0 <= j < self.dim or not isinstance(j, (int, np.integer)):
+            raise ValueError(
+                "The second coordinate must be an integer between 0 and the dimension (excluded)."
             )
 
         return self.covariance_matrix(t)[i,j]
@@ -245,10 +247,7 @@ class Brownian(Process):
                 "The density is only implemented for 1D processes yet."
             )
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         if t == 0:
             return np.array([0])

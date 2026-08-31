@@ -21,6 +21,7 @@ Examples
 import numpy as np
 from pystochastic.random import continuous
 from pystochastic.processes.process import Process
+from pystochastic.processes.process import _validate_t
 from pystochastic.dist import Normal
 
 class FractionalBrownianMotion(Process):
@@ -142,14 +143,10 @@ class FractionalBrownianMotion(Process):
         -----
         The expectation of the Fractional Brownian motion at every time t is always 0, since W_t ~ N(0,t*Q), where Q is the covariance matrix.
         """
+        t = _validate_t(t)
 
         return 0
 
-    def covariance_matrix(self, t):
-        pass
-
-    def covariance(self, t, i, j):
-        pass
 
     def variance(self, t):
 
@@ -184,10 +181,7 @@ class FractionalBrownianMotion(Process):
                 "The density is only implemented for 1D processes yet."
             )
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         if t == 0:
             return np.array([0])

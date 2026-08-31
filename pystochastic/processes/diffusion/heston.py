@@ -163,6 +163,7 @@ class Heston(DiffusionProcess):
         self.path = None #The volatility will be sqrt(self.variance), and stored in the path
         self.couple = (self.price, self.path)
         self.is_autonomous = True
+
     @property
     def feller_condition(self):
 
@@ -306,21 +307,3 @@ class Heston(DiffusionProcess):
             fig_price.show()
 
         return self.couple
-
-    def covariance_matrix(self,t):
-        pass
-
-    def covariance(self,t,i,j):
-        pass
-
-    def expectation(self,t):
-
-        raise NotImplementedError(
-            "There is no explicit formula for the expectation of the Hull-White process."
-        )
-
-    def variance(self,t):
-
-        raise NotImplementedError(
-            "There is no explicit formula for the variance of the Hull-White process."
-        )

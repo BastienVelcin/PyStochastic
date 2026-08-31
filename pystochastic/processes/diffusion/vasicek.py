@@ -24,6 +24,7 @@ import plotly.graph_objects as go
 from pystochastic.random import continuous
 from pystochastic.utils import _decompose
 from pystochastic.processes.diffusion.diffusion_process import DiffusionProcess
+from pystochastic.processes.process import _validate_t
 from pystochastic.random.setseed import *
 from pystochastic.dist import Normal
 
@@ -254,10 +255,7 @@ class Vasicek(DiffusionProcess):
                             initial * exp(-speed*t) + mean * (Id - exp(-volatility*t))
         """
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         return self.mean + scipy.linalg.expm(-self.m_speed * t) @ (self.initial - self.mean)
 
@@ -281,10 +279,7 @@ class Vasicek(DiffusionProcess):
             Covariance matrix of the Ornstein-Uhlenbeck process at a time t.
         """
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         Q = self.m_volatility @ self.m_volatility.T
 
@@ -341,9 +336,16 @@ class Vasicek(DiffusionProcess):
         This method is using the covariance matrix method, which solves the Lyapunov equation.
         """
 
-        if t < 0:
+        t = _validate_t(t)
+
+        if not 0 <= i < self.dim or not isinstance(i, (int, np.integer)):
             raise ValueError(
-                "The time parameter must be positive."
+                "The first coordinate must be an integer between 0 and the dimension (excluded)."
+            )
+
+        if not 0 <= j < self.dim or not isinstance(j, (int, np.integer)):
+            raise ValueError(
+                "The second coordinate must be an integer between 0 and the dimension (excluded)."
             )
 
         return self.covariance_matrix(t)[i,j]
@@ -371,10 +373,7 @@ class Vasicek(DiffusionProcess):
         This method is using the covariance matrix method, which solves the Lyapunov equation.
         """
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         return np.diag(self.covariance_matrix(t))
 
@@ -385,10 +384,7 @@ class Vasicek(DiffusionProcess):
                 "The density is only implemented for 1D processes yet."
             )
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         if t == 0:
             return np.array([0])

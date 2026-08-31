@@ -22,6 +22,7 @@ Examples
 import numpy as np
 from pystochastic.processes.elementary.brownian import Brownian
 from pystochastic.processes.diffusion.diffusion_process import DiffusionProcess
+from pystochastic.processes.process import _validate_t
 from pystochastic.utils import _decompose
 from pystochastic.random.setseed import *
 
@@ -217,10 +218,7 @@ class GeometricBrownianMotion(DiffusionProcess):
         The expectation of the GBM path at every time t with a fixed initial is given by initial * exp(mu*t)
         """
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         return self.initial * np.exp(self.mu * t)
 
@@ -252,9 +250,16 @@ class GeometricBrownianMotion(DiffusionProcess):
             S_{0,i} * S_{0,j} * exp((mu_{i} + mu_{j})*t) * (exp((volatility*volatility^T)_{ij}*t) - 1).
         """
 
-        if t < 0:
+        t = _validate_t(t)
+
+        if not 0 <= i < self.dim or not isinstance(i, (int, np.integer)):
             raise ValueError(
-                "The time parameter must be positive."
+                "The first coordinate must be an integer between 0 and the dimension (excluded)."
+            )
+
+        if not 0 <= j < self.dim or not isinstance(j, (int, np.integer)):
+            raise ValueError(
+                "The second coordinate must be an integer between 0 and the dimension (excluded)."
             )
 
         return self.initial[i]*self.initial[j]*np.exp((self.mu[i]+self.mu[j])*t)*(np.exp((self.m_volatility @ self.m_volatility.T)[i,j] * t)-1)
@@ -277,10 +282,7 @@ class GeometricBrownianMotion(DiffusionProcess):
             Covariance matrix of the GBM at a time t.
         """
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         covar = np.zeros((self.dim,self.dim))
 
@@ -308,10 +310,7 @@ class GeometricBrownianMotion(DiffusionProcess):
             Variance of the GBM path coordinates at a given time t.
         """
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         return np.array([self.covariance(t,i,i) for i in range(self.dim)])
 
@@ -344,10 +343,7 @@ class GeometricBrownianMotion(DiffusionProcess):
                 "The density is only defined implemented for 1D processes yet."
             )
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         if t == 0:
             return np.array([0])

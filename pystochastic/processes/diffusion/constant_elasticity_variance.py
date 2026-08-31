@@ -19,10 +19,9 @@ Examples
 """
 
 import numpy as np
-import scipy
-
 from pystochastic.processes.diffusion.diffusion_process import DiffusionProcess
 from pystochastic.random.setseed import *
+from pystochastic.processes.process import _validate_t
 
 class CEV(DiffusionProcess):
 
@@ -190,20 +189,6 @@ class CEV(DiffusionProcess):
                             initial * exp(-speed*t) + mean * (Id - exp(-volatility*t))
         """
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         return self.initial * np.exp(self.speed * t)
-
-    def covariance_matrix(self, t):
-        pass
-
-    def covariance(self, t,i,j):
-        pass
-
-    def variance(self,t):
-        raise NotImplementedError(
-            "There is no explicit formula for the variance of the CEV process."
-        )

@@ -21,6 +21,7 @@ Examples
 import numpy as np
 import scipy
 from pystochastic.processes.diffusion.diffusion_process import DiffusionProcess
+from pystochastic.processes.process import _validate_t
 from pystochastic.dist import Normal
 
 class HullWhite(DiffusionProcess):
@@ -171,33 +172,9 @@ class HullWhite(DiffusionProcess):
 
         return self.volatility(t)
 
-    def _simulate_exact(self, n_simulations=1,plot=False):
-        raise NotImplementedError(
-            "The exact method is not implemented for this process yet."
-        )
-
-    def expectation(self,t):
-        raise NotImplementedError(
-            "There is no explicit formula for the expectation of the Hull-White process."
-        )
-
-    def covariance_matrix(self, t):
-        pass
-
-    def covariance(self, t,i,j):
-        pass
-
-    def variance(self,t):
-        raise NotImplementedError(
-            "There is no explicit formula for the variance of the Hull-White process."
-        )
-
     def density(self,t,x):
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         if t == 0:
             return np.array([0])

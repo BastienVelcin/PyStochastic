@@ -22,6 +22,7 @@ import numpy as np
 import scipy
 from pystochastic.processes.elementary.brownian import Brownian
 from pystochastic.processes.process import Process
+from pystochastic.processes.process import _validate_t
 from pystochastic.random.setseed import *
 
 class Bessel(Process):
@@ -124,22 +125,6 @@ class Bessel(Process):
 
         return self.path
 
-    def expectation(self,t):
-        raise NotImplementedError(
-            "There is no explicit formula for the expectation of the Bessel process."
-        )
-
-    def covariance_matrix(self, t):
-        pass
-
-    def covariance(self, t,i,j):
-        pass
-
-    def variance(self,t):
-        raise NotImplementedError(
-            "There is no explicit formula for the variance of the Bessel process."
-        )
-
     def density(self,t,x):
 
         if self.dim > 1:
@@ -147,10 +132,7 @@ class Bessel(Process):
                 "The density is only implemented for 1D processes yet."
             )
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         if t == 0:
             return np.array([0])

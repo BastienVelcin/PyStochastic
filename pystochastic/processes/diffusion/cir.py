@@ -23,6 +23,7 @@ import scipy
 
 from pystochastic.random.setseed import *
 from pystochastic.processes.diffusion.diffusion_process import DiffusionProcess
+from pystochastic.processes.process import _validate_t
 
 class CIR(DiffusionProcess):
 
@@ -191,10 +192,7 @@ class CIR(DiffusionProcess):
         The expectation of the CIR path at every time t with a fixed initial is given by initial * exp(-speed*t) + b*(1-exp(-speed*t))
         """
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         return self.initial * np.exp(-self.speed * t) + self.mean*(1-np.exp(-self.speed * t))
 
@@ -221,27 +219,34 @@ class CIR(DiffusionProcess):
         initial * volatility^2/a * (exp(-a*t)-exp(-2*a*t)) + (b*volatility^2)/(2*a) * (1-exp(-a*t))^2
         """
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         return self.initial * (self.volatility**2 / self.speed) * (np.exp(-self.speed*t)-np.exp(-2 * self.speed * t)) + (self.mean * self.volatility**2)/(2*self.speed) * (1-np.exp(-self.speed*t))**2
 
     def covariance_matrix(self,t):
+        t = _validate_t(t)
         return self.variance(t)
 
     def covariance(self,t,i,j):
+        t = _validate_t(t)
+
+        if not 0 <= i < self.dim or not isinstance(i, (int, np.integer)):
+            raise ValueError(
+                "The first coordinate must be an integer between 0 and the dimension (excluded)."
+            )
+
+        if not 0 <= j < self.dim or not isinstance(j, (int, np.integer)):
+            raise ValueError(
+                "The second coordinate must be an integer between 0 and the dimension (excluded)."
+            )
+
         return self.variance(t)
 
     def density(self, t, x):
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
-        if t <= 0:
+        if t == 0:
             return np.array([0])
 
         x = np.asarray(x)

@@ -24,6 +24,7 @@ import scipy
 from pystochastic.random import continuous
 from pystochastic.utils import _decompose
 from pystochastic.processes.diffusion.diffusion_process import DiffusionProcess
+from pystochastic.processes.process import _validate_t
 from pystochastic.random.setseed import *
 from pystochastic.dist import Normal
 
@@ -127,7 +128,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
             self.volatility = _volatility
             self.speed = _speed
 
-        if np.all(self.speed < 0) or np.all(self.volatility <=0):
+        if np.any(self.speed < 0) or np.any(self.volatility <=0):
             raise ValueError(
                 "The volatility and speed parameters should be greater than 0."
             )
@@ -213,7 +214,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         Z = continuous.normal(0, 1, self.steps * n_simulations).reshape((n_simulations, self.steps))
 
         for i in range(1,self.steps+1):
-            # The induction formula is given by R_t = (mean + R_{t-1} - mean) * exp(-speed * dt) + volatility * sqrt(1 - exp(-2 * speed * dt)) / (2 * speed)) * Z[i-1])
+            # The induction formula is given by R_t = R_{t-1} * exp(-speed * dt) + volatility * sqrt(1 - exp(-2 * speed * dt)) / (2 * speed)) * Z[i-1])
             self.path[:,i,0] = ((self.path[:,i-1,0]) * np.exp(-self.speed * self.dt) + self.volatility * np.sqrt((1 - np.exp(-2 * self.speed * self.dt)) / (2 * self.speed)) * Z[:,i-1])
 
         if plot:
@@ -242,15 +243,12 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         Notes
         -----
         The expectation of the Ornstein-Uhlenbeck process at every time t with a fixed initial is given by
-                            initial * exp(-speed*t) + mean * (Id - exp(-volatility*t))
+                            initial * exp(-speed*t)
         """
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
-        return self.initial @ scipy.linalg.expm(- self.m_speed * t) - scipy.linalg.expm(- self.m_speed * t)
+        return self.initial @ scipy.linalg.expm(- self.m_speed * t)
 
     def covariance_matrix(self, t):
 
@@ -272,10 +270,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
             Covariance matrix of the Ornstein-Uhlenbeck process at a time t.
         """
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         Q = self.m_volatility @ self.m_volatility.T
 
@@ -332,9 +327,16 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         This method is using the covariance matrix method, which solves the Lyapunov equation.
         """
 
-        if t < 0:
+        t = _validate_t(t)
+
+        if not 0 <= i < self.dim or not isinstance(i, (int, np.integer)):
             raise ValueError(
-                "The time parameter must be positive."
+                "The first coordinate must be an integer between 0 and the dimension (excluded)."
+            )
+
+        if not 0 <= j < self.dim or not isinstance(j, (int, np.integer)):
+            raise ValueError(
+                "The second coordinate must be an integer between 0 and the dimension (excluded)."
             )
 
         return self.covariance_matrix(t)[i,j]
@@ -362,19 +364,39 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         This method is using the covariance matrix method, which solves the Lyapunov equation.
         """
 
+        t = _validate_t(t)
+
         return np.diag(self.covariance_matrix(t))
 
     def density(self,t,x):
 
+        """
+        Density method.
+
+        Return the density of the Ornstein-Uhlenbeck process at a given time t.
+
+        Parameters
+        ----------
+        t : float
+            Time at which the density is evaluated.
+        x :
+            Point at which the density is evaluated.
+
+        Returns
+        -------
+        np.ndarray
+            Dist of the Ornstein-Uhlenbeck process path coordinates at a given time t.
+
+        Note
+        ----
+        When the density is evaluated at t=0, the function returns 0 instead of returning the Dirac distribution.
+        """
         if self.dim > 1:
             raise ValueError(
                 "The density is only implemented for 1D processes yet."
             )
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         if t == 0:
             return np.array([0])

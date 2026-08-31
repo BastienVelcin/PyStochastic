@@ -21,6 +21,7 @@ Examples
 import numpy as np
 from pystochastic.processes.process import Process
 from pystochastic.processes.elementary.brownian import Brownian
+from pystochastic.processes.process import _validate_t
 from pystochastic.dist import Normal
 class BrownianBridge(Process):
 
@@ -102,19 +103,13 @@ class BrownianBridge(Process):
 
     def expectation(self,t):
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         return 0
 
     def variance(self,t):
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         if self.dim == 1:
             return t*(self.T - t)/self.T
@@ -122,10 +117,7 @@ class BrownianBridge(Process):
 
     def covariance_matrix(self,t):
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
 
         if self.dim == 1:
             return t*(self.T - t)/self.T
@@ -133,9 +125,16 @@ class BrownianBridge(Process):
 
     def covariance(self,t,i,j):
 
-        if t < 0:
+        t = _validate_t(t)
+
+        if not 0 <= i < self.dim or not isinstance(i, (int, np.integer)):
             raise ValueError(
-                "The time parameter must be positive."
+                "The first coordinate must be an integer between 0 and the dimension (excluded)."
+            )
+
+        if not 0 <= j < self.dim or not isinstance(j, (int, np.integer)):
+            raise ValueError(
+                "The second coordinate must be an integer between 0 and the dimension (excluded)."
             )
 
         return t*(self.T - t)/self.T if i == j else 0
@@ -147,10 +146,8 @@ class BrownianBridge(Process):
                 "The density is only implemented for 1D processes yet."
             )
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
+
         if t == 0 or t == self.T:
             return np.array([0])
         N = Normal(mu = 0, var = t*(self.T - t)/self.T)

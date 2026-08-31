@@ -27,6 +27,7 @@ import plotly.graph_objects as go
 from pystochastic.random import discrete
 from pystochastic.dist import Poisson
 from pystochastic.processes.jump.jump_process import JumpProcess
+from pystochastic.processes.process import _validate_t
 
 class PoissonProcess(JumpProcess):
 
@@ -133,21 +134,16 @@ class PoissonProcess(JumpProcess):
 
     def expectation(self,t):
 
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
         return self.intensity*t
 
     def variance(self,t):
-        if t < 0:
-            raise ValueError(
-                "The time parameter must be positive."
-            )
+        t = _validate_t(t)
         return self.intensity * t
 
     def density(self,t,x):
 
+        t = _validate_t(t)
         if t == 0:
             return np.array([0])
         P = Poisson(lam  = t*self.intensity)

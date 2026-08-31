@@ -2,7 +2,16 @@ import numpy as np
 import plotly.graph_objects as go
 from abc import abstractmethod, ABC
 
-
+def _validate_t(t):
+    if not 0 <= t :
+        raise ValueError(
+            f"The time must be a real number greater than 0, but {t} was given."
+        )
+    if not isinstance(t, (int, np.integer, float, np.floating)):
+        raise ValueError(
+            f"The time must be a real number greater than 0."
+        )
+    return t
 class Process(ABC):
 
     def __init__(
@@ -51,51 +60,33 @@ class Process(ABC):
     @abstractmethod
     def expectation(self,t):
 
-        if not 0 <= t:
-            raise ValueError(
-                f"The time must be greater than 0, but {t} was given."
-            )
+        raise NotImplementedError(
+            "There is no explicit formula for the expectation of this process yet."
+        )
 
         pass
 
     @abstractmethod
     def covariance_matrix(self,t):
 
-        if not 0 <= t:
-            raise ValueError(
-                f"The time must be greater than 0, but {t} was given."
-            )
+        raise NotImplementedError(
+            "There is no explicit formula for the covariance matrix of this process yet."
+        )
 
         pass
 
     @abstractmethod
     def covariance(self,t,i,j):
+        raise NotImplementedError(
+            "There is no explicit formula for the covariance of this process yet."
+        )
 
-        if not 0 <= t:
-            raise ValueError(
-                f"The time must be greater than 0, but {t} was given."
-            )
-
-        if not 0 <= i < self.dim:
-            raise ValueError(
-                "The first coordinate must be between 0 and the dimension (excluded)."
-            )
-
-        if not 0 <= j < self.dim:
-            raise ValueError(
-                "The second coordinate must be between 0 and the dimension (excluded)."
-            )
-        pass
 
     @abstractmethod
     def variance(self,t):
-
-        if not 0 <= t:
-            raise ValueError(
-                f"The time must be greater than 0, but {t} was given."
-            )
-
-        pass
+        raise NotImplementedError(
+            "There is no explicit formula for the variance of this process yet."
+        )
 
     def plot(self, density = True):
 
