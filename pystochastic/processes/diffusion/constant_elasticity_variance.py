@@ -159,12 +159,6 @@ class CEV(DiffusionProcess):
 
         return self.volatility * np.power(np.maximum(x,0),self.elasticity)
 
-    def _simulate_exact(self, n_simulations=1, plot=False):
-
-        raise NotImplementedError(
-            "The exact method is not implemented for this process yet."
-        )
-
 
     def expectation(self,t):
 

@@ -7,17 +7,7 @@ Description
 -----------
 This module provides a way to simulate a Brownian motion with a given covariance matrix.
 
-This module provides a general class "Brownian", which is an SDEs solver, built with the following methods:
-    - .simulate() : Simulate a Brownian motion path.
-    - .plot() : Plot the Brownian motion path.
-    - .final_position() : Return the final position of the Brownian motion.
-    - .max() : Return the maximum value of the Brownian motion (only in 1D).
-    - .min() : Return the minimum value of the Brownian motion (only in 1D).
-    - .max_norm() : Return the maximum norm value of the Brownian motion.
-    - .mean() : Return the mean value of the Brownian motion at a given time.
-    - .covariance_matrix() : Return the covariance matrix of the Brownian motion at a given time.
-    - .covariance() : Return the covariance between two coordinates of the Brownian motion at a given time.
-    - .variance() : Return the variance value of the Brownian motion at a given time.
+This module provides a general class "Brownian", which inherits from the methods of Process abstract class.
 
 as well as an external trajectory simulation function.
 

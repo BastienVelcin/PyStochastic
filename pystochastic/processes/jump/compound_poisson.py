@@ -7,11 +7,7 @@ Description
 -----------
 This module provides a way to simulate a Compound Poisson process with a given intensity parameter.
 
-This module provides a general class "CompoundPoisson", with the following built-in methods:
-    - .simulate() : Simulate a Poisson process path in 1D.
-    - .plot() : Plot the Poisson process path.
-    - .mean() : Mean of the Poisson process at a given time.
-    - .variance() : Variance of the Poisson process at a given time.
+This module provides a general class "CompoundPoisson", which inherits from the methods of Process and JumpProcess abstract classes.
 
 Examples
 --------
@@ -40,8 +36,8 @@ class CompoundPoisson(JumpProcess):
     ----------
     intensity : float
         Intensity parameter of the poisson process. Must be strictly positive.
-    distribution : pystochastic.dist.ContinuousDistribution or pystochastic.dist.DiscreteDistribution
-        Distribution of the random variables X_i.
+    distribution : pystochastic.dist.Distribution
+        Distribution of the jump sizes.
     T : float
         Final time. Must be strictly greater than 0.
     steps : int
@@ -51,6 +47,8 @@ class CompoundPoisson(JumpProcess):
     ----------
     intensity : float
         Intensity parameter.
+    distribution : pystochastic.dist.Distribution
+        Distribution of the jump sizes.
     T : float
         Final time.
     steps : int
@@ -70,7 +68,7 @@ class CompoundPoisson(JumpProcess):
 
     Examples
     --------
-    >> P = Poisson(intensity=2,T=1, steps=1000)
+    >> P = CompoundPoisson(intensity=2, distribution=Normal(-1,0.5)T=1, steps=1000)
     >> P.simulate()
     >> P.plot()
     """
@@ -85,9 +83,18 @@ class CompoundPoisson(JumpProcess):
                          dim = 1,
                          name = "Compound Poisson process")
 
+        if not isinstance(intensity, (int, float, np.integer, np.floating)):
+            raise ValueError(
+                "The intensity must be a strictly positive real number."
+            )
         if intensity <= 0:
             raise ValueError(
                 "The intensity must be strictly positive."
+            )
+
+        if not isinstance(distribution, Distribution):
+            raise ValueError(
+                "The distribution must be a Distribution object (pystochastic.dist.Distribution)."
             )
 
         self.intensity = intensity
@@ -112,6 +119,12 @@ class CompoundPoisson(JumpProcess):
         np.ndarray
             Path of the simulated Compound Poisson process of the form ``(n_simulations, steps + 1)``.
         """
+
+        if not n_simulations >= 1 or not isinstance(n_simulations, (int, np.integer)):
+            raise ValueError(
+                "The number of simulations must be a strictly positive integer."
+            )
+
         self.n_simulations = n_simulations
         self.path = np.zeros((n_simulations,self.steps+1))
 
@@ -138,8 +151,7 @@ class CompoundPoisson(JumpProcess):
         jump_sums = np.concatenate([np.zeros((n_simulations, 1)),jump_sums,],axis=1,)
 
         # For each time, we take the cumulative sum of the simulated distribution at the corresponding time of the Poisson process
-        self.path = np.take_along_axis(jump_sums,N.path[:,:,0],axis=1)[:,:,None]
-
+        self.path = np.atleast_3d(np.take_along_axis(jump_sums,N.path[:,:,0],axis=1))
         if plot:
             self.plot()
 
@@ -149,7 +161,7 @@ class CompoundPoisson(JumpProcess):
 
         t = _validate_t(t)
 
-        if self.distribution.mean() is not None or self.distribution.mean() != np.inf:
+        if self.distribution.mean() is not None and self.distribution.mean() != np.inf:
             return self.intensity * t * self.distribution.mean()
         return None
 
@@ -157,7 +169,7 @@ class CompoundPoisson(JumpProcess):
 
         t = _validate_t(t)
 
-        if self.distribution.variance() is not None or self.distribution.variance() != np.inf:
+        if self.distribution.variance() is not None and self.distribution.variance() != np.inf:
             moment2 = self.distribution.variance() + self.distribution.mean()**2
             return self.intensity * t * moment2
         return None

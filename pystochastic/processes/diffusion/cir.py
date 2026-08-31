@@ -36,13 +36,13 @@ class CIR(DiffusionProcess):
     Parameters
     ----------
     speed : float
-        Speed of adjustment to the mean and volatility.
+        Speed of mean reversion. Must be strictly positive.
     mean : float
-        Mean parameter.
+        Mean parameter. Must be positive.
     volatility : float
-        Volatility parameter.
+        Volatility parameter. Must be strictly positive.
     initial : float, or list, or np.ndarray
-        Initial condition of the model.
+        Initial condition of the model. Must be positive.
     T : float
         Final time. Must be strictly greater than 0.
     steps : int
@@ -51,7 +51,7 @@ class CIR(DiffusionProcess):
     Attributes
     ----------
     speed : float
-        Speed of adjustment to the mean and volatility.
+        Speed of mean reversion.
     mean : float
         Mean parameter.
     volatility : float
@@ -159,8 +159,10 @@ class CIR(DiffusionProcess):
 
         self.path = np.zeros((n_simulations,self.steps+1, 1))
         self.path[:,0] = self.initial
+        rng = get_rng()
+
         for i in range(1,self.steps+1):
-            rng = get_rng()
+
             # The induction formula is given by R_{t+1} = c*Z, where Z ~ NCX2(df=nu, nc=R_t * nc_factor)
             Y = rng.noncentral_chisquare(df=self.nu, nonc=self.path[:,i-1] * self.nc_factor)
             self.path[:,i] = self.c*Y
@@ -249,8 +251,6 @@ class CIR(DiffusionProcess):
 
         t = _validate_t(t)
 
-        if t == 0:
-            return np.array([0])
 
         x = np.asarray(x)
 

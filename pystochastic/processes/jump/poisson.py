@@ -7,11 +7,7 @@ Description
 -----------
 This module provides a way to simulate a Poisson process with a given intensity parameter.
 
-This module provides a general class "Poisson", with the following built-in methods:
-    - .simulate() : Simulate a Poisson process path in 1D.
-    - .plot() : Plot the Poisson process path.
-    - .mean() : Mean of the Poisson process at a given time.
-    - .variance() : Variance of the Poisson process at a given time.
+This module provides a general class "Poisson", which inherits from the methods of Process and JumpProcess abstract classes.
 
 Examples
 --------
@@ -89,6 +85,10 @@ class PoissonProcess(JumpProcess):
                          dim = 1,
                          name = "Poisson process")
 
+        if not isinstance(intensity, (int, float, np.integer, np.floating)):
+            raise ValueError(
+                "The intensity must be a strictly positive real number."
+            )
         if intensity <= 0:
             raise ValueError(
                 "The intensity must be strictly positive."
@@ -114,6 +114,11 @@ class PoissonProcess(JumpProcess):
         np.ndarray
             Path of the simulated Poisson process of the form ``(n_simulations, steps + 1)``.
         """
+
+        if not n_simulations >= 1 or not isinstance(n_simulations, (int, np.integer)):
+            raise ValueError(
+                "The number of simulations must be a strictly positive integer."
+            )
 
         self.path = np.zeros((n_simulations, self.steps + 1, 1))
 
