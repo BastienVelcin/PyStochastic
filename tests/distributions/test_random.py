@@ -35,10 +35,10 @@ def test_exponential_generator_is_positive():
 
 
 def test_normal_generator_moments():
-    samples = continuous.normal(mean=2, sd=3, n=100_000)
+    samples = continuous.normal(mean=2, var=3, n=100_000)
 
     assert np.mean(samples) == pytest.approx(2, abs=0.05)
-    assert np.var(samples) == pytest.approx(9, abs=0.15)
+    assert np.var(samples) == pytest.approx(3, abs=0.15)
 
 
 def test_gamma_generator_moments():

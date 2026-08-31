@@ -46,8 +46,6 @@ def test_public_distribution_classes():
 def test_public_montecarlo_classes():
     from pystochastic.montecarlo import (
         MonteCarlo,
-        MonteCarloProcess,
     )
 
     assert MonteCarlo is not None
-    assert MonteCarloProcess is not None

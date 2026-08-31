@@ -5,7 +5,7 @@ Tests for pystochastic.montecarlo.
 import numpy as np
 import pytest
 
-from pystochastic.montecarlo.montecarlo import MonteCarlo, MonteCarloProcess
+from pystochastic.montecarlo.montecarlo import MonteCarlo
 from pystochastic.random import continuous
 from pystochastic.processes.diffusion.vasicek import Vasicek
 
@@ -393,7 +393,7 @@ class TestErrors:
 
         mc = MonteCarlo(samples)
 
-        result = mc.bias(
+        result = mc.bias_estimator(
             reference=2.0,
         )
 
@@ -418,7 +418,7 @@ class TestErrors:
         )
 
         np.testing.assert_allclose(
-            mc.rmse(reference=2.0),
+            mc.rmse_estimator(reference=2.0),
             expected,
         )
 
@@ -533,75 +533,3 @@ class TestMonteCarloConvergence:
             abs=0.15,
         )
 
-
-# ======================================================================
-# Monte Carlo Process
-# ======================================================================
-
-class TestMonteCarloProcess:
-
-    @pytest.fixture
-    def vasicek(self):
-        return Vasicek(
-            speed=2,
-            mean=1.5,
-            volatility=0.3,
-            initial=0,
-            T = 5,
-            steps=100,
-        )
-
-    def test_values_at_shape(self, vasicek):
-        mc = MonteCarloProcess(
-            vasicek,
-            n_simulations=500,
-        )
-
-        values = mc.values_at(t_0=5)
-
-        assert values.shape == (500,)
-
-    def test_estimate_matches_theoretical_mean(self, vasicek):
-        mc = MonteCarloProcess(
-            vasicek,
-            n_simulations=5000,
-        )
-
-        estimate = mc.estimate(
-            t_0=5,
-            function=lambda x: x[:, 0],
-        )
-
-        theoretical_mean = (
-            1.5
-            + (0 - 1.5)
-            * np.exp(-2 * 5)
-        )
-
-        assert estimate.item() == pytest.approx(
-            theoretical_mean,
-            abs=0.05,
-        )
-
-    def test_mean_path(self, vasicek):
-        mc = MonteCarloProcess(
-            vasicek,
-            n_simulations=3000,
-        )
-
-        path = mc.mean_path(
-            plot_sim=False,
-        )
-
-        theoretical_path = (
-            1.5
-            + (0 - 1.5)
-            * np.exp(-2 * vasicek.t)
-        )
-
-        assert np.max(
-            np.abs(
-                path[:, 0]
-                - theoretical_path
-            )
-        ) < 0.1

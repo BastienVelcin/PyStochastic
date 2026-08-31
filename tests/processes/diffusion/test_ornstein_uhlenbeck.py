@@ -31,7 +31,7 @@ def test_multidimensional_em():
 def test_drift_and_diffusion():
     r = OrnsteinUhlenbeck(speed=[2,3], volatility=[.5,.7], initial=[0,1])
     x = np.array([.5,1.5])
-    assert np.allclose(r.drift(x), [1,4.5])
+    assert np.allclose(r.drift(x), [-1,-4.5])
     assert np.allclose(r.diffusion(x), [.5,.7])
 
 

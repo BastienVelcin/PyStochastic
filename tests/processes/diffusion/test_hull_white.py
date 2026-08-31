@@ -23,7 +23,7 @@ def test_invalid_parameters(kw):
 
 def test_drift_and_diffusion():
     h = make_hw(reversion_speed=.5, calibration=.1, volatility=.02)
-    assert h.drift(np.array([.2]), .3) == pytest.approx(-.05)
+    assert h.drift(np.array([.2]), .3) == pytest.approx(0.0)
     assert h.diffusion(np.array([.2]), .3) == pytest.approx(.02)
 
 

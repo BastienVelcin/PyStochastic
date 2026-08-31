@@ -52,9 +52,9 @@ class TestDerivedAttributesStayFresh:
     def test_cir_derived_constants_track_dt(self):
         """nu/factor/c depend on dt; changing steps must refresh all three."""
         c = CIR(speed=2, mean=0.05, volatility=0.1, initial=0.03, T=1, steps=1000)
-        factor_before = c.factor
+        factor_before = c.nc_factor
         c.steps = 50
-        factor_after = c.factor
+        factor_after = c.nc_factor
         assert factor_before != pytest.approx(factor_after)
         # sanity check against the closed-form formula using the *current* dt
         expected_factor = (4*c.speed*np.exp(-c.speed*c.dt)) / (c.volatility**2*(1-np.exp(-c.speed*c.dt)))
@@ -138,7 +138,7 @@ class TestQuadraticVariation:
     def test_matches_elapsed_time_for_standard_brownian_motion(self):
         """For standard BM, the quadratic variation on [0, t] equals t."""
         seed(0)
-        W = Brownian(variance=np.eye(1), T=1, steps=10)
+        W = Brownian(cov=np.eye(1), T=1, steps=10)
         W.simulate(n_simulations=200000)
         qv = W.quadratic_variation(t=1.0, mean=True, plot=False)
         assert qv == pytest.approx(1.0, abs=0.05)
@@ -151,7 +151,7 @@ class TestQuadraticVariation:
         specific off-by-one regression.
         """
         seed(1)
-        W = Brownian(variance=np.eye(1), T=1, steps=10)
+        W = Brownian(cov=np.eye(1), T=1, steps=10)
         W.simulate(n_simulations=200000)
         qv = W.quadratic_variation(t=1.0, mean=True, plot=False)
         assert abs(qv - 1.0) < 0.05

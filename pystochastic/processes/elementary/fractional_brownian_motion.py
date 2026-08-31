@@ -121,7 +121,7 @@ class FractionalBrownianMotion(Process):
         Z = continuous.normal(0, 1, n_simulations * (self.steps + 1)).reshape(self.steps + 1, n_simulations)
 
         self.path = (Z.T @ self.cholesky_time_covar_matrix)[:, :, None]
-
+        self.path[:,0,0] = np.zeros(self.dim)
         if plot:
             self.plot()
 

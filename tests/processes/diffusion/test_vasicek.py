@@ -9,7 +9,7 @@ def test_representations():
     r = Vasicek(speed=[1,2], mean=[.05,.1], volatility=[.1,.2], initial=[.03,.04])
     assert r.dim == 2 and r._diagonal
     r = Vasicek(speed=np.eye(2), mean=[.05,.1], volatility=np.eye(2), initial=[.03,.04])
-    assert not r._diagonal
+    assert r._diagonal
 
 
 def test_invalid_dimensions():

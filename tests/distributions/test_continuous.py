@@ -151,7 +151,7 @@ def test_normal_moments():
     distribution = Normal(2, 3)
 
     assert distribution.mean() == pytest.approx(2)
-    assert distribution.variance() == pytest.approx(9)
+    assert distribution.variance() == pytest.approx(3)
 
 
 def test_gamma_moments():

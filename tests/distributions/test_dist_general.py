@@ -126,7 +126,7 @@ def test_distribution_invalid_parameters():
         Exponential(0)
 
     with pytest.raises(ValueError):
-        Normal(sd=0)
+        Normal(var=0)
 
     with pytest.raises(ValueError):
         Gamma(k=0)
@@ -149,9 +149,9 @@ def test_distribution_invalid_parameters():
 
 def test_normal_properties():
     """Check the Normal distribution API and its theoretical moments."""
-    X = Normal(mu=2, sd=3)
+    X = Normal(mu=2, var=3)
 
-    assert X.pdf(2) == pytest.approx(1 / (3 * np.sqrt(2 * np.pi)))
+    assert X.pdf(2) == pytest.approx(1 / ( np.sqrt(2 * 3 * np.pi)))
     assert X.cdf(2) == pytest.approx(0.5)
     assert X.support() == (-np.inf, np.inf)
 
@@ -160,6 +160,6 @@ def test_normal_properties():
     # later uses ``self.mu`` in sample()/mean(). They should pass once
     # that naming inconsistency is fixed.
     assert X.mean() == pytest.approx(2)
-    assert X.variance() == pytest.approx(9)
+    assert X.variance() == pytest.approx(3)
     samples = X.sample(100)
     assert samples.shape == (100,)

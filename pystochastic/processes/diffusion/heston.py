@@ -270,10 +270,10 @@ class Heston(DiffusionProcess):
                                                            n_workers=n_workers,
                                                            brownian_increments=W.increments)
         self.price = self.couple[:, :, 0][:,:,None]
-        self.var = self.couple[:, :, 1][:,:,None]
-
         # WARNING: Due to some approximation with the Euler-Maruyama method, the variance can be negative, so we need to truncate the variance with max(V_t, 0)
-        self.path = np.sqrt(np.maximum(self.var, 0))
+        self.var = np.maximum(self.couple[:, :, 1],0)[:,:,None]
+
+        self.path = np.sqrt(self.var)
 
         if plot:
             fig_price = go.Figure()

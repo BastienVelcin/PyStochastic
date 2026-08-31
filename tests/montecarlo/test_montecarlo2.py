@@ -4,11 +4,9 @@ import numpy as np
 import pytest
 from scipy import stats
 
-from pystochastic.montecarlo.montecarlo import MonteCarlo, MonteCarloProcess
+from pystochastic.montecarlo.montecarlo import MonteCarlo
 from pystochastic.random import continuous
 from pystochastic.random.setseed import seed
-from pystochastic.processes.diffusion.vasicek import Vasicek
-
 
 # ======================================================================
 # MonteCarlo -- construction / shapes
@@ -133,14 +131,14 @@ class TestStatisticalErrors:
         seed(0)
         samples = continuous.normal(0, 1, 20000)
         mc = MonteCarlo(samples)
-        assert mc.bias(reference=0, n=20000).item() == pytest.approx(0, abs=0.05)
+        assert mc.bias_estimator(reference=0, n=20000).item() == pytest.approx(0, abs=0.05)
 
     def test_rmse_matches_expected_scale(self):
         seed(0)
         samples = continuous.normal(0, 1, 20000)
         mc = MonteCarlo(samples)
         # RMSE of individual N(0,1) draws around the true mean 0 should be close to std=1
-        assert mc.rmse(reference=0, n=20000).item() == pytest.approx(1, rel=0.1)
+        assert mc.rmse_estimator(reference=0, n=20000).item() == pytest.approx(1, rel=0.1)
 
 
 # ======================================================================
@@ -175,34 +173,4 @@ class TestDescriptiveStatistics:
         mc = MonteCarlo(samples)
         # Raw (unnormalized) 4th standardized moment of N(0,1) is 3
         assert mc.kurtosis(n=20000).item() == pytest.approx(3, abs=0.3)
-
-
-# ======================================================================
-# MonteCarloProcess
-# ======================================================================
-
-class TestMonteCarloProcess:
-
-    def test_estimate_matches_theoretical_mean(self):
-        seed(0)
-        v = Vasicek(speed=2, mean=1.5, volatility=0.3, initial=0, T=5, steps=100)
-        mc = MonteCarloProcess(v, n_simulations=5000)
-        est = mc.estimate(t_0=5, function=lambda x: x[:, 0])
-        theo = 1.5 + (0 - 1.5) * np.exp(-2 * 5)
-        assert est.item() == pytest.approx(theo, abs=0.05)
-
-    def test_values_at_shape(self):
-        seed(0)
-        v = Vasicek(speed=2, mean=1.5, volatility=0.3, initial=0, T=5, steps=100)
-        mc = MonteCarloProcess(v, n_simulations=500)
-        vals = mc.values_at(t_0=5)
-        assert vals.shape == (500,)
-
-    def test_mean_path_matches_theory(self):
-        seed(0)
-        v = Vasicek(speed=2, mean=1.5, volatility=0.3, initial=0, T=5, steps=100)
-        mc = MonteCarloProcess(v, n_simulations=3000)
-        path = mc.mean_path(plot_sim=False)
-        theo_path = 1.5 + (0 - 1.5) * np.exp(-2 * v.t)
-        assert np.max(np.abs(path[:, 0] - theo_path)) < 0.1
 

@@ -8,7 +8,7 @@ from pystochastic.processes import Brownian
 ## Description
 
 ```python
-pystochastic.processes.Brownian(variance = 1, T = 1, steps = 1000)
+pystochastic.processes.Brownian(cov = 1, T = 1, steps = 1000)
 ```
 **Type :** Class
 
@@ -28,8 +28,8 @@ It appears naturally in stochastic differential equations and so, within the dif
 
 ### Parameters
 
-`variance` : _float_ or _array_like_
-: Variance-covariance matrix of the Brownian motion. In the previous example, it is represented by $Q$.
+`cov` : _float_ or _array_like_
+: Covariance matrix $Q$ of the Brownian motion.
 
 `T` : _float_
 : Final time of the Brownian motion simulation. Must be greater than `0`.
@@ -47,7 +47,7 @@ The Brownian class inherits all methods from the [Processes](<project:/processes
 ## Examples
 
 ```python
->>> W = Brownian(variance = np.eye(2), T = 1, steps = 1000)
+>>> W = Brownian(cov = np.eye(2), T = 1, steps = 1000)
 >>> W.simulate(2, plot = True)
 array([[[ 0.        ,  0.        ],
         [-0.00944504, -0.0103207 ],

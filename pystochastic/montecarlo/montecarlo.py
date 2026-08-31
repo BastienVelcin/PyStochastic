@@ -481,7 +481,7 @@ class MonteCarlo:
 
         n = self._validate_n(n)
 
-        return np.sqrt(self.mse(reference,n,function))
+        return np.sqrt(self.mse_estimator(reference,n,function))
 
 
     ######################################
@@ -729,7 +729,7 @@ class MonteCarlo:
                 "The considered dimension must be a strictly positive integer that is inferior to the number of dimensions of the samples."
             )
 
-        if not isinstance(isinstance(N, Distribution)):
+        if distribution is not None and isinstance(distribution, Distribution):
             raise ValueError(
                 "The distribution must be a Distribution object (pystochastic.dist.Distribution)."
             )
