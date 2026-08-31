@@ -399,6 +399,68 @@ class Process(ABC):
         # RETURN FORM: (max_value, time_index, time)
         return np.min(path, axis=1), argmin, self.t[argmin]
 
+    def mean_path(self, plot_sim=True):
+
+        """
+        Mean Path method.
+
+        Compute the average path from the n_simulations simulated paths of the process.
+        The average path can be plotted.
+
+        Returns
+        -------
+        np.ndarray
+            Average path deduced from the samples.
+        """
+
+        meanpath = np.mean(self.path,axis=0)
+        fig = go.Figure()
+
+        if self.dim == 1:
+            if plot_sim:
+                for sim in range(self.n_simulations):
+                    fig.add_trace(go.Scatter(x=self.t,
+                                             y=self.path[sim, :, 0],
+                                             mode="lines",
+                                             line=dict(width=1,color="#D1D9ED")))
+
+            fig.add_trace(go.Scatter(x=self.t,
+                                     y=meanpath[:, 0],
+                                     mode="lines",
+                                     line=dict(width=2)))
+
+        elif self.dim == 2:
+            if plot_sim:
+                for sim in range(self.n_simulations):
+                    fig.add_trace(
+                        go.Scatter(x=self.path[sim, :, 0],
+                                   y=self.path[sim, :, 1],
+                                   mode="lines",
+                                   line=dict(width=1,color="#D1D9ED")))
+
+            fig.add_trace(go.Scatter(x=meanpath[:, 0],
+                                     y=meanpath[:, 1],
+                                     mode="lines",
+                                     line=dict(width=2)))
+
+        elif self.dim ==3:
+            if plot_sim:
+                for sim in range(self.n_simulations):
+                    fig.add_trace(go.Scatter3d(x=self.path[sim, :, 0],
+                                               y=self.path[sim, :, 1],
+                                               z=self.path[sim, :, 2],
+                                               mode="lines",
+                                               line=dict(width=1,color="#D1D9ED")))
+
+            fig.add_trace(go.Scatter3d(x=meanpath[:, 0],
+                                       y=meanpath[:, 1],
+                                       z=meanpath[:, 2],
+                                       mode="lines",
+                                       line=dict(width=2)))
+
+        fig.show()
+
+        return meanpath
 
     def max_norm(self, order=2):
 
@@ -618,7 +680,51 @@ class Process(ABC):
                 quad_var = np.mean(quad_var)
         return quad_var
 
+    def values_at(self, t0=None, function=lambda x: x[:,0]):
+
+        """
+        Values At method.
+
+        Returns the values of the process at a given time t_0.
+
+        Returns
+        -------
+        np.ndarray
+            Values of the process at a given time t_0.
+        """
+
+        if self.path is None:
+            raise ValueError(
+                "The path has not been simulated yet. Please run the simulate method first."
+            )
+
+        if t0 is None:
+            t0 = self.path.t_n
+
+        if not 0<= t0 <= self.T:
+            raise ValueError(
+                f"The time must be between {0} and {self.T}."
+            )
+
+        # The specified time might not be in the time interval of the process. In this case, the closest time is used.
+        if t0 not in self.t:
+            t_index = np.argmin(np.abs(t0 - self.t))
+        else:
+            t_index = np.where(self.t == t0)[0][0]
+
+        return function(self.path[:,t_index])
+
     def density(self, t, x):
         raise NotImplementedError(
             "The density function is not implemented for this process yet."
         )
+
+    def estimator_at(self, t0=None, function=lambda x: x[:, 0]):
+
+        if not 0<= t0 <= self.T:
+            raise ValueError(
+                f"The time must be between {0} and {self.T}."
+            )
+
+        from pystochastic.montecarlo.montecarlo import MonteCarlo
+        return MonteCarlo(self.values_at(t0, function))

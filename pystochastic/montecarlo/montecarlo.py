@@ -103,6 +103,12 @@ class MonteCarlo:
 
         if n is None:
             n = self.n_pool_values
+
+        if not n > 1 or not isinstance(n, (int, np.integer)):
+            raise ValueError(
+                "n must be strictly an integer strictly greater than 1."
+            )
+
         return np.mean(function(self.samples[:,:n]), axis=1)
 
     def half_width(self, n=None, function = lambda x: x, confidence=0.95, type="normal"):
@@ -134,6 +140,16 @@ class MonteCarlo:
 
         if n is None:
             n = self.n_pool_values
+
+        if not n > 1 or not isinstance(n, (int, np.integer)):
+            raise ValueError(
+                "n must be strictly an integer strictly greater than 1."
+            )
+
+        if not 0 < confidence < 1:
+            raise ValueError(
+                "The confidence level must be a float between 0 and 1."
+            )
 
         sd_estimate = self.std(n,function,correction=True)
 
@@ -179,6 +195,16 @@ class MonteCarlo:
         if n is None:
             n = self.n_pool_values
 
+        if not n > 1 or not isinstance(n, (int, np.integer)):
+            raise ValueError(
+                "n must be strictly an integer strictly greater than 1."
+            )
+
+        if order < 1 or not isinstance(order, int):
+            raise ValueError(
+                "The order must be a strictly positive integer."
+            )
+
         return self.estimate(n, lambda x: np.power(function(x), order))
 
 
@@ -210,9 +236,9 @@ class MonteCarlo:
         if n is None:
             n = self.n_pool_values
 
-        if not n > 1:
+        if not n > 1 or not isinstance(n, (int, np.integer)):
             raise ValueError(
-                "n must be strictly greater than 1."
+                "n must be strictly an integer strictly greater than 1."
             )
 
         var = self.estimate(n, lambda x : function(x)**2) - (self.estimate(n, lambda x : function(x)))**2
@@ -246,6 +272,14 @@ class MonteCarlo:
             Estimation of the standard deviation.
         """
 
+        if n is None:
+            n = self.n_pool_values
+
+        if not n > 1 or not isinstance(n, (int, np.integer)):
+            raise ValueError(
+                "n must be strictly an integer strictly greater than 1."
+            )
+
         return np.sqrt(self.variance(n,function,correction))
 
     def standard_error(self, n = None, function = lambda x: x, correction = True):
@@ -275,6 +309,11 @@ class MonteCarlo:
         if n is None:
             n = self.n_pool_values
 
+        if not n > 1 or not isinstance(n, (int, np.integer)):
+            raise ValueError(
+                "n must be strictly an integer strictly greater than 1."
+            )
+
         return self.std(n,function,correction)/np.sqrt(n)
 
 
@@ -299,9 +338,9 @@ class MonteCarlo:
         if n is None:
             n = self.n_pool_values
 
-        if n <= 1:
+        if not n > 1 or not isinstance(n, (int, np.integer)):
             raise ValueError(
-                "n must be strictly greater than 1."
+                "n must be strictly an integer strictly greater than 1."
             )
 
         mean_est = self.estimate(n, function=function)
@@ -320,6 +359,11 @@ class MonteCarlo:
 
         if n is None:
             n = self.n_pool_values
+
+        if not n > 1 or not isinstance(n, (int, np.integer)):
+            raise ValueError(
+                "n must be strictly an integer strictly greater than 1."
+            )
 
         n_axis = np.arange(1, n + 1)
 
@@ -393,6 +437,14 @@ class MonteCarlo:
             Bias of the likelihood estimator.
         """
 
+        if n is None:
+            n = self.n_pool_values
+
+        if not n > 1 or not isinstance(n, (int, np.integer)):
+            raise ValueError(
+                "n must be strictly an integer strictly greater than 1."
+            )
+
         return self.estimate(n, function=function) - reference
 
     def mse(self, reference, n=None, function = lambda x: x):
@@ -420,6 +472,11 @@ class MonteCarlo:
         if n is None:
             n = self.n_pool_values
 
+        if not n > 1 or not isinstance(n, (int, np.integer)):
+            raise ValueError(
+                "n must be strictly an integer strictly greater than 1."
+            )
+
         return self.estimate(n, function = lambda x : (reference - function(x))**2)
 
     def rmse(self, reference, n=None, function = lambda x: x):
@@ -446,6 +503,11 @@ class MonteCarlo:
 
         if n is None:
             n = self.n_pool_values
+
+        if not n > 1 or not isinstance(n, (int, np.integer)):
+            raise ValueError(
+                "n must be strictly an integer strictly greater than 1."
+            )
 
         return np.sqrt(self.mse(reference,n,function))
 
@@ -479,6 +541,11 @@ class MonteCarlo:
         if n is None:
             n = self.n_pool_values
 
+        if not n > 1 or not isinstance(n, (int, np.integer)):
+            raise ValueError(
+                "n must be strictly an integer strictly greater than 1."
+            )
+
         return np.quantile(function(self.samples[:,:n]),q, axis=1)
 
     def min(self,n = None,function = lambda x: x):
@@ -503,6 +570,11 @@ class MonteCarlo:
 
         if n is None:
             n = self.n_pool_values
+
+        if not n > 1 or not isinstance(n, (int, np.integer)):
+            raise ValueError(
+                "n must be strictly an integer strictly greater than 1."
+            )
 
         return np.min(function(self.samples[:,:n]), axis=1)
 
@@ -529,6 +601,11 @@ class MonteCarlo:
         if n is None:
             n = self.n_pool_values
 
+        if not n > 1 or not isinstance(n, (int, np.integer)):
+            raise ValueError(
+                "n must be strictly an integer strictly greater than 1."
+            )
+
         return np.max(function(self.samples[:,:n]), axis=1)
 
     def median(self, n = None, function = lambda x: x):
@@ -554,6 +631,11 @@ class MonteCarlo:
         if n is None:
             n = self.n_pool_values
 
+        if not n > 1 or not isinstance(n, (int, np.integer)):
+            raise ValueError(
+                "n must be strictly an integer strictly greater than 1."
+            )
+
         return np.median(function(self.samples[:,:n]), axis=1)
 
     def skewness(self,n=None, function = lambda x: x):
@@ -575,6 +657,14 @@ class MonteCarlo:
         float or np.ndarray
             Skewness coefficient(s).
         """
+
+        if n is None:
+            n = self.n_pool_values
+
+        if not n > 1 or not isinstance(n, (int, np.integer)):
+            raise ValueError(
+                "n must be strictly an integer strictly greater than 1."
+            )
 
         std = self.std(n, function, correction=True)
         mean = self.estimate(n, function)
@@ -600,6 +690,14 @@ class MonteCarlo:
         float or np.ndarray
             Unormalized kurtosis coefficient(s).
         """
+
+        if n is None:
+            n = self.n_pool_values
+
+        if not n > 1 or not isinstance(n, (int, np.integer)):
+            raise ValueError(
+                "n must be strictly an integer strictly greater than 1."
+            )
 
         std = self.std(n, function, correction=True)
         mean = self.estimate(n, function)
@@ -644,6 +742,11 @@ class MonteCarlo:
         if n is None:
             n = self.n_pool_values
 
+        if not n > 1 or not isinstance(n, (int, np.integer)):
+            raise ValueError(
+                "n must be strictly an integer strictly greater than 1."
+            )
+
         # If the samples array contains samples from different simulations, we get the number of simulations.
         size = self.samples.shape[0]
         histograms = np.empty((size, bins))
@@ -685,6 +788,11 @@ class MonteCarlo:
         if n is None:
             n = self.n_pool_values
 
+        if not n > 1 or not isinstance(n, (int, np.integer)):
+            raise ValueError(
+                "n must be strictly an integer strictly greater than 1."
+            )
+
         # If the samples array contains samples from different simulations, we get the number of simulations.
         size = self.samples.shape[0]
 
@@ -694,7 +802,7 @@ class MonteCarlo:
         fig = go.Figure()
         for i in range(size):
 
-            x = np.sort(self.samples[i, :, dim])
+            x = np.sort(function(self.samples[i, :, dim]))
             f = np.arange(1, len(x) + 1) / len(x)
             fig.add_trace(go.Scatter(x=x,
                                      y=f,
@@ -718,248 +826,3 @@ class MonteCarlo:
 
 
         fig.show()
-
-class MonteCarloProcess:
-
-    """
-    MonteCarloProcess class
-
-    A Monte Carlo class for stochastic processes.
-    It provides the main methods for estimating parameters of the state of a stochastic process at a given time, and the
-    overall average process.
-
-    Parameters
-    ----------
-    process : np.ndarray
-        Stochastic process. It must be a stochastic process of the sublibrary processes.
-    n_simulations : None or int
-        Number of used simulated path of the process
-
-    Attributes
-    ----------
-    process : np.ndarray
-        Stochastic process.
-    n_simulations : None or int
-        Number of used simulated path of the process
-    t : np.ndarray
-        Time interval on which we want to simulate the process.
-    ech : np.ndarray
-        Samples obtained from the process.
-
-    Examples
-    --------
-    >> R = CIR(a=2,b=3,sigma=1,r_0=0,t_0=0,t_n=1,n_steps=1000)
-    >> mc = MonteCarloProcess(R,100)
-    >> mc.estimate(t_0=0.5, lambda x: x**2)
-    >> mc.mean_path()
-    """
-
-    def __init__(self,process,n_simulations=100, method="euler-maruyama"):
-
-        self.process = process
-        self.n_simulations = n_simulations
-        self.t = self.process.t
-        self.ech = self.process.simulate(self.n_simulations,method=method)
-        self.dim = self.process.dim
-
-    def simulate(self):
-
-        """
-        Simulate method.
-
-        Simulate n_simulations times a stochastic process path.
-
-        Returns
-        -------
-        np.ndarray
-            Paths of the simulated process.
-        """
-
-        self.ech = self.process.simulate(self.n_simulations)
-        return self.ech
-
-    def estimate(self, t_0=None, function = lambda x: x,n=None):
-
-        """
-        Estimate method.
-
-        Provides an estimation of the mean of a function of the process samples at a time t_0 with the Law of large numbers.
-                        E[f(X)] ~~ (f(X_1) + ... + f(X_n)) / n
-
-        Returns
-        -------
-        float
-            Estimation of the mean.
-        """
-
-        if n is None:
-            n = self.n_simulations
-
-        if n <= 0:
-            raise ValueError("n must be strictly positive.")
-
-        if n > self.n_simulations:
-
-            raise ValueError(
-                "n cannot be greater than the number of simulations."
-            )
-
-        if t_0 is None:
-            t_0 = self.process.t_n
-
-        # The specified time might not be in the time interval of the process. In this case, the closest time is used.
-        if t_0 not in self.t:
-            t_index = np.argmin(np.abs(t_0 - self.t))
-        else:
-            t_index = np.where(self.t == t_0)[0][0]
-
-        # Apply function to the process samples
-        samples = self.ech[:n, t_index]
-
-        # Apply f to X(t_0)
-        samples = function(samples)
-
-        # Monte Carlo estimate
-        means = np.mean(samples, axis=0)
-
-        return np.atleast_1d(means)
-
-    def mean_path(self, plot_sim=True):
-
-        """
-        Mean Path method.
-
-        Compute the average path from the n_simulations simulated paths of the process.
-        The average path can be plotted.
-
-        Returns
-        -------
-        np.ndarray
-            Average path deduced from the samples.
-        """
-
-        meanpath = np.mean(self.ech,axis=0)
-        fig = go.Figure()
-
-        if self.process.dim == 1:
-            if plot_sim:
-                for sim in range(self.n_simulations):
-                    fig.add_trace(go.Scatter(x=self.t,
-                                             y=self.ech[sim, :, 0],
-                                             mode="lines",
-                                             line=dict(width=1,color="#D1D9ED")))
-
-            fig.add_trace(go.Scatter(x=self.t,
-                                     y=meanpath[:, 0],
-                                     mode="lines",
-                                     line=dict(width=2)))
-
-        elif self.process.dim == 2:
-            if plot_sim:
-                for sim in range(self.n_simulations):
-                    fig.add_trace(
-                        go.Scatter(x=self.ech[sim, :, 0],
-                                   y=self.ech[sim, :, 1],
-                                   mode="lines",
-                                   line=dict(width=1,color="#D1D9ED")))
-
-            fig.add_trace(go.Scatter(x=meanpath[:, 0],
-                                     y=meanpath[:, 1],
-                                     mode="lines",
-                                     line=dict(width=2)))
-
-        elif self.process.dim ==3:
-            if plot_sim:
-                for sim in range(self.n_simulations):
-                    fig.add_trace(go.Scatter3d(x=self.ech[sim, :, 0],
-                                               y=self.ech[sim, :, 1],
-                                               z=self.ech[sim, :, 2],
-                                               mode="lines",
-                                               line=dict(width=1,color="#D1D9ED")))
-
-            fig.add_trace(go.Scatter3d(x=meanpath[:, 0],
-                                       y=meanpath[:, 1],
-                                       z=meanpath[:, 2],
-                                       mode="lines",
-                                       line=dict(width=2)))
-
-        fig.show()
-
-        return meanpath
-
-    def values_at(self, t_0=None, function=lambda x: x[:,0]):
-
-        """
-        Values At method.
-
-        Returns the values of the process at a given time t_0.
-
-        Returns
-        -------
-        np.ndarray
-            Values of the process at a given time t_0.
-        """
-
-        if t_0 is None:
-            t_0 = self.process.t_n
-
-        # The specified time might not be in the time interval of the process. In this case, the closest time is used.
-        if t_0 not in self.t:
-            t_index = np.argmin(np.abs(t_0 - self.t))
-        else:
-            t_index = np.where(self.t == t_0)[0][0]
-
-        if self.ech is None:
-            self.simulate()
-
-        return function(self.ech[:,t_index])
-
-    def mean_error(self,t,N=(10, 100, 1000),error_type="absolute",n_experiments=1,plot=True,plottype=None):
-
-        N = np.asarray(N)
-        N_len = np.size(N)
-        dim = self.process.dim
-
-        mean_approximation = np.zeros((n_experiments,N_len,dim))
-
-        for i in range(n_experiments):
-            self.ech = self.process.simulate(self.n_simulations)
-            mean_approximation[i, :] = self.estimate(t_0=t, n=N).reshape(N_len, dim)
-
-        true_mean = self.process.mean(t)
-
-        if error_type == "absolute":
-            error = np.abs(mean_approximation - true_mean)
-
-        elif error_type == "relative":
-
-            if np.any(true_mean == 0):
-                raise ValueError(
-                    "The relative error is not defined when the process mean is zero."
-                )
-
-            error = np.abs((mean_approximation - true_mean) / true_mean)
-
-        elif error_type == "mse":
-            error = np.mean((mean_approximation - true_mean) ** 2, axis=0)
-
-        else:
-            raise ValueError(
-                "error_type must be 'absolute', 'relative' or 'mse'."
-            )
-
-        if plot == True:
-            fig = go.Figure()
-            for d in range(dim):
-                fig.add_trace(
-                    go.Scatter(
-                        x=N,
-                        y=error[:, d],
-                        mode="lines+markers",
-                        name=f"Dimension {d + 1}"
-                    )
-                )
-            if plottype == "log":
-                fig.update_xaxes(type="log")
-                fig.update_yaxes(type="log")
-            fig.show()
