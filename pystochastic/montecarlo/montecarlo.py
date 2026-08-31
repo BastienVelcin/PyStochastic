@@ -9,16 +9,24 @@ This module provides some Monte Carlo methods, for both random variables and pro
 This modules provides two classes, with the following methods:
     - MonteCarlo : Monte Carlo methods for samples from a given random variable.
         - .estimate() : Estimates the mean of a function of a given random variable.
-        - .mean_estimator() : Estimates the mean and the half-width of the confidence interval.
-        - .confidence_interval() : Estimates the confidence interval of the mean.
-        - .confidence_curve() : Plots the cumulative distribution function of the mean.
-
-    - MonteCarloProcess : Monte Carlo methods for stochastic processes
-        - .simulate() : Resample a stochastic process path.
-        - .estimate() : Plots the mean path of a function of the process at a given time.
-        - .values_at() : Returns the values of the process at a given time.
-        - .mean_path() : Plots the mean path of the process.
-
+        - .half_width() : Estimates the half-width of the confidence interval of the mean estimator.
+        - .moment() : Estimates a moment of a given order of a function of a samples from a random variable.
+        - .variance() : Estimates the variance of a function of samples from a random variable.
+        - .std() : Estimates the standard deviation of a function of samples from a random variable.
+        - .standard_error() : Estimates the standard error of a function of samples from a random variable.
+        - .confidence_interval() : Estimates the confidence interval of the mean estimator of a given random variable.
+        - .confidence_curve() : Plots the mean estimator and the confidence interval of the mean estimator for all estimations, from 2 samples to the maximum number of samples specified in attributes.
+        - .bias_estimator() : Estimates the bias of the likelihood estimator of E[f(X)] when E[f(X)] is known.
+        - .mse_estimator() : Estimates the mean squared error of the likelihood estimator of E[f(X)] when E[f(X)] is known.
+        - .rmse_estimator() : Estimates the root mean squared error of the likelihood estimator of E[f(X)] when E[f(X)] is known.
+        - .quantile() : Estimates the quantile of order q of a specified array of values.
+        - .min() : Estimates the minimum value from samples.
+        - .max() : Estimates the maximum value from samples.
+        - .median() : Estimates the median value from samples.
+        - .skewness() : Estimates the skewness of a function of samples from a random variable.
+        - .kurtosis() : Estimates the kurtosis of a function of samples from a random variable.
+        - .histogram() : Plots the histogram of samples.
+        - .ecdf() : Plots the empirical cumulative distribution function of samples.
 
 
 Examples
@@ -32,10 +40,9 @@ Examples
 
 import numpy as np
 import plotly.graph_objects as go
-from pystochastic.processes import *
-import sys, inspect
 from scipy.stats import norm, t
-from pystochastic.dist import *
+from pystochastic.dist import Distribution
+
 
 class MonteCarlo:
 
@@ -74,6 +81,22 @@ class MonteCarlo:
         self.n_pool_values = self.samples.shape[1]
         self.dim = self.samples.shape[2]
 
+    def _validate_n(self, n):
+
+        if n is None:
+            n = self.n_pool_values
+
+        if not n >= 2 or not isinstance(n, (int, np.integer)):
+            raise ValueError(
+                "The number of considered samples n must be strictly an integer strictly greater than 2."
+            )
+
+        if not n <= self.n_pool_values:
+            raise ValueError(
+                "The number of considered samples n must be inferior to the number of samples."
+            )
+        return n
+
 
     ##################################
     #    I.  ESTIMATORS & MOMENTS    #
@@ -101,25 +124,17 @@ class MonteCarlo:
             Estimation of the mean.
         """
 
-        if n is None:
-            n = self.n_pool_values
-
-        if not n > 1 or not isinstance(n, (int, np.integer)):
-            raise ValueError(
-                "n must be strictly an integer strictly greater than 1."
-            )
+        n = self._validate_n(n)
 
         return np.mean(function(self.samples[:,:n]), axis=1)
 
-    def half_width(self, n=None, function = lambda x: x, confidence=0.95, type="normal"):
+    def half_width(self, n=None, function = lambda x: x, confidence=0.95, type="normal", variance = None):
 
         """
         Half Width method.
 
-        Provide the Half Width estimation of the confidence interval of specified confidence level. The half width can
-        be computed with two laws :
-            - Normal law : when the variance is known.
-            - Student law : when the variance is unknown.
+        Provide the Half Width estimation of the confidence interval of specified confidence level. We can use the normal (with specified or
+        approximed variance) and Student confidence intervals.
 
         Parameters
         ----------
@@ -138,28 +153,25 @@ class MonteCarlo:
             Estimation of the half width.
         """
 
-        if n is None:
-            n = self.n_pool_values
-
-        if not n > 1 or not isinstance(n, (int, np.integer)):
-            raise ValueError(
-                "n must be strictly an integer strictly greater than 1."
-            )
+        n = self._validate_n(n)
 
         if not 0 < confidence < 1:
             raise ValueError(
                 "The confidence level must be a float between 0 and 1."
             )
 
-        sd_estimate = self.std(n,function,correction=True)
-
         if type == "normal":
             #Quantile function of the standard normal distribution
             z = norm.ppf(0.5 + confidence / 2)
+            if variance is None:
+                sd_estimate = self.std(n, function, correction=True)
+            else:
+                sd_estimate = np.sqrt(variance)
 
         elif type == "student":
             # Quantile function of the Student distribution with n-1 degrees of freedom
             z = t.ppf(0.5 + confidence / 2, df=n-1)
+            sd_estimate = self.std(n, function, correction=True)
 
         else:
             raise ValueError(
@@ -192,13 +204,7 @@ class MonteCarlo:
             Estimation of the moment of specified order.
         """
 
-        if n is None:
-            n = self.n_pool_values
-
-        if not n > 1 or not isinstance(n, (int, np.integer)):
-            raise ValueError(
-                "n must be strictly an integer strictly greater than 1."
-            )
+        n = self._validate_n(n)
 
         if order < 1 or not isinstance(order, int):
             raise ValueError(
@@ -233,13 +239,7 @@ class MonteCarlo:
             Estimation of the variance.
         """
 
-        if n is None:
-            n = self.n_pool_values
-
-        if not n > 1 or not isinstance(n, (int, np.integer)):
-            raise ValueError(
-                "n must be strictly an integer strictly greater than 1."
-            )
+        n = self._validate_n(n)
 
         var = self.estimate(n, lambda x : function(x)**2) - (self.estimate(n, lambda x : function(x)))**2
 
@@ -272,13 +272,7 @@ class MonteCarlo:
             Estimation of the standard deviation.
         """
 
-        if n is None:
-            n = self.n_pool_values
-
-        if not n > 1 or not isinstance(n, (int, np.integer)):
-            raise ValueError(
-                "n must be strictly an integer strictly greater than 1."
-            )
+        n = self._validate_n(n)
 
         return np.sqrt(self.variance(n,function,correction))
 
@@ -306,13 +300,7 @@ class MonteCarlo:
             Estimation of the standard error.
         """
 
-        if n is None:
-            n = self.n_pool_values
-
-        if not n > 1 or not isinstance(n, (int, np.integer)):
-            raise ValueError(
-                "n must be strictly an integer strictly greater than 1."
-            )
+        n = self._validate_n(n)
 
         return self.std(n,function,correction)/np.sqrt(n)
 
@@ -335,13 +323,7 @@ class MonteCarlo:
             (Lower bound, Upper bound) : bounds of the confidence interval.
         """
 
-        if n is None:
-            n = self.n_pool_values
-
-        if not n > 1 or not isinstance(n, (int, np.integer)):
-            raise ValueError(
-                "n must be strictly an integer strictly greater than 1."
-            )
+        n = self._validate_n(n)
 
         mean_est = self.estimate(n, function=function)
         half_width = self.half_width(n,function=function,confidence=confidence,type=type)
@@ -357,20 +339,24 @@ class MonteCarlo:
         the maximum number of samples specified in attributes
         """
 
-        if n is None:
-            n = self.n_pool_values
+        n = self._validate_n(n)
 
-        if not n > 1 or not isinstance(n, (int, np.integer)):
+        if not 0 < confidence < 1:
             raise ValueError(
-                "n must be strictly an integer strictly greater than 1."
+                "The confidence level must be a float between 0 and 1."
             )
 
-        n_axis = np.arange(1, n + 1)
+        if not 0 <= n_pool < self.n_pool_values:
+            raise ValueError(
+                "The number of considered sample pool must be inferior to the number of sample pools."
+            )
+
+        n_axis = np.arange(2, n + 1)
 
         # Computation of the mean and variance of the estimator
         samples = function(self.samples[n_pool])
-        S1 = np.cumsum(samples[:n])
-        S2 = np.cumsum(samples[:n] ** 2)
+        S1 = np.cumsum(samples[:])[1:n]
+        S2 = np.cumsum(samples[:n] ** 2)[1:n]
         cum_mean = S1 / n_axis
 
         # Ignore the division by zero when the number of samples is 1
@@ -385,6 +371,10 @@ class MonteCarlo:
 
         elif type == "student":
             q = t.ppf(0.5 + confidence / 2, df=n_axis - 1)
+        else:
+            raise ValueError(
+                "The confidence curve type must be 'normal' or 'student'."
+            )
 
         half_width = q * np.sqrt(cum_var) / np.sqrt(n_axis)
 
@@ -415,12 +405,12 @@ class MonteCarlo:
     #    III.  STATISTICAL ERRORS    #
     ##################################
 
-    def bias(self, reference, n=None, function = lambda x: x):
+    def bias_estimator(self, reference, n=None, function = lambda x: x):
 
         """
         Bias method
 
-        Provides the bias of the likelihood estimator of E[f(X)] when E[f(X)] is known.
+        Provides the bias estimation of the likelihood estimator of E[f(X)] when E[f(X)] is known.
 
         Parameters
         ----------
@@ -437,22 +427,16 @@ class MonteCarlo:
             Bias of the likelihood estimator.
         """
 
-        if n is None:
-            n = self.n_pool_values
-
-        if not n > 1 or not isinstance(n, (int, np.integer)):
-            raise ValueError(
-                "n must be strictly an integer strictly greater than 1."
-            )
+        n = self._validate_n(n)
 
         return self.estimate(n, function=function) - reference
 
-    def mse(self, reference, n=None, function = lambda x: x):
+    def mse_estimator(self, reference, n=None, function = lambda x: x):
 
         """
         MSE method
 
-        Provides the mean squared error of the likelihood estimator of E[f(X)] when E[f(X)] is known.
+        Provides the mean squared error estimation of the likelihood estimator of E[f(X)] when E[f(X)] is known.
 
         Parameters
         ----------
@@ -469,22 +453,16 @@ class MonteCarlo:
             Bias of the likelihood estimator.
         """
 
-        if n is None:
-            n = self.n_pool_values
-
-        if not n > 1 or not isinstance(n, (int, np.integer)):
-            raise ValueError(
-                "n must be strictly an integer strictly greater than 1."
-            )
+        n = self._validate_n(n)
 
         return self.estimate(n, function = lambda x : (reference - function(x))**2)
 
-    def rmse(self, reference, n=None, function = lambda x: x):
+    def rmse_estimator(self, reference, n=None, function = lambda x: x):
 
         """
         RMSE method
 
-        Provides the root mean squared error of the likelihood estimator of E[f(X)] when E[f(X)] is known.
+        Provides the root mean squared error estimation of the likelihood estimator of E[f(X)] when E[f(X)] is known.
 
         Parameters
         ----------
@@ -501,13 +479,7 @@ class MonteCarlo:
             Bias of the likelihood estimator.
         """
 
-        if n is None:
-            n = self.n_pool_values
-
-        if not n > 1 or not isinstance(n, (int, np.integer)):
-            raise ValueError(
-                "n must be strictly an integer strictly greater than 1."
-            )
+        n = self._validate_n(n)
 
         return np.sqrt(self.mse(reference,n,function))
 
@@ -538,13 +510,7 @@ class MonteCarlo:
             Quantile of order q.
         """
 
-        if n is None:
-            n = self.n_pool_values
-
-        if not n > 1 or not isinstance(n, (int, np.integer)):
-            raise ValueError(
-                "n must be strictly an integer strictly greater than 1."
-            )
+        n = self._validate_n(n)
 
         return np.quantile(function(self.samples[:,:n]),q, axis=1)
 
@@ -568,13 +534,7 @@ class MonteCarlo:
             Minimum value(s).
         """
 
-        if n is None:
-            n = self.n_pool_values
-
-        if not n > 1 or not isinstance(n, (int, np.integer)):
-            raise ValueError(
-                "n must be strictly an integer strictly greater than 1."
-            )
+        n = self._validate_n(n)
 
         return np.min(function(self.samples[:,:n]), axis=1)
 
@@ -598,13 +558,7 @@ class MonteCarlo:
             Maximum value(s).
         """
 
-        if n is None:
-            n = self.n_pool_values
-
-        if not n > 1 or not isinstance(n, (int, np.integer)):
-            raise ValueError(
-                "n must be strictly an integer strictly greater than 1."
-            )
+        n = self._validate_n(n)
 
         return np.max(function(self.samples[:,:n]), axis=1)
 
@@ -628,13 +582,7 @@ class MonteCarlo:
             Median value(s).
         """
 
-        if n is None:
-            n = self.n_pool_values
-
-        if not n > 1 or not isinstance(n, (int, np.integer)):
-            raise ValueError(
-                "n must be strictly an integer strictly greater than 1."
-            )
+        n = self._validate_n(n)
 
         return np.median(function(self.samples[:,:n]), axis=1)
 
@@ -658,18 +606,11 @@ class MonteCarlo:
             Skewness coefficient(s).
         """
 
-        if n is None:
-            n = self.n_pool_values
-
-        if not n > 1 or not isinstance(n, (int, np.integer)):
-            raise ValueError(
-                "n must be strictly an integer strictly greater than 1."
-            )
+        n = self._validate_n(n)
 
         std = self.std(n, function, correction=True)
         mean = self.estimate(n, function)
-
-        return self.estimate(n, lambda x : np.power((self.samples - mean) / std,3))
+        return self.estimate(n, lambda x : np.power((function(x) - mean) / std,3))
 
     def kurtosis(self, n=None, function = lambda x: x):
 
@@ -691,18 +632,12 @@ class MonteCarlo:
             Unormalized kurtosis coefficient(s).
         """
 
-        if n is None:
-            n = self.n_pool_values
-
-        if not n > 1 or not isinstance(n, (int, np.integer)):
-            raise ValueError(
-                "n must be strictly an integer strictly greater than 1."
-            )
+        n = self._validate_n(n)
 
         std = self.std(n, function, correction=True)
         mean = self.estimate(n, function)
 
-        return self.estimate(n, lambda x: np.power((self.samples - mean) / std, 4))
+        return self.estimate(n, lambda x: np.power((function(x)- mean) / std, 4))
 
 
     #################################
@@ -739,27 +674,29 @@ class MonteCarlo:
             Histogram of samples values.
         """
 
-        if n is None:
-            n = self.n_pool_values
+        n = self._validate_n(n)
 
-        if not n > 1 or not isinstance(n, (int, np.integer)):
+        if not (0 <= dim < self.dim and isinstance(dim, (int, np.integer))):
             raise ValueError(
-                "n must be strictly an integer strictly greater than 1."
+                "The considered dimension must be a strictly positive integer that is inferior to the number of dimensions of the samples."
             )
 
+        if not isinstance(bins, (int, np.integer)) or bins < 1:
+            raise ValueError(
+                "The number of bins must be a strictly positive integer."
+            )
         # If the samples array contains samples from different simulations, we get the number of simulations.
-        size = self.samples.shape[0]
-        histograms = np.empty((size, bins))
-        bins_val = np.empty((size, bins+1))
+        histograms = np.empty((self.n_simulations, bins))
+        bins_val = np.empty((self.n_simulations, bins+1))
 
 
-        for i in range(0,size):
+        for i in range(0,self.n_simulations):
             histograms[i], bins_val[i] = np.histogram(function(self.samples[i,:n,dim]), bins=bins, density=normalized)
 
         if plot:
             fig = go.Figure()
 
-            for i in range(size):
+            for i in range(self.n_simulations):
                 fig.add_trace(go.Bar(x=(bins_val[i, :-1] + bins_val[i, 1:]) / 2,
                                      y=histograms[i],
                                      width=np.diff(bins_val[i]),
@@ -773,7 +710,7 @@ class MonteCarlo:
             )
 
             if distribution is not None :
-                t = np.linspace(bins_val[0,0],bins_val[0,-1], int(100*np.floor(bins_val[0,-1]-bins_val[0,0])))
+                t = np.linspace(bins_val[0,0],bins_val[0,-1], 500)
                 fig.add_trace(go.Scatter(x=t,
                                          y=distribution.pdf(t),
                                          mode="lines",
@@ -783,46 +720,55 @@ class MonteCarlo:
 
         return histograms
 
-    def ecdf(self,n=None, function = lambda x: x, dim=0, distribution=None):
+    def ecdf(self,n=None, function = lambda x: x, dim=0, plot=True, distribution=None):
 
-        if n is None:
-            n = self.n_pool_values
+        n = self._validate_n(n)
 
-        if not n > 1 or not isinstance(n, (int, np.integer)):
+        if not (0 <= dim < self.dim and isinstance(dim, (int, np.integer))):
             raise ValueError(
-                "n must be strictly an integer strictly greater than 1."
+                "The considered dimension must be a strictly positive integer that is inferior to the number of dimensions of the samples."
+            )
+
+        if not isinstance(isinstance(N, Distribution)):
+            raise ValueError(
+                "The distribution must be a Distribution object (pystochastic.dist.Distribution)."
             )
 
         # If the samples array contains samples from different simulations, we get the number of simulations.
-        size = self.samples.shape[0]
 
         min_val = np.min(self.min(n, function))
         max_val = np.max(self.max(n, function))
 
-        fig = go.Figure()
-        for i in range(size):
 
-            x = np.sort(function(self.samples[i, :, dim]))
-            f = np.arange(1, len(x) + 1) / len(x)
-            fig.add_trace(go.Scatter(x=x,
-                                     y=f,
-                                     mode="lines",
-                                     line=dict(width=2),
-                                     name=f"eCDE for sample pool {i}"))
-        fig.update_layout(
-            title=f"Empirical Cumulative Distribution Function",
-            xaxis_title="Values",
-            yaxis_title="Probability",
-            template="plotly_white",
-        )
+        if plot :
+            fig = go.Figure()
+            for i in range(self.n_simulations):
 
-        if distribution is not None:
-            t = np.linspace(min_val, max_val, int(1000 * np.floor(max_val - min_val)))
-            fig.add_trace(go.Scatter(x=t,
-                                     y=distribution.cdf(t),
-                                     mode="lines",
-                                     line=dict(width=2),
-                                     name=f"Target CDF ({type(distribution).__name__})"))
+                x = np.sort(function(self.samples[i, :n, dim]))
+                f = np.arange(1, len(x) + 1) / len(x)
+                fig.add_trace(go.Scatter(x=x,
+                                         y=f,
+                                         mode="lines",
+                                         line=dict(width=2),
+                                         name=f"eCDE for sample pool {i}"))
 
+            fig.update_layout(
+                title=f"Empirical Cumulative Distribution Function",
+                xaxis_title="Values",
+                yaxis_title="Probability",
+                template="plotly_white",
+            )
 
-        fig.show()
+            if distribution is not None:
+                t = np.linspace(min_val, max_val, int(1000 * np.floor(max_val - min_val)))
+                fig.add_trace(go.Scatter(x=t,
+                                         y=distribution.cdf(t),
+                                         mode="lines",
+                                         line=dict(width=2),
+                                         name=f"Target CDF ({type(distribution).__name__})"))
+            fig.show()
+        else:
+            for i in range(self.n_simulations):
+                x = np.sort(function(self.samples[i, :n, dim]))
+                f = np.arange(1, len(x) + 1) / len(x)
+        return x,f
