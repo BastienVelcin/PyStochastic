@@ -65,7 +65,7 @@ class CIR(DiffusionProcess):
     n_simulations : None, or int
         Number of simulations.
     dim : int
-        Dimension of the process. Here, the dimension is 1.
+        Dimension of the process. Here, the dimension is 1 since we consider only the unidimensional case.
     t : np.ndarray
         Time interval on which we want to simulate the CIR.
     dt : float
@@ -74,7 +74,7 @@ class CIR(DiffusionProcess):
         Path of the simulated CIR.
     nu : float
         First parameter of the Noncentral chi-squared distribution for the exact simulation equation
-    factor : float
+    nc_factor : float
         Factor for the second parameter of the Noncentral chi-squared distribution for the exact simulation equation.
     c : float
         Standardization coefficient for the Noncentral chi-squared distribution for the exact simulation equation.
@@ -110,7 +110,7 @@ class CIR(DiffusionProcess):
 
         if (self.speed <= 0) or (self.mean < 0) or (self.volatility <= 0) or (self.initial < 0):
             raise ValueError(
-                "The model parameters must satisfy a > 0, b >= 0, volatility > 0 and initial >= 0."
+                "The model parameters must satisfy speed > 0, mean >= 0, volatility > 0 and initial >= 0."
             )
 
         self.is_autonomous = True
@@ -120,7 +120,7 @@ class CIR(DiffusionProcess):
         return (4*self.speed*self.mean)/(self.volatility**2)
 
     @property
-    def factor(self):
+    def nc_factor(self):
         return (4*self.speed*np.exp(-self.speed * self.dt))/((self.volatility**2)*(1-np.exp(-self.speed * self.dt)))
 
     @property
@@ -161,8 +161,8 @@ class CIR(DiffusionProcess):
         self.path[:,0] = self.initial
         for i in range(1,self.steps+1):
             rng = get_rng()
-            # The induction formula is given by R_{t+1} = c*Z, where Z ~ NCX2(df=nu, nc=R_t * factor)
-            Y = rng.noncentral_chisquare(df=self.nu, nonc=self.path[:,i-1] * self.factor)
+            # The induction formula is given by R_{t+1} = c*Z, where Z ~ NCX2(df=nu, nc=R_t * nc_factor)
+            Y = rng.noncentral_chisquare(df=self.nu, nonc=self.path[:,i-1] * self.nc_factor)
             self.path[:,i] = self.c*Y
 
         if plot:
@@ -189,7 +189,7 @@ class CIR(DiffusionProcess):
 
         Notes
         -----
-        The expectation of the CIR path at every time t with a fixed initial is given by initial * exp(-speed*t) + b*(1-exp(-speed*t))
+        The expectation of the CIR path at every time t with a fixed initial is given by initial * exp(-speed*t) + mean*(1-exp(-speed*t))
         """
 
         t = _validate_t(t)
@@ -216,33 +216,36 @@ class CIR(DiffusionProcess):
         Notes
         -----
         The variance of the CIR path at every time t with a fixed initial is given by
-        initial * volatility^2/a * (exp(-a*t)-exp(-2*a*t)) + (b*volatility^2)/(2*a) * (1-exp(-a*t))^2
+        initial * volatility^2/speed * (exp(-speed*t)-exp(-2*speed*t)) + (mean*volatility^2)/(2*speed) * (1-exp(-speed*t))^2
         """
 
         t = _validate_t(t)
 
         return self.initial * (self.volatility**2 / self.speed) * (np.exp(-self.speed*t)-np.exp(-2 * self.speed * t)) + (self.mean * self.volatility**2)/(2*self.speed) * (1-np.exp(-self.speed*t))**2
 
-    def covariance_matrix(self,t):
-        t = _validate_t(t)
-        return self.variance(t)
-
-    def covariance(self,t,i,j):
-        t = _validate_t(t)
-
-        if not 0 <= i < self.dim or not isinstance(i, (int, np.integer)):
-            raise ValueError(
-                "The first coordinate must be an integer between 0 and the dimension (excluded)."
-            )
-
-        if not 0 <= j < self.dim or not isinstance(j, (int, np.integer)):
-            raise ValueError(
-                "The second coordinate must be an integer between 0 and the dimension (excluded)."
-            )
-
-        return self.variance(t)
-
     def density(self, t, x):
+
+        """
+        Density method.
+
+        Return the density of the CIR process at a given time t.
+
+        Parameters
+        ----------
+        t : float
+            Time at which the density is evaluated.
+        x :
+            Point at which the density is evaluated.
+
+        Returns
+        -------
+        np.ndarray
+            Dist of the CIR process path coordinates at a given time t.
+
+        Notes
+        -----
+        When the density is evaluated at t=0, the function returns 0 instead of returning the Dirac distribution.
+        """
 
         t = _validate_t(t)
 
@@ -255,8 +258,8 @@ class CIR(DiffusionProcess):
 
         c = ((self.volatility ** 2) * (1 - np.exp(-self.speed * t)) / (4 * self.speed))
 
-        factor = (4 * self.speed * np.exp(-self.speed * t) / ((self.volatility ** 2) * (1 - np.exp(-self.speed * t))))
+        nc_factor = (4 * self.speed * np.exp(-self.speed * t) / ((self.volatility ** 2) * (1 - np.exp(-self.speed * t))))
 
-        noncentrality = factor * self.initial
+        noncentrality = nc_factor * self.initial
 
-        return scipy.stats.ncx2.pdf(x / c,df=nu,nc=noncentrality) / c
+        return scipy.stats.ncx2.pdf(x / c,df=nu,nc=noncentrality) / c if x > 0 else np.array([0])

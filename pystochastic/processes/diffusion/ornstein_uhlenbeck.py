@@ -257,7 +257,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
 
         Return the covariance of the Ornstein-Uhlenbeck process at a given time t.
         The covariance matrix satisfies the following Lyapunov equation :
-            P'(t) = -volatility*P(t) - P(t)*volatility^T + (speed*speed^T)
+            P'(t) = -speed*P(t) - P(t)*speed^T + (volatility*volatility^T)
 
         Parameters
         ----------

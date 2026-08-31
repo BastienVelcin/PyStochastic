@@ -140,11 +140,15 @@ class Vasicek(DiffusionProcess):
             self.speed = _speed
             self.volatility = _volatility
 
-        if np.all(self.speed <= 0) or np.all(self.volatility < 0):
+        if np.any(self.speed <= 0):
             raise ValueError(
-                "The sigma and theta parameters should be greater than 0."
+                "The coefficients of the speed parameter should be strictly positive."
             )
 
+        if np.any(self.volatility < 0):
+            raise ValueError(
+                "The coefficients of the volatility parametersshould be positive."
+            )
 
     def drift(self,x,t=None):
 
@@ -223,7 +227,7 @@ class Vasicek(DiffusionProcess):
         Z = continuous.normal(0, 1, self.steps * n_simulations).reshape((n_simulations, self.steps))
 
         for i in range(1,self.steps+1):
-            #  The induction formula is given by R_t = (mean + R_{t-1} - mean) * exp(-speed * dt) + volatility * sqrt(1 - exp(-2 * speed * dt)) / (2 * theta)) * Z[i-1])
+            #  The induction formula is given by R_t = (mean + R_{t-1} - mean) * exp(-speed * dt) + volatility * sqrt((1 - exp(-2 * speed * dt)) / (2 * theta)) * Z[i-1])
             self.path[:,i,0] = (self.mean+ (self.path[:,i-1,0] - self.mean) * np.exp(-self.speed * self.dt) + self.volatility * np.sqrt((1 - np.exp(-2 * self.speed * self.dt)) / (2 * self.speed)) * Z[:,i-1])
 
         if plot:
@@ -252,7 +256,7 @@ class Vasicek(DiffusionProcess):
         Notes
         -----
         The expectation of the Ornstein-Uhlenbeck process at every time t with a fixed initial is given by
-                            initial * exp(-speed*t) + mean * (Id - exp(-volatility*t))
+                            mean + exp(-speed*t)*(initial - mean)
         """
 
         t = _validate_t(t)
@@ -266,7 +270,7 @@ class Vasicek(DiffusionProcess):
 
         Return the covariance of the Ornstein-Uhlenbeck process at a given time t.
         The covariance matrix satisfies the following Lyapunov equation :
-            P'(t) = -volatility*P(t) - P(t)*volatility^T + (speed*speed^T)
+            P'(t) = -speed*P(t) - P(t)*speed^T + (volatility*volatility^T)
 
         Parameters
         ----------
@@ -378,6 +382,28 @@ class Vasicek(DiffusionProcess):
         return np.diag(self.covariance_matrix(t))
 
     def density(self,t,x):
+
+        """
+        Density method.
+
+        Return the density of the Vasicek process at a given time t.
+
+        Parameters
+        ----------
+        t : float
+            Time at which the density is evaluated.
+        x :
+            Point at which the density is evaluated.
+
+        Returns
+        -------
+        np.ndarray
+            Dist of the Vasicek process path coordinates at a given time t.
+
+        Notes
+        -----
+        When the density is evaluated at t=0, the function returns 0 instead of returning the Dirac distribution.
+        """
 
         if self.dim > 1:
             raise ValueError(
