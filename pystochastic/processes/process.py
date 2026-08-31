@@ -12,15 +12,7 @@ class Process(ABC):
             dim = 1,
             name = ""):
 
-        self.T = T
-    
-        self.steps = steps
-        self.n_simulations = None
-        self.path = None
-        self.dim = dim
-        self.name = name
-
-        if not 0 < T or not isinstance(steps, (int, np.integer, float, np.floating)):
+        if not 0 < T or not isinstance(T, (int, np.integer, float, np.floating)):
             raise ValueError(
                 "The final time must be a strictly positive number."
             )
@@ -29,6 +21,21 @@ class Process(ABC):
             raise ValueError(
                 "The number of steps must be strictly positive."
             )
+
+        if not dim >= 1 or not isinstance(dim, (int, np.integer)):
+            raise ValueError(
+                "The dimension must be strictly positive."
+            )
+        self.T = T
+    
+        self.steps = steps
+        self.n_simulations = None
+        self.path = None
+        self.dim = dim
+        self.name = name
+
+
+
     @property
     def dt(self):
         return self.T / self.steps
@@ -44,9 +51,9 @@ class Process(ABC):
     @abstractmethod
     def expectation(self,t):
 
-        if not 0 <= t <= self.T:
+        if not 0 <= t:
             raise ValueError(
-                f"The time must be between 0 and {self.T}."
+                f"The time must be greater than 0, but {t} was given."
             )
 
         pass
@@ -54,9 +61,9 @@ class Process(ABC):
     @abstractmethod
     def covariance_matrix(self,t):
 
-        if not 0 <= t <= self.T:
+        if not 0 <= t:
             raise ValueError(
-                f"The time must be between {0} and {self.T}."
+                f"The time must be greater than 0, but {t} was given."
             )
 
         pass
@@ -64,9 +71,9 @@ class Process(ABC):
     @abstractmethod
     def covariance(self,t,i,j):
 
-        if not 0 <= t <= self.T:
+        if not 0 <= t:
             raise ValueError(
-                f"The time must be between {0} and {self.T}."
+                f"The time must be greater than 0, but {t} was given."
             )
 
         if not 0 <= i < self.dim:
@@ -83,9 +90,9 @@ class Process(ABC):
     @abstractmethod
     def variance(self,t):
 
-        if not 0 <= t <= self.T:
+        if not 0 <= t:
             raise ValueError(
-                f"The time must be between {0} and {self.T}."
+                f"The time must be greater than 0, but {t} was given."
             )
 
         pass

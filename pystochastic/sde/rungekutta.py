@@ -80,7 +80,7 @@ class RungeKutta:
                  T = 1,
                  steps=1000):
 
-        if not isinstance(initial, (int, float, np.integer, np.floating)):
+        if not isinstance(initial, (int, float, np.integer, np.floating, np.ndarray)):
             raise NotImplementedError(
                 "Milstein is currently implemented only for autonomous one-dimensional SDEs. Please specify the initial condition as a number."
             )

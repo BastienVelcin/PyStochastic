@@ -91,7 +91,13 @@ class GeometricBrownianMotion(DiffusionProcess):
 
         if initial is None:
             initial = np.ones(np.size(mu))
+
         self.initial = np.atleast_1d(initial)
+
+        if not np.all(self.initial > 0):
+            raise ValueError(
+                "The coefficients of the initial position must be strictly positive."
+            )
 
         super().__init__(T = T,
                          steps = steps,
@@ -168,6 +174,7 @@ class GeometricBrownianMotion(DiffusionProcess):
 
         W = Brownian(np.eye(self.dim), self.T, self.steps)
         W.simulate(n_simulations=n_simulations)
+
         #If the volatility is a scalar, a vector or a diagonal matrix, then volatility is reshaped as a vector,
         # so we need to sum on the only available axis. Otherwise, volatility is a matrix, and we need to sum on the axis 1.
         if self._diagonal:
@@ -179,9 +186,8 @@ class GeometricBrownianMotion(DiffusionProcess):
         else:
             for i in range(0, self.steps + 1):
                 # The explicit solution is given by S_t = initial * exp((mu - 1/2 * volatility^2) * t + volatility * W_t)
-
                 self.path[:, i, :] = self.initial * np.exp(
-                    (self.mu - np.sum(self.volatility * 2, axis=1) / 2) * self.t[i] + self.volatility  @ W.path[:,i,:])
+                    (self.mu - np.sum(self.volatility ** 2, axis=1) / 2) * self.t[i] + W.path[:,i] @ self.volatility.T)
 
         if plot:
             self.n_simulations = n_simulations
@@ -251,7 +257,7 @@ class GeometricBrownianMotion(DiffusionProcess):
                 "The time parameter must be positive."
             )
 
-        return self.initial[i]*self.initial[j]*np.exp((self.mu[i]+self.mu[j])*t)*(np.exp((self.m_volatility*self.m_volatility.T)[i,j] * t)-1)
+        return self.initial[i]*self.initial[j]*np.exp((self.mu[i]+self.mu[j])*t)*(np.exp((self.m_volatility @ self.m_volatility.T)[i,j] * t)-1)
 
     def covariance_matrix(self,t):
 
@@ -311,6 +317,28 @@ class GeometricBrownianMotion(DiffusionProcess):
 
     def density(self,t,x):
 
+        """
+        Density method.
+
+        Return the density of the GBM at a given time t.
+
+        Parameters
+        ----------
+        t : float
+            Time at which the density is evaluated.
+        x :
+            Point at which the density is evaluated.
+
+        Returns
+        -------
+        np.ndarray
+            Dist of the GBM path coordinates at a given time t.
+
+        Note
+        ----
+        When the density is evaluated at t=0, the function returns 0 instead of returning the Dirac distribution.
+        """
+
         if self.dim > 1:
             raise ValueError(
                 "The density is only defined implemented for 1D processes yet."
@@ -323,4 +351,4 @@ class GeometricBrownianMotion(DiffusionProcess):
 
         if t == 0:
             return np.array([0])
-        return 1/(x*self.volatility*np.sqrt(2*np.pi*t)) * np.exp(-(np.log(x)-(np.log(self.initial)+(self.mu-0.5*self.volatility**2)*t))**2/(2*self.volatility**2 * t))
+        return 1/(x*self.volatility*np.sqrt(2*np.pi*t)) * np.exp(-(np.log(x)-(np.log(self.initial)+(self.mu-0.5*self.volatility**2)*t))**2/(2*self.volatility**2 * t)) if x > 0 else np.array([0])

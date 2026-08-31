@@ -76,7 +76,7 @@ class DiffusionProcess(Process,ABC):
         self.n_simulations = n_simulations
 
         if method == "exact":
-            self.path = self._simulate_exact(n_simulations=n_simulations,plot= plot)
+            return self._simulate_exact(n_simulations=n_simulations,plot = plot)
 
         elif not self.is_autonomous and method != "euler-maruyama":
             print("Because the process SDE is not autonomous, the Euler-Maruyama method is used by default.")
@@ -126,7 +126,8 @@ class DiffusionProcess(Process,ABC):
             )
         return self.path
 
-    def _simulate_exact(self, n_simulations):
+
+    def _simulate_exact(self, n_simulations, plot = True):
         raise NotImplementedError(
             f"Exact simulation is not available for "
             f"{self.__class__.__name__}."
