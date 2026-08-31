@@ -21,17 +21,17 @@ class Process(ABC):
             dim = 1,
             name = ""):
 
-        if not 0 < T or not isinstance(T, (int, np.integer, float, np.floating)):
+        if not isinstance(T, (int, np.integer, float, np.floating)) or not 0 < T :
             raise ValueError(
                 "The final time must be a strictly positive number."
             )
 
-        if steps <= 0 or not isinstance(steps, (int, np.integer)):
+        if not isinstance(steps, (int, np.integer)) or steps <= 0:
             raise ValueError(
                 "The number of steps must be strictly positive."
             )
 
-        if not dim >= 1 or not isinstance(dim, (int, np.integer)):
+        if not isinstance(dim, (int, np.integer)) or not dim >= 1:
             raise ValueError(
                 "The dimension must be strictly positive."
             )

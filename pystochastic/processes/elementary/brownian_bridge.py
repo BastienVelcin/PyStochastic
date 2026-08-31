@@ -91,7 +91,7 @@ class BrownianBridge(Process):
             Path of the simulated Brownian Bridge process of the form ``(n_simulations, steps + 1, dim)``.
         """
         self.n_simulations = n_simulations
-        W = Brownian(variance = np.eye(self.dim), T = self.T, steps = self.steps)
+        W = Brownian(cov = np.eye(self.dim), T = self.T, steps = self.steps)
         W.simulate(n_simulations = n_simulations)
         self.path = np.zeros((n_simulations,self.steps+1, self.dim))
 

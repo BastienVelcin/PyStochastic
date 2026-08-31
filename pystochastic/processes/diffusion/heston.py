@@ -250,14 +250,14 @@ class Heston(DiffusionProcess):
         Returns
         -------
         np.ndarray
-            Path of the simulated brownian motion.
+            Path of the simulated Heston process.
 
         """
         self.n_simulations = n_simulations
 
         covariance_matrix = np.array([[1, self.correlation], [self.correlation, 1]])
 
-        W = Brownian(variance = covariance_matrix, T = self.T, steps = self.steps)
+        W = Brownian(cov = covariance_matrix, T = self.T, steps = self.steps)
         W.simulate(n_simulations = n_simulations)
 
         self.couple = EulerMaruyama(drift=self.drift,

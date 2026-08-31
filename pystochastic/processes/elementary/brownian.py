@@ -13,7 +13,7 @@ as well as an external trajectory simulation function.
 
 Examples
 --------
->> W = Brownian(variance=np.eye(2),T=1,steps=1000) #Brownian motion with covariance matrix np.eye(2)
+>> W = Brownian(cov=np.eye(2),T=1,steps=1000) #Brownian motion with covariance matrix np.eye(2)
 >>
 >> W.simulate() #Simulate the Brownian motion path
 >>
@@ -36,7 +36,7 @@ class Brownian(Process):
 
     Parameters
     ----------
-    variance : None, float, or np.ndarray
+    cov : None, float, or np.ndarray
         Covariance matrix of the Brownian motion. If None, the covariance matrix is set to identity. The matrix must be positive-definite.
     T : float
         Final time. Must be strictly greater than 0.
@@ -45,7 +45,7 @@ class Brownian(Process):
 
     Attributes
     ----------
-    variance : None, float, or np.ndarray
+    cov : None, float, or np.ndarray
         Covariance matrix of the Brownian motion. If None, the covariance matrix is set to identity.
     T : float
         Final time.
@@ -70,18 +70,18 @@ class Brownian(Process):
     """
 
     def __init__(self,
-                 variance=1,
+                 cov=1,
                  T=1,
                  steps=1000):
 
-        self.variance = np.atleast_2d(variance)
+        self.cov = np.atleast_2d(cov)
 
         super().__init__(T=T,
                          steps=steps,
-                         dim = np.shape(self.variance)[0],
+                         dim = np.shape(self.cov)[0],
                          name = "Brownian Motion")
 
-        if not is_pos_def(self.variance):
+        if not is_pos_def(self.cov):
             raise ValueError(
                 "The covariance matrix is not positive-definite."
             )
@@ -108,7 +108,7 @@ class Brownian(Process):
 
         self.n_simulations = n_simulations
 
-        self.sim = brownian_motion(self.variance, self.T,self.steps, n_simulations)
+        self.sim = brownian_motion(self.cov, self.T,self.steps, n_simulations)
         self.path = self.sim[0]
         self.increments = self.sim[1]
 
@@ -166,7 +166,7 @@ class Brownian(Process):
 
         t = _validate_t(t)
 
-        return t*self.variance
+        return t*self.cov
 
     def covariance(self, t,i,j):
 
@@ -241,7 +241,7 @@ class Brownian(Process):
 
         if t == 0:
             return np.array([0])
-        N = Normal(mu=0,var = t*self.variance)
+        N = Normal(mu=0,var = t*self.cov)
         return N.pdf(x)
 
 def brownian_motion(variance=1, T=1, steps = 1000,n_simulations=1):

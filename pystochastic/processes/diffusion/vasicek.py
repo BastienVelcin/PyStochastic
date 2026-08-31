@@ -123,6 +123,16 @@ class Vasicek(DiffusionProcess):
 
         self.initial = np.atleast_1d(initial)
 
+        if not np.any(np.real(np.linalg.eig(self.volatility)[0]) > 0):
+            raise ValueError(
+                "The speed parameter must be positive definite. If you are considering the unidimensional case, please specify a strictly positive number."
+            )
+
+        if not np.any(np.real(np.linalg.eig(self.speed)[0]) > 0):
+            raise ValueError(
+                "The volatility parameter must be positive definite. If you are considering the unidimensional case, please specify a strictly positive number."
+            )
+
         if not(np.shape(self.speed)[0] == np.shape(self.speed)[1] == self.dim == np.shape(self.volatility)[0] == np.shape(self.volatility)[1]  == self.initial.size):
             raise ValueError(
                 "The dimension of the the mean, signa, theta, and of the starting point must coincide."
@@ -140,15 +150,7 @@ class Vasicek(DiffusionProcess):
             self.speed = _speed
             self.volatility = _volatility
 
-        if np.any(self.speed <= 0):
-            raise ValueError(
-                "The coefficients of the speed parameter should be strictly positive."
-            )
 
-        if np.any(self.volatility < 0):
-            raise ValueError(
-                "The coefficients of the volatility parametersshould be positive."
-            )
 
     def drift(self,x,t=None):
 

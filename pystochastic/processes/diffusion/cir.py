@@ -108,9 +108,9 @@ class CIR(DiffusionProcess):
         self.volatility = volatility
         self.initial = initial
 
-        if (self.speed <= 0) or (self.mean < 0) or (self.volatility <= 0) or (self.initial < 0):
+        if (self.speed <= 0) or (self.mean <= 0) or (self.volatility <= 0) or (self.initial < 0):
             raise ValueError(
-                "The model parameters must satisfy speed > 0, mean >= 0, volatility > 0 and initial >= 0."
+                "The model parameters must satisfy speed > 0, mean > 0, volatility > 0 and initial >= 0."
             )
 
         self.is_autonomous = True
@@ -252,6 +252,9 @@ class CIR(DiffusionProcess):
         t = _validate_t(t)
 
 
+        if not x > 0 or t == 0:
+            return np.array([0])
+
         x = np.asarray(x)
 
         nu = (4 * self.speed * self.mean) / (self.volatility ** 2)
@@ -262,4 +265,4 @@ class CIR(DiffusionProcess):
 
         noncentrality = nc_factor * self.initial
 
-        return scipy.stats.ncx2.pdf(x / c,df=nu,nc=noncentrality) / c if x > 0 else np.array([0])
+        return scipy.stats.ncx2.pdf(x / c,df=nu,nc=noncentrality) / c

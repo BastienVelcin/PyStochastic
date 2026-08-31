@@ -103,6 +103,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
         self.m_speed = np.atleast_2d(speed)
         self.m_volatility = np.atleast_2d(volatility)
 
+
         if self.volatility.ndim == 1:
             self.volatility = np.diag(self.volatility)
 
@@ -111,6 +112,15 @@ class OrnsteinUhlenbeck(DiffusionProcess):
 
         self.initial = np.atleast_1d(initial)
 
+        if not np.any(np.real(np.linalg.eig(self.volatility)[0]) > 0):
+            raise ValueError(
+                "The speed parameter must be positive definite. If you are considering the unidimensional case, please specify a strictly positive number."
+            )
+
+        if not np.any(np.real(np.linalg.eig(self.speed)[0]) > 0) :
+            raise ValueError(
+                "The volatility parameter must be positive definite. If you are considering the unidimensional case, please specify a strictly positive number."
+            )
 
         if not(np.shape(self.speed)[0] == np.shape(self.speed)[1]  == np.shape(self.volatility)[0] == np.shape(self.volatility)[1] ==  self.initial.size):
             raise ValueError(
@@ -128,10 +138,7 @@ class OrnsteinUhlenbeck(DiffusionProcess):
             self.volatility = _volatility
             self.speed = _speed
 
-        if np.any(self.speed < 0) or np.any(self.volatility <=0):
-            raise ValueError(
-                "The volatility and speed parameters should be greater than 0."
-            )
+
 
         self.is_autonomous = True
     def drift(self, x, t=None):

@@ -110,13 +110,18 @@ class GeometricBrownianMotion(DiffusionProcess):
         self.mu = np.atleast_1d(mu)
 
         self.volatility = np.atleast_1d(volatility)
+
         self.m_volatility = np.atleast_2d(volatility)
 
-        if self.volatility.shape[0] == 1:
+        if self.volatility.ndim == 1:
             self.volatility = np.diag(self.volatility)
 
+        if not np.any(np.real(np.linalg.eig(self.volatility)[0]) > 0) :
+            raise ValueError(
+                "The volatility parameter must be positive definite. If you are considering the unidimensional case, please specify a strictly positive number."
+            )
 
-        if self.volatility.ndim == 1 and not(np.shape(self.volatility) == self.dim == np.size(self.mu)):
+        if self.volatility.ndim == 1 and not(np.shape(self.volatility)[0] == self.dim == np.size(self.mu)):
             raise ValueError(
                 "The dimension of the volatility matrix, of the drift and of the starting point must coincide."
             )
@@ -125,6 +130,8 @@ class GeometricBrownianMotion(DiffusionProcess):
             raise ValueError(
                 "The dimension of the volatility matrix, of the drift and of the starting point must coincide."
             )
+
+
 
         # We check if the diffusion is a scalar, a vector or a diagonal matrix.
         _volatility, _volatility_diag = _decompose(volatility) # Form : (Scalar/Vec/Matrix, Bool)

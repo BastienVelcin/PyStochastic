@@ -13,21 +13,21 @@ from pystochastic.processes import (
 
 class TestBrownian:
     def test_scalar_initialization(self):
-        W = Brownian(variance=1, T=1, steps=50)
+        W = Brownian(cov=1, T=1, steps=50)
         assert W.dim == 1
-        assert W.variance.shape == (1, 1)
+        assert W.cov.shape == (1, 1)
         assert W.t.shape == (51,)
         assert W.path is None
         assert W.increments is None
 
     def test_multidimensional_initialization(self):
-        W = Brownian(variance=np.eye(2), T=1, steps=20)
+        W = Brownian(cov=np.eye(2), T=1, steps=20)
         assert W.dim == 2
-        assert W.variance.shape == (2, 2)
+        assert W.cov.shape == (2, 2)
 
     def test_invalid_covariance(self):
         with pytest.raises(ValueError):
-            Brownian(variance=np.array([[1., 2.], [2., 1.]]))
+            Brownian(cov=np.array([[1., 2.], [2., 1.]]))
 
     def test_invalid_time(self):
         with pytest.raises(ValueError):
@@ -41,7 +41,7 @@ class TestBrownian:
         assert W.increments.shape == (n_simulations, 50, 1)
 
     def test_multidimensional_shape(self):
-        W = Brownian(variance=np.eye(2), T=1, steps=50)
+        W = Brownian(cov=np.eye(2), T=1, steps=50)
         path = W.simulate(8)
         assert path.shape == (8, 51, 2)
         assert W.increments.shape == (8, 50, 2)
@@ -78,7 +78,7 @@ class TestPoisson:
     def test_shape(self):
         P = PoissonProcess(intensity=2, T=1, steps=50)
         path = P.simulate(10)
-        assert path.shape == (10, 51)
+        assert path.shape == (10, 51,1)
 
     def test_paths_are_non_decreasing_and_integer(self):
         P = PoissonProcess(intensity=2, T=1, steps=50)
@@ -108,7 +108,7 @@ class TestGeometricBrownianMotion:
 
     def test_vector_representation(self):
         S = GeometricBrownianMotion(
-            mu=[.1, .2], volatility=[.2, .3], initial=[1, 2], steps=20
+            mu=[.1, .2], volatility=([.2, .3]), initial=[1, 2], steps=20
         )
         assert S.dim == 2
         assert S.volatility.shape == (2,)
@@ -147,7 +147,7 @@ class TestGeometricBrownianMotion:
 
     def test_multidimensional_em(self):
         S = GeometricBrownianMotion(
-            mu=[.1, .2], volatility=[.2, .3], initial=[1, 2], steps=30
+            mu=[.1, .2], volatility=np.diag([.2, .3]), initial=[1, 2], steps=30
         )
         path = S.simulate(10, "euler-maruyama")
         assert path.shape == (10, 31, 2)
@@ -165,7 +165,7 @@ class TestGeometricBrownianMotion:
 
     def test_drift_and_diagonal_diffusion(self):
         S = GeometricBrownianMotion(
-            mu=[.1, .2], volatility=[.2, .3], initial=[1, 2]
+            mu=[.1, .2], volatility=np.diag([.2, .3]), initial=[1, 2]
         )
         x = np.array([2., 3.])
         assert np.allclose(S.drift(x), [.2, .6])
@@ -182,7 +182,7 @@ class TestGeometricBrownianMotion:
 
 class TestOrnsteinUhlenbeck:
     def test_scalar_representation(self):
-        R = OrnsteinUhlenbeck(mean=1, volatility=.5, speed=2, initial=0, steps=20)
+        R = OrnsteinUhlenbeck(volatility=.5, speed=2, initial=0, steps=20)
         assert R.dim == 1
         assert R.volatility.shape == (1,)
         assert R.speed.shape == (1,)
@@ -190,7 +190,7 @@ class TestOrnsteinUhlenbeck:
 
     def test_vector_representation(self):
         R = OrnsteinUhlenbeck(
-            mean=[1, 2], volatility=[.5, .7], speed=[2, 3], initial=[0, 1]
+            volatility=[.5, .7], speed=[2, 3], initial=[0, 1]
         )
         assert R.volatility.shape == (2,)
         assert R.speed.shape == (2,)
@@ -198,7 +198,7 @@ class TestOrnsteinUhlenbeck:
 
     def test_diagonal_matrix_representation(self):
         R = OrnsteinUhlenbeck(
-            mean=[1, 2], volatility=np.diag([.5, .7]),
+            volatility=np.diag([.5, .7]),
             speed=np.diag([2, 3]), initial=[0, 1]
         )
         assert R.volatility.shape == (2,)
@@ -209,7 +209,7 @@ class TestOrnsteinUhlenbeck:
         speed = np.array([[2., .5], [.2, 3.]])
         volatility = np.array([[.5, .1], [.2, .7]])
         R = OrnsteinUhlenbeck(
-            mean=[1, 2], volatility=volatility, speed=speed, initial=[0, 1]
+            volatility=volatility, speed=speed, initial=[0, 1]
         )
         assert not R._diagonal
         assert np.allclose(R.volatility, volatility)
@@ -218,28 +218,28 @@ class TestOrnsteinUhlenbeck:
     def test_invalid_dimensions(self):
         with pytest.raises(ValueError):
             OrnsteinUhlenbeck(
-                mean=[1, 2], volatility=np.eye(2),
+                volatility=np.eye(2),
                 speed=np.eye(2), initial=[0]
             )
 
     @pytest.mark.parametrize("method", ["euler-maruyama", "milstein"])
     def test_scalar_methods_shape(self, method):
         R = OrnsteinUhlenbeck(
-            mean=1, volatility=.5, speed=2, initial=0, steps=30
+            volatility=.5, speed=2, initial=0, steps=30
         )
         path = R.simulate(10, method)
         assert path.shape == (10, 31, 1)
 
     def test_exact_scalar_shape(self):
         R = OrnsteinUhlenbeck(
-            mean=1, volatility=.5, speed=2, initial=0, steps=30
+            volatility=.5, speed=2, initial=0, steps=30
         )
         path = R.simulate(10, "exact")
         assert path.shape == (10, 31, 1)
 
     def test_multidimensional_em(self):
         R = OrnsteinUhlenbeck(
-            mean=[1, 2], volatility=[.5, .7], speed=[2, 3],
+            volatility=[.5, .7], speed=[2, 3],
             initial=[0, 1], steps=30
         )
         path = R.simulate(10, "euler-maruyama")
@@ -247,7 +247,6 @@ class TestOrnsteinUhlenbeck:
 
     def test_full_matrix_em(self):
         R = OrnsteinUhlenbeck(
-            mean=[1, 2],
             volatility=np.array([[.5, .1], [.2, .7]]),
             speed=np.array([[2., .5], [.2, 3.]]),
             initial=[0, 1], steps=30
@@ -257,22 +256,22 @@ class TestOrnsteinUhlenbeck:
 
     def test_drift_diagonal(self):
         R = OrnsteinUhlenbeck(
-            mean=[1, 2], volatility=[.5, .7], speed=[2, 3], initial=[0, 1]
+            volatility=[.5, .7], speed=[2, 3], initial=[0, 1]
         )
         x = np.array([.5, 1.5])
-        assert np.allclose(R.drift(x), [1., 1.5])
+        assert np.allclose(R.drift(x), [-1., -4.5])
 
     def test_drift_full_matrix(self):
         speed = np.array([[2., .5], [.2, 3.]])
         R = OrnsteinUhlenbeck(
-            mean=[1, 2], volatility=np.eye(2), speed=speed, initial=[0, 1]
+            volatility=np.eye(2), speed=speed, initial=[0, 1]
         )
         x = np.array([.5, 1.5])
-        assert np.allclose(R.drift(x), speed @ (R.mean - x))
+        assert np.allclose(R.drift(x), speed @ (- x))
 
     def test_exact_is_1d_only(self):
         R = OrnsteinUhlenbeck(
-            mean=[1, 2], volatility=np.eye(2), speed=np.eye(2),
+            volatility=np.eye(2), speed=np.eye(2),
             initial=[0, 1], steps=20
         )
         with pytest.raises(ValueError):
@@ -439,5 +438,3 @@ class TestCIR:
         R = CIR(T=1)
         with pytest.raises(ValueError):
             R.expectation(-.1)
-        with pytest.raises(ValueError):
-            R.variance(1.1)

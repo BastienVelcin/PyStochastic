@@ -71,7 +71,7 @@ class DiffusionProcess(Process,ABC):
         Returns
         -------
         np.ndarray
-            Path of the simulated Geometric Brownian Motion of the form ``(n_simulations, steps + 1, dim)``.
+            Path of the simulated process path of the form ``(n_simulations, steps + 1, dim)``.
         """
         self.n_simulations = n_simulations
 
