@@ -20,9 +20,12 @@ Examples
 
 import numpy as np
 import scipy
+import plotly.graph_objects as go
 from pystochastic.processes.diffusion.diffusion_process import DiffusionProcess
 from pystochastic.processes.process import _validate_t
 from pystochastic.dist import Normal
+from pystochastic.random import get_rng
+
 
 class HullWhite(DiffusionProcess):
 
@@ -112,6 +115,10 @@ class HullWhite(DiffusionProcess):
                 "The calibration parameter should be a real number or a function."
             )
         if isinstance(volatility, (int, float)):
+            if volatility <= 0:
+                raise ValueError(
+                    "The volatility parameter should be strictly positive."
+                )
             volatility = lambda t, v=volatility: v
         elif not callable(volatility):
             raise ValueError(
@@ -172,6 +179,36 @@ class HullWhite(DiffusionProcess):
 
         return self.volatility(t)
 
+    def _simulate_exact(self,n_simulations=1,plot=False):
+        self.path = np.zeros((n_simulations,self.steps+1,1))
+        self.path[:,0,0] = self.initial
+
+        #For a Hull White model, the distribution of X_{i+1}|X_i is a normal distribution with the mean and variance being given by the next equations:
+        N = Normal(0, 1)
+        for i in range(self.steps):
+            mean = self.path[:, i, 0] * np.exp(-self.reversion_speed * self.dt)  + np.exp(-self.reversion_speed * self.t[i + 1]) * scipy.integrate.quad(lambda s: np.exp(self.reversion_speed * s) * self.calibration(s), self.t[i], self.t[i + 1])[0]
+
+            variance = np.exp(-2 * self.reversion_speed * self.t[i + 1]) * scipy.integrate.quad(lambda s: np.exp(2 * self.reversion_speed * s) * self.volatility(s) ** 2, self.t[i], self.t[i + 1])[0]
+
+            self.path [:,i+1,0] = N.sample(n_simulations)*np.sqrt(variance) + mean
+
+        if plot:
+            self.plot()
+        return self.path
+
+    def expectation(self,t):
+        t = _validate_t(t)
+
+        integral = scipy.integrate.quad(lambda s: np.exp(self.reversion_speed * s) * self.calibration(s), 0, t)[0]
+
+        return np.exp(-self.reversion_speed * t) * (self.initial + integral)
+
+    def variance(self,t):
+        t = _validate_t(t)
+
+        integral = scipy.integrate.quad(lambda s: np.exp(2 * self.reversion_speed * s) * self.volatility(s) ** 2, 0, t)[0]
+
+        return np.exp(-2*self.reversion_speed*t)*integral
     def density(self,t,x):
 
         t = _validate_t(t)

@@ -7,7 +7,7 @@ Description
 -----------
 This module provides a way to simulate a Poisson process with a given intensity parameter.
 
-This module provides a general class "Poisson", which inherits from the methods of Process and JumpProcess abstract classes.
+This module provides a general class "Poisson", Hwhich inherits from the methods of Process and JumpProcess abstract classes.
 
 Examples
 --------

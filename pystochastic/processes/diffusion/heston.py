@@ -296,7 +296,7 @@ class Heston(DiffusionProcess):
                                     template="plotly_white")
             fig_vol.update_layout(title=f"Volatility evolution",
                                     xaxis_title="t",
-                                    yaxis_title="Volatility $\sqrt{\nu_t}$",
+                                    yaxis_title="Volatility $sqrt(\nu_t)$",
                                     template="plotly_white")
 
             fig_vol.show()

@@ -57,7 +57,6 @@ class Process(ABC):
     def simulate(self):
         pass
 
-    @abstractmethod
     def expectation(self,t):
 
         raise NotImplementedError(
@@ -66,23 +65,18 @@ class Process(ABC):
 
         pass
 
-    @abstractmethod
     def covariance_matrix(self,t):
 
         raise NotImplementedError(
             "There is no explicit formula for the covariance matrix of this process yet."
         )
 
-        pass
 
-    @abstractmethod
     def covariance(self,t,i,j):
         raise NotImplementedError(
             "There is no explicit formula for the covariance of this process yet."
         )
 
-
-    @abstractmethod
     def variance(self,t):
         raise NotImplementedError(
             "There is no explicit formula for the variance of this process yet."
