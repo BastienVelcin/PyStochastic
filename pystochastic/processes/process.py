@@ -20,12 +20,12 @@ class Process(ABC):
         self.dim = dim
         self.name = name
 
-        if not 0 < T:
+        if not 0 < T or not isinstance(steps, (int, np.integer, float, np.floating)):
             raise ValueError(
-                "The final time must be strictly greater 0."
+                "The final time must be a strictly positive number."
             )
 
-        if steps <= 0:
+        if steps <= 0 or not isinstance(steps, (int, np.integer)):
             raise ValueError(
                 "The number of steps must be strictly positive."
             )

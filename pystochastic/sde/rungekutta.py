@@ -38,9 +38,9 @@ class RungeKutta:
     Parameters
     ----------
     drift : function of one argument
-        Drift function of the SDE.
+        Drift function of the SDE. The calculations need to be batch-compatible with numpy.
     diffusion : function of one argument
-        Diffusion function of the SDE.
+        Diffusion function of the SDE. The calculations need to be batch-compatible with numpy.
     initial : float, or list, or np.ndarray
         Initial condition.
     T : float
@@ -80,13 +80,19 @@ class RungeKutta:
                  T = 1,
                  steps=1000):
 
-        if np.size(initial) != 1:
+        if not isinstance(initial, (int, float, np.integer, np.floating)):
             raise NotImplementedError(
-                "Runge-Kutta is currently implemented only for autonomous one-dimensional SDEs."
+                "Milstein is currently implemented only for autonomous one-dimensional SDEs. Please specify the initial condition as a number."
             )
-        if not 0 < T:
+
+        if not 0 < T or not isinstance(steps, (int, np.integer, float, np.floating)):
             raise ValueError(
-                "The final time must be strictly greater than t0."
+                "The final time must be a strictly positive number."
+            )
+
+        if steps <= 0 or not isinstance(steps, (int, np.integer)):
+            raise ValueError(
+                "The number of steps must be a strictly positive integer."
             )
 
         initial = np.atleast_1d(initial)
@@ -98,6 +104,7 @@ class RungeKutta:
         self.n_simulations = None
         self.t = np.linspace(0,T,steps+1)
         self.dt = T/steps
+        self.dim = 1
 
     def solve(self, n_simulations = 1, plot=True):
 
@@ -119,7 +126,7 @@ class RungeKutta:
             Array of every simulated path of the approximation of the SDE solution.
         """
 
-        if n_simulations < 1 or not isinstance(n_simulations, int):
+        if n_simulations < 1 or not isinstance(n_simulations, (int, np.integer)):
             raise ValueError(
                 "The number of simulations must be a strictly positive integer."
             )
@@ -144,7 +151,7 @@ class RungeKutta:
 
         # Plotting is allowed only if the user has specified the plot parameter to True.
 
-        if plot == True:
+        if plot:
             for sim in range(self.n_simulations):
                 fig.add_trace(go.Scatter(x=self.t,
                                          y=Y[sim,:,0],

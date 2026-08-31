@@ -23,7 +23,6 @@ Examples
 import numpy as np
 import plotly.graph_objects as go
 from pystochastic.processes import Brownian
-from pystochastic.utils import default_drift, default_diffusion
 
 class Milstein:
 
@@ -39,9 +38,9 @@ class Milstein:
     Parameters
     ----------
     drift : function of one argument
-        Drift function of the SDE.
+        Drift function of the SDE. The calculations need to be batch-compatible with numpy.
     diffusion : function of one argument
-        Diffusion function of the SDE.
+        Diffusion function of the SDE. The calculations need to be batch-compatible with numpy.
     initial : float, or list, or np.ndarray
         Initial condition.
     T : float
@@ -81,13 +80,19 @@ class Milstein:
                  T=1,
                  steps=1000):
 
-        if np.size(initial) != 1:
+        if not isinstance(initial, (int, float, np.integer, np.floating)):
             raise NotImplementedError(
-                "Milstein is currently implemented only for autonomous one-dimensional SDEs."
+                "Milstein is currently implemented only for autonomous one-dimensional SDEs. Please specify the initial condition as a number."
             )
-        if not 0 < T:
+
+        if not 0 < T or not isinstance(steps, (int, np.integer, float, np.floating)):
             raise ValueError(
-                "The final time must be strictly greater than 0."
+                "The final time must be a strictly positive number."
+            )
+
+        if steps <= 0 or not isinstance(steps, (int, np.integer)):
+            raise ValueError(
+                "The number of steps must be a strictly positive integer."
             )
 
         initial = np.atleast_1d(initial)
@@ -99,19 +104,28 @@ class Milstein:
         self.n_simulations = None
         self.t = np.linspace(0,T,steps+1)
         self.dt = T/steps
+        self.dim = 1
 
     def approx_derivative_diffusion(self,x, eps=1e-6):
 
         """
         Approx derivative diffusion method.
 
-        Compute an approximation of the derivative of the diffusion function at a given point numerically, to avoid
+        Compute an approximation of the derivative of the diffusion function at a given point numerically to avoid
         symbolic computations.
 
         Parameters
         ----------
+        x : float or np.ndarray
+            Point at which we want to approximate the derivative of the diffusion function.
         eps : float
             Specifies the gap between diffusion(x) and diffusion(x+eps).
+        plot : bool
+            Specifies whether to plot the evolution of the SDE.
+        brownian_increments : np.ndarray or None
+            Brownian increments used in the Milstein computation. If None, Brownian increments are computed.
+        diffusion_derivative : function or float
+            Derivative of the diffusion function. If None, the derivative is approximated numerically.
 
         Returns
         -------
@@ -119,10 +133,14 @@ class Milstein:
             Approximation of the derivative of the diffusion function at x.
         """
 
+        if eps <= 0 and not isinstance(eps, (int, np.integer, float, np.floating)):
+            raise ValueError(
+                "The gap between diffusion(x) and diffusion(x+eps) must be strictly positive."
+            )
         # Rate of change of the diffusion function at x, with a small gap eps.
         return (self.diffusion(x + eps)- self.diffusion(x - eps)) / (2 * eps)
 
-    def solve(self, n_simulations=1, plot=True):
+    def solve(self, n_simulations=1, plot=True, brownian_increments=None, diffusion_derivative=None):
 
         """
         Solve method.
@@ -140,10 +158,9 @@ class Milstein:
         -------
         np.ndarray
             Array of every simulated path of the approximation of the SDE solution.
-            :param n_simulations:
         """
 
-        if n_simulations < 1 or not isinstance(n_simulations, int):
+        if n_simulations < 1 or not isinstance(n_simulations, (int, np.integer)):
             raise ValueError(
                 "The number of simulations must be a strictly positive integer."
             )
@@ -156,19 +173,33 @@ class Milstein:
         # Fixing the initial condition on every simulation.
         Y[:,0,:] = self.initial
 
-        fig = go.Figure()
+        if brownian_increments is None:
+            W = Brownian(1, self.T, self.steps)
+            W.simulate(self.n_simulations)
+            dW = W.increments
+        else:
+            if not brownian_increments.shape == (self.n_simulations, self.steps, 1) or not brownian_increments == (self.n_simulations, self.steps):
+                raise ValueError(
+                    "The brownian sequence must have the same shape as the number of simulations."
+                )
+            dW = np.atleast_3d(brownian_increments)
 
         W = Brownian(1, self.T, self.steps)
         W.simulate(self.n_simulations)
         dW = W.increments
 
-        for i in range(1,self.steps+1):
-            # Milstein induction formula.
-            Y[:,i,:] = Y[:,i-1,:] + self.drift(Y[:,i-1,:])*self.dt + self.diffusion(Y[:,i-1,:]) * dW[:,i-1,:] + (1/2)*self.diffusion(Y[:,i-1,:])*self.approx_derivative_diffusion(Y[:,i-1,:])*(dW[:,i-1,:]**2-self.dt)
-
+        if diffusion_derivative is None:
+            for i in range(1,self.steps+1):
+                # Milstein induction formula.
+                Y[:,i,:] = Y[:,i-1,:] + self.drift(Y[:,i-1,:])*self.dt + self.diffusion(Y[:,i-1,:]) * dW[:,i-1,:] + (1/2)*self.diffusion(Y[:,i-1,:])*self.approx_derivative_diffusion(Y[:,i-1,:])*(dW[:,i-1,:]**2-self.dt)
+        else:
+            for i in range(1, self.steps + 1):
+                # Milstein induction formula.
+                Y[:, i, :] = Y[:, i - 1, :] + self.drift(Y[:, i - 1, :]) * self.dt + self.diffusion(Y[:, i - 1, :]) * dW[:, i - 1, :] + (1 / 2) * self.diffusion(Y[:, i - 1, :]) * diffusion_derivative(Y[:, i - 1, :]) * (dW[:, i - 1, :] ** 2 - self.dt)
         # Plotting is allowed only if the user has specified the plot parameter to True.
 
-        if plot == True:
+        if plot:
+            fig = go.Figure()
             for sim in range(self.n_simulations):
                 fig.add_trace(go.Scatter(x=self.t,
                                          y=Y[sim,:,0],

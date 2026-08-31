@@ -244,9 +244,9 @@ class EulerMaruyama:
                  T=1,
                  steps=1000):
 
-        if not 0 < T:
+        if not 0 < T or not isinstance(steps, (int, np.integer, float, np.floating)):
             raise ValueError(
-                "The final time must be strictly greater than 0."
+                "The final time must be a strictly positive number."
             )
 
         if steps <= 0 or not isinstance(steps, (int, np.integer)):
@@ -311,7 +311,7 @@ class EulerMaruyama:
             W.simulate(self.n_simulations)
             dW = W.increments
         else:
-            if not dW.shape == (self.n_simulations, self.steps, self.dim):
+            if not brownian_increments.shape == (self.n_simulations, self.steps, self.dim):
                 raise ValueError(
                     "The brownian sequence must have the same shape as the number of simulations."
                 )
