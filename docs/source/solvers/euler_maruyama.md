@@ -16,7 +16,7 @@ pystochastic.sde.EulerMaruyama(drift = lambda x,t : 2*x, diffusion = lambda x,t 
 
 **Multidimensional support :** ✅
 
-The Euler-Maruyama method is a way to solve a stochastic differential equation of the following form:
+The Euler-Maruyama scheme is a way to solve a stochastic differential equation of the following form:
 
 \begin{equation*}
 dX_t = \mu(X_t, t) dt + \sigma(X_t, t) dW_t
