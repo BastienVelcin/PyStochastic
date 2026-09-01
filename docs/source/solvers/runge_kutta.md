@@ -107,7 +107,7 @@ _np.ndarray_
 This example provides a step-by-step explanation on how to simulate 100 solutions of the following unidimensional SDE:
 
 \begin{equation*}
-dX_t = \min{X_t, 1} dt - \exp{-|X_t|} dW_t
+dX_t = \min(X_t, 1) dt - \exp(-|X_t|) dW_t
 \end{equation*}
 
 on the interval $[0,1]$, with the initial value $X_0 = 0.7$.
