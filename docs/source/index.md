@@ -40,16 +40,6 @@ import pystochastic
    
 Now, you're ready to use PyStochastic!
 
-## Conventions & Notations
-
-In PyStochastic, vectors are represented by a 1D array-like. This means that a vector is a line one, and each matrix-vector operation $AX$ must be implemented
-like
-
-```python
->>> X @ A
-```
-where `@` denotes the NumPy matrix multiplication operator.
-
 ```{toctree}
 :maxdepth: 2
 :caption: Contents

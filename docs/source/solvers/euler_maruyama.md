@@ -34,10 +34,12 @@ where:
 To proceed, Euler-Maruyama scheme introduces a partition of the time interval `[0,T]` into `steps+1` time steps $0=t_0 < t_1 < \dots < t_{\text{steps}} = T$.
 By letting $\Delta t = \frac{T}{\text{steps}}$ and $\Delta W_{t_i} = W_{t_{i+1}} - W_{t_i} $, the following recursively-built stochastic process $(\tilde X_{t_i})_{i\in \{0, \cdots, \text{steps}\}}$ defined by
 
-\begin{align*}
-\tilde{X}_0 = X_0 \\
-\tilde{X}_{t_{i+1}} = \tilde{X}_{t_i} + \mu(\tilde{X}_{t_i}, t_i) \Delta t + \sigma(\tilde{X}_{t_i}, t_i) \Delta W_{t_i}
-\end{align*}
+\begin{equation*}
+    \left\{ \begin{array}{l}
+        \tilde{X}_0 = X_0 \\
+        \tilde{X}_{t_{i+1}} = \tilde{X}_{t_i} + \mu(\tilde{X}_{t_i}, t_i) \Delta t + \sigma(\tilde{X}_{t_i}, t_i) \Delta W_{t_i} \\
+    \end{array} \right
+\end{equation*}
 
 is an approximation of the solution of the considered SDE.
 
@@ -46,13 +48,13 @@ is an approximation of the solution of the considered SDE.
 
 ### Parameters
 
-- `drift` : _function_
+`drift` : _function_
 : Drift function $\mu$ of the model. Must be batch-compatible with NumPy.
 
-- `diffusion` : _function_
+`diffusion` : _function_
 : Diffusion function $\sigma$ of the model. Must be batch-compatible with NumPy.
 
-- `initial` : _float_ or _array_like_
+`initial` : _float_ or _array_like_
 : Initial value of the process. The dimension of the initial value must be equal to the dimension of the output of the drift and diffusion functions.
 
 `T` : _float_
@@ -79,13 +81,13 @@ The `solve` method returns an approximation of the solution of the considered SD
 : Specifies whether to plot the simulation.
 
 `parallel` : _bool_
-: For non-batchable case, specifies whether to parallelize the simulation.
+: For the non-vectorizable case, specifies whether to parallelize the simulation.
 
 `n_workers` : _int_ or `None`
 : If parallel is set to True, specifies the number of workers to use.
 
 `brownian_increments` : _array_like_ or `None`
-: Brownian increments to use for the simulation. If None, the Brownian increments are automatically computed.
+: Brownian increments $(\Delta W_{t_i})_{i\in \{0, \cdots, \text{steps}-1\}}$to use for the simulation. If None, the Brownian increments are automatically computed.
 
 **Returns**
 
@@ -101,7 +103,7 @@ _np.ndarray_
 > NumPy vectorization is not available for multidimensional SDEs where the drift and diffusion functions are not diagonal.
 > In this case, you can use the `parallel` parameter to parallelize the simulation.
 >
-> Notice that the parallel simulation is useful only on a huge number of simulations.
+> Notice that the parallel simulation is only useful on a huge number of simulations.
 
 ## Examples
 
@@ -147,7 +149,7 @@ import numpy as np
 from pystochastic.sde import EulerMaruyama
 
 def drift_fct(x,t):
-    return x @ np.array([[1,0.2],[0.2,2]]) 
+    return np.array([[1,0.2],[0.2,2]]) @ x
 
 def diffusion_fct(x,t):
     return np.eye(2)
