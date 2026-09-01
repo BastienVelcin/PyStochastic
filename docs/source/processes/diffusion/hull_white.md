@@ -41,7 +41,7 @@ It is generally used to model short interest rates in financial markets.
 : Final time of the Hull-White model simulation. Must be greater than `0`.
 
 `steps` : _int_
-: Number of time steps between `0` and `T` on which the GHull-White model is simulated. Must be strictly greater than 0.
+: Number of time steps between `0` and `T` on which the Hull-White model is simulated. Must be strictly greater than 0.
 
 ### Attributes
 The Hull-White class inherits all attributes from the [Diffusion Process](<project:/processes/diffusion/index.md>) class.

@@ -38,7 +38,11 @@ It appears naturally in stochastic differential equations and so, within the dif
 : Number of time steps between `0` and `T` on which the Brownian motion is simulated. Must be strictly greater than 0.
 
 ### Attributes
-The Brownian class inherits all attributes from the [Processes](<project:/processes/index.md>) class.
+
+`increments` : _np.ndarray_
+: Array of Brownian motion increments at each time step.
+
+The Brownian class also inherits all attributes from the [Processes](<project:/processes/index.md>) class.
 It also possesses the attributes deduced from its parameters.
 
 ### Methods

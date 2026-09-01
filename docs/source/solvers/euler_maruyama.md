@@ -31,7 +31,7 @@ where:
 > [!IMPORTANT]
 > The drift and diffusion functions must be batch-compatible with NumPy.
 
-To proceed, Euler-Maruyama scheme introduces a partition of the time interval `[0,T]` into `steps+1` time steps $0=t_0 < t_1 < \dots < t_{\text{steps}} = T$.
+To proceed, the Euler-Maruyama scheme introduces a partition of the time interval `[0,T]` into `steps+1` time steps $0=t_0 < t_1 < \dots < t_{\text{steps}} = T$.
 By letting $\Delta t = \frac{T}{\text{steps}}$ and $\Delta W_{t_i} = W_{t_{i+1}} - W_{t_i} $, the following recursively-built stochastic process $(\tilde X_{t_i})_{i\in \{0, \cdots, \text{steps}\}}$ defined by
 
 \begin{equation*}
@@ -44,7 +44,7 @@ By letting $\Delta t = \frac{T}{\text{steps}}$ and $\Delta W_{t_i} = W_{t_{i+1}}
 is an approximation of the solution of the considered SDE.
 
 > [!NOTE]
-> The Euler-Maruyama method is used to simulate the diffusion processes of the [Diffusion Process](<project:/processes/diffusion/index.md>) class.
+> The Euler-Maruyama method is used to numerically simulate diffusion processes implemented by the [Diffusion Process](<project:/processes/diffusion/index.md>) class.
 
 ### Parameters
 
