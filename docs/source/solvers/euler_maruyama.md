@@ -1,4 +1,4 @@
-# Euler-Maruyma Solver
+# Euler-Maruyama Solver
 
 ## Import line
 You can import the Euler-Maruyama class from the `sde` module as follows:
@@ -38,7 +38,7 @@ By letting $\Delta t = \frac{T}{\text{steps}}$ and $\Delta W_{t_i} = W_{t_{i+1}}
     \left\{ \begin{array}{l}
         \tilde{X}_0 = X_0 \\
         \tilde{X}_{t_{i+1}} = \tilde{X}_{t_i} + \mu(\tilde{X}_{t_i}, t_i) \Delta t + \sigma(\tilde{X}_{t_i}, t_i) \Delta W_{t_i} \\
-    \end{array} \right
+    \end{array} \right.
 \end{equation*}
 
 is an approximation of the solution of the considered SDE.
