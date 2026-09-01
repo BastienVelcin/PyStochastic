@@ -1,14 +1,6 @@
 # Stochastic Differential Equations Solvers
 
-PyStochastic provides 3 different solvers for solving stochastic differential equations.
-
-```{toctree}
-:maxdepth: 2
-:caption: Solvers
-euler_maruyama
-milstein
-runge_kutta
-```
+PyStochastic provides 3 different solvers for solving stochastic differential equations : Euler-Maruyama, Milstein and Runge-Kutta.
 
 Note that Milstein and Runge-Kutta only support autonomous and unidimensional stochastic differential equations of the form
 
@@ -33,3 +25,11 @@ where:
 - $(W_t)_{t\geq 0}$ is a standard $d$-dimensional Brownian motion,
 - $\mu : \mathbb{R}^n\times [0,+\infty) \to \mathbb{R}^n$ is a continuous mapping, called **drift**,
 - $\sigma : \mathbb{R}^n\times [0,+\infty) \to \mathbb{R}^{n\times d}$ is a continuous mapping, called **diffusion**.
+
+```{toctree}
+:maxdepth: 2
+:caption: Solvers
+euler_maruyama
+milstein
+runge_kutta
+```
