@@ -203,6 +203,21 @@ No parameters.
 _np.ndarray_
 : Final values of the effective process.
 
+#### .values_at()
+```python
+.values_at(t = 0)
+```
+Returns the approximative values of the effective process at time `t`.
+
+**Parameters**
+
+`t` : _float_
+: Time at which the values are computed. Must be in the interval $[0,T]$.
+
+**Returns**
+
+_np.ndarray_
+: Values of the effective process at time `t`.
 
 #### .max()
 ```python
@@ -364,6 +379,32 @@ where $(t_i^n)_{1\leq i \leq n}$ is a mesh of $[0,T]$.
 
 _np.ndarray_ 
 : Estimation of the quadratic variation of the process at time `t`.
+
+#### .density()
+```python
+.density(t = 0, x = 0)
+```
+Returns the density of the effective process at time `t` and coordinate `x`.
+
+> [!NOTE]
+> This method is only implemented for unidimensional processes.
+
+**Parameters**
+
+`t` : _float_
+: Time at which the density is computed. Must be in the interval $[0,T]$.
+
+`x` : _float_
+: Coordinate at which the density is computed.
+
+
+**Returns**
+
+_np.ndarray_ 
+: Density of the effective process at time `t` and coordinate `x`.
+
+> [!IMPORTANT]
+> If the theoretical density is a Dirac density, then we arbitrarily return `np.array([0])`.
 
 ## Implemented processes
 

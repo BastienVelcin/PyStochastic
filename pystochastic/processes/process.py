@@ -672,12 +672,12 @@ class Process(ABC):
                 quad_var = np.mean(quad_var)
         return quad_var
 
-    def values_at(self, t0=None, function=lambda x: x[:,0]):
+    def values_at(self, t=None, function=lambda x: x[:,0]):
 
         """
         Values At method.
 
-        Returns the values of the process at a given time t_0.
+        Returns the values of the process at a given time t.
 
         Returns
         -------
@@ -685,6 +685,7 @@ class Process(ABC):
             Values of the process at a given time t_0.
         """
 
+        t0 = t
         if self.path is None:
             raise ValueError(
                 "The path has not been simulated yet. Please run the simulate method first."
@@ -710,13 +711,3 @@ class Process(ABC):
         raise NotImplementedError(
             "The density function is not implemented for this process yet."
         )
-
-    def estimator_at(self, t0=None, function=lambda x: x[:, 0]):
-
-        if not 0<= t0 <= self.T:
-            raise ValueError(
-                f"The time must be between {0} and {self.T}."
-            )
-
-        from pystochastic.montecarlo.montecarlo import MonteCarlo
-        return MonteCarlo(self.values_at(t0, function))
