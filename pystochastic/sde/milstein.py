@@ -120,12 +120,6 @@ class Milstein:
             Point at which we want to approximate the derivative of the diffusion function.
         eps : float
             Specifies the gap between diffusion(x) and diffusion(x+eps).
-        plot : bool
-            Specifies whether to plot the evolution of the SDE.
-        brownian_increments : np.ndarray or None
-            Brownian increments used in the Milstein computation. If None, Brownian increments are computed.
-        diffusion_derivative : function or float
-            Derivative of the diffusion function. If None, the derivative is approximated numerically.
 
         Returns
         -------
@@ -153,7 +147,10 @@ class Milstein:
             Number of solution simulations. Must be a strictly positive integer.
         plot : bool
             Specifies whether to plot the evolution of the SDE.
-
+        brownian_increments : np.ndarray or None
+            Brownian increments used in the Milstein computation. If None, Brownian increments are computed.
+        diffusion_derivative : function or float
+            Derivative of the diffusion function. If None, the derivative is approximated numerically.
         Returns
         -------
         np.ndarray

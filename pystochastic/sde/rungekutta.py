@@ -106,7 +106,7 @@ class RungeKutta:
         self.dt = T/steps
         self.dim = 1
 
-    def solve(self, n_simulations = 1, plot=True):
+    def solve(self, n_simulations = 1, plot=True, brownian_increments = None):
 
         """
         Solve method.
@@ -119,7 +119,8 @@ class RungeKutta:
             Number of solution simulations. Must be a strictly positive integer.
         plot : bool
             Specifies whether to plot the evolution of the SDE.
-
+        brownian_increments : np.ndarray or None
+            Brownian increments used in the Milstein computation. If None, Brownian increments are computed.
         Returns
         -------
         np.ndarray
@@ -139,11 +140,17 @@ class RungeKutta:
         # Fixing the initial condition on every simulation.
         Y[:,0,:] = self.initial
 
-        fig = go.Figure()
-
-        W = Brownian(1, self.T, self.steps)
-        W.simulate(self.n_simulations)
-        dW = W.increments
+        if brownian_increments is None:
+            W = Brownian(1, self.T, self.steps)
+            W.simulate(self.n_simulations)
+            dW = W.increments
+        else:
+            if not brownian_increments.shape == (self.n_simulations, self.steps, 1) or not brownian_increments == (
+                    self.n_simulations, self.steps):
+                raise ValueError(
+                    "The brownian sequence must have the same shape as the number of simulations."
+                )
+            dW = np.atleast_3d(brownian_increments)
 
         for i in range(1,self.steps+1):
             # Runge-Kutta induction formula.
@@ -152,6 +159,7 @@ class RungeKutta:
         # Plotting is allowed only if the user has specified the plot parameter to True.
 
         if plot:
+            fig = go.Figure()
             for sim in range(self.n_simulations):
                 fig.add_trace(go.Scatter(x=self.t,
                                          y=Y[sim,:,0],

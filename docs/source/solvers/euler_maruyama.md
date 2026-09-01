@@ -26,7 +26,7 @@ where:
 - $(X_t)_{t\geq 0}$ is a $n$-dimensional stochastic process,
 - $(W_t)_{t\geq 0}$ is a standard $d$-dimensional Brownian motion,
 - $\mu : \mathbb{R}^n\times [0,+\infty) \to \mathbb{R}^n$ is a continuous mapping, called **drift**,
-- $\sigma : \mathbb{R}^n\times [0,+\infty) \to \mathbb{R}^{n\times d}$ is a mapping, called **diffusion**.
+- $\sigma : \mathbb{R}^n\times [0,+\infty) \to \mathbb{R}^{n\times d}$ is a continuous mapping, called **diffusion**.
 
 > [!IMPORTANT]
 > The drift and diffusion functions must be batch-compatible with NumPy.
@@ -62,6 +62,9 @@ is an approximation of the solution of the considered SDE.
 
 `steps` : _int_
 : Number of time steps between `0` and `T` on which the SDE is simulated. Must be strictly greater than 0.
+
+> [!WARNING]
+> The drift and diffusion functions must take two arguments as input: the position point `x` and the time `t`, even if the SDE is autonomous.
 
 ### Methods
 
