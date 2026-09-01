@@ -219,3 +219,8 @@ print("Price:", solutions[:,:,0][:,:,None])
 print("Variance:", solutions[:,:,1][:,:,None])
 print("Volatility:", np.sqrt(solutions[:,:,1])[:,:,None])
 ```
+
+## References
+
+- Kloeden, P. E., & Platen, E. (1992). Numerical Solution of Stochastic Differential Equations. Springer Berlin Heidelberg. https://doi.org/10.1007/978-3-662-12616-5
+- Higham, D. J. (2001). An Algorithmic Introduction to Numerical Simulation of Stochastic Differential Equations. SIAM Review, 43(3), 525–546. https://doi.org/10.1137/s0036144500378302
