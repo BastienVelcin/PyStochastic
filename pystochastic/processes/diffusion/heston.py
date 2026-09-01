@@ -221,9 +221,7 @@ class Heston(DiffusionProcess):
         price = x[0]
         variance = np.maximum(x[1], 0)
 
-        diffusion = np.array([[price * np.sqrt(variance),0],
-                              [0, self.variance_volatility * np.sqrt(variance)]])
-
+        diffusion = np.array([[price * np.sqrt(variance),0], [0, self.variance_volatility * np.sqrt(variance)]])
         return diffusion
 
 

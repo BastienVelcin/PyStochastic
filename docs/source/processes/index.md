@@ -39,6 +39,7 @@ Simulates the effective process on the interval $[0,T]$.
 
 _np.ndarray_
 : Path of `n_simulations` effective process on $[0,T]$. The final array is a three-dimensional array such that :
+
 - 1st dimension is the number of simulations
 - 2nd dimension is the number of time steps
 - 3rd dimension is the dimension of the effective process 

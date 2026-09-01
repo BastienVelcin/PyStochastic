@@ -16,10 +16,10 @@ or parallelization the SDE.
 
 Examples
 --------
->> solver = EulerMaruyama(drift=lambda x,t : x, diffusion=lambda x,t : 0.1*x, initial=1, T=1, steps=1000, n_simulations=10)
+>> solver = EulerMaruyama(drift=lambda x,t : x, diffusion=lambda x,t : 0.1*x, initial=1, T=1, steps=1000)
 >> solver.solve(plot=True)
 >>
->> solver = EulerMaruyama(drift=lambda x,t: -x, diffusion=lambda x,t: 0.3, n_simulations=1000)
+>> solver = EulerMaruyama(drift=lambda x,t: -x, diffusion=lambda x,t: 0.3)
 >> Y = solver.solve(plot=False)
 >>
 >> solver = EulerMaruyama(drift=lambda x,t: -x, diffusion=lambda x,t: np.array([[0.3]]))
@@ -227,10 +227,10 @@ class EulerMaruyama:
 
     Examples
     --------
-    >> solver = EulerMaruyama(drift=lambda x,t : x, diffusion=lambda x,t : 0.1*x, initial=1, T=1, steps=1000, n_simulations=10)
+    >> solver = EulerMaruyama(drift=lambda x,t : x, diffusion=lambda x,t : 0.1*x, initial=1, T=1, steps=1000)
     >> solver.solve(plot=True)
     >>
-    >> solver = EulerMaruyama(drift=lambda x,t: -x, diffusion=lambda x,t: 0.3, n_simulations=1000)
+    >> solver = EulerMaruyama(drift=lambda x,t: -x, diffusion=lambda x,t: 0.3)
     >> Y = solver.solve(plot=False)
     >>
     >> solver = EulerMaruyama(drift=lambda x,t: -x, diffusion=lambda x,t: np.array([[0.3]]))
