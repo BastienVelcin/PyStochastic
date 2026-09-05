@@ -1,6 +1,6 @@
 [project]
 name = "pystochastic"
-version = "0.2.0"
+version = "0.3.0"
 description = "A Python library for probability, stochastic calculus and modelling, stochastic differential equations, and Monte Carlo simulation"
 readme = "README.md"
 requires-python = ">=3.10"
