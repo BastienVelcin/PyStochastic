@@ -309,7 +309,7 @@ class MonteCarlo:
     #    II.  CONFIDENCE INTERVALS & CURVES    #
     ############################################
 
-    def confidence_interval(self, n = None, function = lambda x : x, confidence = 0.95,type="normal"):
+    def confidence_interval(self, n = None, function = lambda x : x, confidence = 0.95,type="normal", variance = None):
 
 
         """
@@ -326,7 +326,7 @@ class MonteCarlo:
         n = self._validate_n(n)
 
         mean_est = self.estimate(n, function=function)
-        half_width = self.half_width(n,function=function,confidence=confidence,type=type)
+        half_width = self.half_width(n,function=function,confidence=confidence,type=type, variance = None)
 
         return mean_est - half_width, mean_est + half_width
 
@@ -484,9 +484,9 @@ class MonteCarlo:
         return np.sqrt(self.mse_estimator(reference,n,function))
 
 
-    ######################################
-    #    III.  DESCRIPTIVE STATISTICS    #
-    ######################################
+    #####################################
+    #    IV.  DESCRIPTIVE STATISTICS    #
+    #####################################
 
     def quantile(self, q, n=None, function = lambda x: x):
 
