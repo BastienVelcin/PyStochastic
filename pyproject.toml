@@ -35,6 +35,7 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://github.com/BastienVelcin/PyStochastic"
+Documentation = "https://pystochastic.readthedocs.io/en/latest/"
 Repository = "https://github.com/BastienVelcin/PyStochastic"
 Issues = "https://github.com/BastienVelcin/PyStochastic/issues"
 
