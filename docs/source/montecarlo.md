@@ -67,7 +67,7 @@ So, the `estimate()` method estimates the value $\mathbb{E}[f(X)]$ with the empi
 : Number of considered samples from each sample pool. Must be an integer greater than 2.
 
 `function` : _function_
-: Function to apply to the samples. By default, the `function` argument is set as the identity function.
+: Function $f$ to apply to the samples. By default, the `function` argument is set as the identity function.
 
 **Returns**
 
@@ -93,7 +93,7 @@ The moment of order $r\in \mathbb{N}$ of a function of a random variable $f(X)$ 
 : Number of considered samples from each sample pool. Must be an integer greater than 2.
 
 `function` : _function_
-: Function to apply to the samples. By default, the `function` argument is set as the identity function.
+: Function $f$ to apply to the samples. By default, the `function` argument is set as the identity function.
 
 **Returns**
 
@@ -118,7 +118,7 @@ The `variance()` method estimates the variance of the samples with the König-Hu
 : Number of considered samples from each sample pool. Must be an integer greater than 2.
 
 `function` : _function_
-: Function to apply to the samples. By default, the `function` argument is set as the identity function.
+: Function $f$ to apply to the samples. By default, the `function` argument is set as the identity function.
 
 `correction` : _bool_
 : Specify if the Bessel correction should be applied to the variance. If `true`, the estimated variance is multiplied by $\frac{n}{n-1}$.
@@ -146,7 +146,7 @@ The `std()` method estimates the standard deviation of the samples.
 : Number of considered samples from each sample pool. Must be an integer greater than 2.
 
 `function` : _function_
-: Function to apply to the samples. By default, the `function` argument is set as the identity function.
+: Function $f$ to apply to the samples. By default, the `function` argument is set as the identity function.
 
 `correction` : _bool_
 : Specify if the Bessel correction should be applied to the standard deviation. If `true`, the estimated standard deviation is multiplied by $\sqrt\frac{n}{n-1}$.
@@ -174,7 +174,7 @@ The `standard_error()` method estimates the standard error of the samples.
 : Number of considered samples from each sample pool. Must be an integer greater than 2.
 
 `function` : _function_
-: Function to apply to the samples. By default, the `function` argument is set as the identity function.
+: Function $f$ to apply to the samples. By default, the `function` argument is set as the identity function.
 
 `correction` : _bool_
 : Specify if the Bessel correction should be applied to the standard error. If `true`, the estimated standard error is multiplied by $\sqrt\frac{n}{n-1}$.
@@ -219,7 +219,7 @@ where $t_{1-\frac{\alpha}{2},n-1}$ is the quantile of order $1-\frac{\alpha}{2}$
 : Number of considered samples from each sample pool. Must be an integer greater than 2.
 
 `function` : _function_
-: Function to apply to the samples. By default, the `function` argument is set as the identity function.
+: Function $f$ to apply to the samples. By default, the `function` argument is set as the identity function.
 
 `confidence` : _float_
 : Confidence level $1-\alpha$ of the confidence interval. Must be a float between 0 and 1.
@@ -253,7 +253,7 @@ The `confidence_interval()` method estimates the confidence interval of a given 
 : Number of considered samples from each sample pool. Must be an integer greater than 2.
 
 `function` : _function_
-: Function to apply to the samples. By default, the `function` argument is set as the identity function.
+: Function $f$ to apply to the samples. By default, the `function` argument is set as the identity function.
 
 `confidence` : _float_
 : Confidence level $1-\alpha$ of the confidence interval. Must be a float between 0 and 1.
@@ -293,7 +293,7 @@ The `confidence_curve()` method plots the confidence interval of a given confide
 : Index of the sample pool to work with. Must be an integer between 0 and the first dimension of the `samples` attribute.
 
 `function` : _function_
-: Function to apply to the samples. By default, the `function` argument is set as the identity function.
+: Function $f$ to apply to the samples. By default, the `function` argument is set as the identity function.
 
 `confidence` : _float_
 : Confidence level $1-\alpha$ of the confidence interval. Must be a float between 0 and 1.
@@ -310,8 +310,94 @@ No return value.
 
 ### Statistical errors
 
+#### .bias_estimator()
+
+```python
+.bias_estimator(reference = 0, n = None, function = lambda x: x)
+```
+
+The `bias_estimator()` method estimates the bias of the estimator of $\mathbb{E}[f(X)]$ when $\mathbb{E}[f(X)]$ is known.
+
+**Parameters**
+
+`reference` : _float_
+: Exact value of $\mathbb{E}[f(X)]$.
+
+`n` : _int_
+: Number of considered samples from each sample pool. Must be an integer greater than 2.
+
+`function` : _function_
+: Function $f$ to apply to the samples. By default, the `function` argument is set as the identity function.
+
+**Returns**
+
+_float_ or _np.ndarray_
+: Estimated bias of the empirical estimator of $\mathbb{E}[f(X)]$ for each sample pool.
+
+#### .mse_estimator()
+
+```python
+.mse_estimator(reference = 0, n = None, function = lambda x: x)
+```
+
+The `mse_estimator()` method estimates the mean-squared error estimation of the empirical estimator of $\mathbb{E}[f(X)]$ when $\mathbb{E}[f(X)]$ is known.
+The mean-squared error estimation is defined by:
+
+\begin{equation*}
+MSE(X) = \mathbb{E}[\left(f(X) - \mathbb{E}[f(X)]\right)^2]
+\end{equation*}
+
+**Parameters**
+
+`reference` : _float_
+: Exact value of $\mathbb{E}[f(X)]$.
+
+`n` : _int_
+: Number of considered samples from each sample pool. Must be an integer greater than 2.
+
+`function` : _function_
+: Function $f$ to apply to the samples. By default, the `function` argument is set as the identity function.
+
+**Returns**
+
+_float_ or _np.ndarray_
+: Estimated mean-squared error of the empirical estimator of $\mathbb{E}[f(X)]$ for each sample pool.
+
+#### .mse_estimator()
+
+```python
+.rmse_estimator(reference = 0, n = None, function = lambda x: x)
+```
+
+The `rmse_estimator()` method estimates the root mean-squared error estimation of the empirical estimator of $\mathbb{E}[f(X)]$ when $\mathbb{E}[f(X)]$ is known.
+The root mean-squared error estimation is defined by:
+
+\begin{equation*}
+RMSE(X) = \sqrt{\mathbb{E}[\left(f(X) – \mathbb{E}[f(X)]\right)^2]}
+\end{equation*}
+
+**Parameters**
+
+`reference` : _float_
+: Exact value of $\mathbb{E}[f(X)]$.
+
+`n` : _int_
+: Number of considered samples from each sample pool. Must be an integer greater than 2.
+
+`function` : _function_
+: Function $f$ to apply to the samples. By default, the `function` argument is set as the identity function.
+
+**Returns**
+
+_float_ or _np.ndarray_
+: Estimated root mean-squared error of the empirical estimator of $\mathbb{E}[f(X)]$ for each sample pool.
 
 ### Descriptive statistics
 
 ### Empirical analysis
+
+## Examples
+
+### Estimation of an European Call value
+
 
