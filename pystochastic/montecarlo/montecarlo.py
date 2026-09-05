@@ -648,7 +648,7 @@ class MonteCarlo:
     #    IV.  EMPIRICAL ANALYSIS    #
     #################################
 
-    def histogram(self,n=None, function = lambda x: x, dim=0, bins = 10, normalized = True, plot = True, distribution = None):
+    def histogram(self,n=None, n_pool=0, bins = 10, function = lambda x: x, normalized = True, plot = True, distribution = None):
 
         """
         Histogram method
@@ -661,7 +661,7 @@ class MonteCarlo:
             Number of considered samples from each sample pool. Must be a strictly positive integer.
         function : function
             Functional of the samples of which we want to plot the histogram.
-        dim: int
+        n_pool: int
             Considered and plotted dimension of the samples. Must be a positive integer.
         bins: int
             Number of bars in the histogram. Must be a strictly positive integer.
@@ -680,7 +680,7 @@ class MonteCarlo:
 
         n = self._validate_n(n)
 
-        if not (0 <= dim < self.dim and isinstance(dim, (int, np.integer))):
+        if not (0 <= n_pool < self.dim and isinstance(n_pool, (int, np.integer))):
             raise ValueError(
                 "The considered dimension must be a strictly positive integer that is inferior to the number of dimensions of the samples."
             )
@@ -695,7 +695,7 @@ class MonteCarlo:
 
 
         for i in range(0,self.n_simulations):
-            histograms[i], bins_val[i] = np.histogram(function(self.samples[i,:n,dim]), bins=bins, density=normalized)
+            histograms[i], bins_val[i] = np.histogram(function(self.samples[i,:n,n_pool]), bins=bins, density=normalized)
 
         if plot:
             fig = go.Figure()
@@ -724,11 +724,11 @@ class MonteCarlo:
 
         return histograms
 
-    def ecdf(self,n=None, function = lambda x: x, dim=0, plot=True, distribution=None):
+    def ecdf(self,n=None, n_pool=0, function = lambda x: x, plot=True, distribution=None):
 
         n = self._validate_n(n)
 
-        if not (0 <= dim < self.dim and isinstance(dim, (int, np.integer))):
+        if not (0 <= n_pool < self.dim and isinstance(n_pool, (int, np.integer))):
             raise ValueError(
                 "The considered dimension must be a strictly positive integer that is inferior to the number of dimensions of the samples."
             )
@@ -748,7 +748,7 @@ class MonteCarlo:
             fig = go.Figure()
             for i in range(self.n_simulations):
 
-                x = np.sort(function(self.samples[i, :n, dim]))
+                x = np.sort(function(self.samples[i, :n, n_pool]))
                 f = np.arange(1, len(x) + 1) / len(x)
                 fig.add_trace(go.Scatter(x=x,
                                          y=f,
@@ -773,6 +773,6 @@ class MonteCarlo:
             fig.show()
         else:
             for i in range(self.n_simulations):
-                x = np.sort(function(self.samples[i, :n, dim]))
+                x = np.sort(function(self.samples[i, :n, n_pool]))
                 f = np.arange(1, len(x) + 1) / len(x)
         return x,f

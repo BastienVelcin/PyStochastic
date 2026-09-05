@@ -58,7 +58,6 @@ def _is_vectorizable(f, initial):
     test = np.asarray(f(initial, 0))
     return test.ndim <= 1
 
-
 def _simulate_vectorized(drift, diffusion, initial, t, dt, steps, dim, dW):
 
     """
@@ -321,7 +320,7 @@ class EulerMaruyama:
         args = (self.drift, self.diffusion, self.initial, self.t, self.dt, self.steps, self.dim, dW)
 
         #If the diffusion is diagonal, we use the vectorized method. Otherwise, we use the sequential method.
-        if _is_vectorizable(self.diffusion, self.initial) and _is_vectorizable(self.drift, self.initial) :
+        if _is_vectorizable(self.diffusion, self.initial): #and _is_vectorizable(self.drift, self.initial) :
             Y = _simulate_vectorized(*args)
 
         # SEQUENTIAL METHOD :
