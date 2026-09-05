@@ -330,7 +330,7 @@ class MonteCarlo:
 
         return mean_est - half_width, mean_est + half_width
 
-    def confidence_curve(self,n=None,n_pool = 0,function = lambda x : x, confidence = 0.95,type="normal"):
+    def confidence_curve(self,n=None,n_pool = 0,function = lambda x : x, confidence = 0.95,type="normal", variance = None):
 
         """
         Confidence Curve method.
@@ -359,12 +359,16 @@ class MonteCarlo:
         S2 = np.cumsum(samples[:n] ** 2)[1:n]
         cum_mean = S1 / n_axis
 
-        # Ignore the division by zero when the number of samples is 1
-        with np.errstate(invalid="ignore", divide="ignore"):
-            cum_var = (S2 - S1 ** 2 / n_axis) / (n_axis - 1)
+        if variance is None :
+            # Ignore the division by zero when the number of samples is 1
+            with np.errstate(invalid="ignore", divide="ignore"):
+                cum_var = (S2 - S1 ** 2 / n_axis) / (n_axis - 1)
 
-        # Cumulative variance computation: replacing the NaN values by 0)
-        cum_var = np.nan_to_num(cum_var, nan=0)
+            # Cumulative variance computation: replacing the NaN values by 0)
+
+            cum_var = np.nan_to_num(cum_var, nan=0)
+        else:
+            cum_var = np.repeat(variance, n_axis.size)
 
         if type == "normal":
             q = norm.ppf(0.5 + confidence / 2)
