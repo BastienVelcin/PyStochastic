@@ -11,7 +11,7 @@ import time
 import numpy as np
 
 from pystochastic.processes.diffusion.vasicek import Vasicek
-from pystochastic.processes.diffusion.cir import CIR
+from pystochastic.processes.diffusion.cox_ingersoll_ross import CIR
 from pystochastic.processes.diffusion.ornstein_uhlenbeck import OrnsteinUhlenbeck
 from pystochastic.processes.diffusion.geometric_brownian_motion import GeometricBrownianMotion
 from pystochastic.processes.diffusion.constant_elasticity_variance import CEV

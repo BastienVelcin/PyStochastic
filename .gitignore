@@ -74,3 +74,5 @@ Thumbs.db
 *.tmp
 *.temp
 docs/temp/
+
+pystochastic/sde/em2.py

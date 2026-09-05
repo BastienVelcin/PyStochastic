@@ -4,7 +4,7 @@ PyStochastic is a Python library for probability, stochastic calculus and stocha
 stochastic differential equations.
 
 The project aims to provide a simple and consistent interface for
-simulating, analysing and visualising stochastic models.
+simulating, analyzing and visualizing stochastic models.
 
 ---
 
@@ -18,18 +18,7 @@ PyStochastic currently provides tools for:
 - Random number generation
 - Stochastic processes
 - Numerical SDE solvers
-  - Euler-Maruyama
-  - Milstein
 - Monte Carlo analysis
-  - Estimation
-  - Moments
-  - Variance and standard error
-  - Confidence intervals
-  - Quantiles
-  - Histograms
-  - Empirical cumulative distribution functions
-  - Confidence curves
-- Vectorised simulations
 - Plotting and visualisation
 
 ---
@@ -49,6 +38,12 @@ Then install the package:
 pip install .
 ```
 
+Or directly from PyPI:
+
+```bash
+pip install pystochastic
+```
+
 ---
 
 ## 🚀 Quick start
@@ -62,7 +57,7 @@ For example:
 ```python
 from pystochastic.dist import Normal
 
-distribution = Normal(mu=0, sigma=1)
+distribution = Normal(mu = 0, var = 1)
 
 samples = distribution.sample(10000)
 
@@ -103,9 +98,9 @@ and discrete distributions through the `random` module.
 from pystochastic.random import continuous
 
 samples = continuous.normal(
-  mu=0,
-  sigma=1,
-  size=10000,
+  mean = 0,
+  var = 1,
+  n = 10000,
 )
 ```
 
@@ -121,28 +116,40 @@ seed(42)
 
 # 📈 Stochastic processes
 
-PyStochastic provides several classical stochastic processes, including:
+PyStochastic provides several classical stochastic processes, distributed into three categories:
 
-- Brownian motion
-- Poisson process
-- Geometric Brownian motion
-- Ornstein-Uhlenbeck process
-- Vasicek model
-- Cox-Ingersoll-Ross model
+- Elementary processes
+  - Brownian motion
+  - Brownian bridge
+  - Fractional Brownian motion
+  - Bessel process
+
+- Diffusion processes 
+  - Geometric Brownian motion
+  - Ornstein-Uhlenbeck process
+  - Vasicek model
+  - Cox-Ingersoll-Ross model
+  - Constant Elasticity of Variance model
+  - Heston model
+  - Hull-White model
+  
+- Jump processes
+  - Poisson process
+  - Compound Poisson process
 
 For example:
 
 ```python
+import numpy as np
 from pystochastic.processes import Brownian
 
 process = Brownian(
-    t_0=0,
-    t_n=1,
-    n_steps=1000,
-    n_simulations=10,
+    cov = np.eye(2),
+    T = 1,
+    steps = 1000,
 )
 
-process.simulate()
+process.simulate(n_simulations = 100)
 ```
 
 The simulated paths can then be analysed and visualised.
@@ -157,7 +164,8 @@ equations.
 Currently implemented methods include:
 
 - Euler-Maruyama
-- Milstein
+- Milstein (1D only)
+- Runge-Kutta (1D only)
 
 These solvers support vectorised simulations and can be applied to
 multidimensional stochastic systems.
@@ -165,15 +173,15 @@ multidimensional stochastic systems.
 For example:
 
 ```python
+import numpy as np
 from pystochastic.sde import EulerMaruyama
 
 solver = EulerMaruyama(
-    drift=drift,
-    diffusion=diffusion,
-    x_0=x_0,
-    t_0=0,
-    t_n=1,
-    n_steps=1000,
+    drift = lambda x,t : x,
+    diffusion = lambda x,t : np.exp(-2*t)*0.5*x,
+    initial = 5,
+    T = 1,
+    steps = 1000
 )
 
 solution = solver.solve()
@@ -183,7 +191,7 @@ solution = solver.solve()
 
 # 🎯 Monte Carlo
 
-The `MonteCarlo` class provides statistical tools for analysing
+The `MonteCarlo` class provides statistical tools for analyzing
 collections of simulated samples.
 
 For example:
@@ -273,29 +281,45 @@ numbers of simulations.
 ```text
 pystochastic/
 ├── dist/
-│   ├── dist.py
-│   └── ...
+│   ├── continuous.py
+│   ├── discrete.py
+│   └── distribution.py
 │
 ├── montecarlo/
-│   ├── montecarlo.py
-│   └── ...
+│   └── montecarlo.py
 │
 ├── processes/
-│   ├── brownian.py
-│   ├── poisson.py
-│   ├── GeometricBrownianMotion.py
-│   ├── OrnsteinUhlenbeck.py
-│   ├── vasicek.py
-│   └── CIR.py
+│   ├──  diffusion/
+│   │   ├── constant_elasticity_variance.py
+│   │   ├── cox_ingersoll_ross.py
+│   │   ├── diffusion_process.py
+│   │   ├── geometric_brownian_motion.py
+│   │   ├── heston.py
+│   │   ├── hull_white.py
+│   │   ├── ornstein_uhlenbeck.py
+│   │   └── vasicek.py
+│   │
+│   ├──  elementary/
+│   │   ├── bessel.py
+│   │   ├── brownian.py
+│   │   ├── brownian_bridge.py
+│   │   └── fractional_brownian_motion.py
+│   │
+│   └──  jump/
+│       ├── compound_poisson.py
+│       ├── jump_process.py
+│       └── poisson.py
 │
 ├── random/
-│   ├── crandom.py
-│   ├── drandom.py
+│   ├── continuous.py
+│   ├── discrete.py
+│   ├── multivariate.py
 │   └── setseed.py
 │
 └── sde/
     ├── eulermaruyama.py
-    └── milstein.py
+    ├── milstein.py
+    └── rungekutta.py
 ```
 
 ---
@@ -326,11 +350,10 @@ Possible future developments include:
 - Additional probability distributions
 - Additional stochastic processes
 - Additional SDE numerical schemes
-- Improved documentation
-- Additional performance optimisations
+- Additional performance optimizations
 - More statistical analysis tools
 - Expanded benchmarking
-- Improved visualisation capabilities
+- Improved visualization capabilities
 
 ---
 
