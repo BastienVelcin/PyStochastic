@@ -26,7 +26,7 @@ The aim of this class is to provide statistical methods for Monte-Carlo simulati
 This section lists all the attributes that are common to all implemented processes.
 
 `samples` : _array_like_
-: 3-dimensional array of samples from the process.
+: 3-dimensional array of samples.
 
 - 1st dimension is the number of sample pools
 - 2nd dimension is the sample at each time step
@@ -74,12 +74,125 @@ So, the `estimate()` method estimates the value $\mathbb{E}[f(X)]$ with the empi
 _np.ndarray_
 : Estimated value of $\mathbb{E}[f(X)]$ for each sample pool.
 
+#### .moment()
+
+```python
+.moment(order = 1, n = None, function = lambda x: x)
+```
+
+The `moment()` method estimates the moment of a given order with the Law of Large Numbers.
+
+The moment of order $r\in \mathbb{N}$ of a function of a random variable $f(X)$ is defined as $\mathbb{E}[f(X)^n]$.
+
+**Parameters**
+
+`order` : _int_
+: Moment order $r$. Must be a positive integer.
+
+`n` : _int_
+: Number of considered samples from each sample pool. Must be an integer greater than 2.
+
+`function` : _function_
+: Function to apply to the samples. By default, the `function` argument is set as the identity function.
+
+**Returns**
+
+_np.ndarray_
+: Estimated value of $\mathbb{E}[f(X)^n]$ for each sample pool.
+
+#### .variance()
+
+```python
+.variance(n = None, function = lambda x: x, correction = True)
+```
+
+The `variance()` method estimates the variance of the samples with the König-Huygens formula.
+
+\begin{equation*}
+\mathbb{V}[X] = \mathbb{E}[X^2] - \mathbb{E}[X]^2
+\end{equation*}
+
+**Parameters**
+
+`n` : _int_
+: Number of considered samples from each sample pool. Must be an integer greater than 2.
+
+`function` : _function_
+: Function to apply to the samples. By default, the `function` argument is set as the identity function.
+
+`correction` : _bool_
+: Specify if the Bessel correction should be applied to the variance. If `true`, the estimated variance is multiplied by $\frac{n}{n-1}$.
+
+**Returns**
+
+_np.ndarray_
+: Estimated value of $\mathbb{V}[f(X)^n]$ for each sample pool.
+
+#### .std()
+
+```python
+.std(n = None, function = lambda x: x, correction = True)
+```
+
+The `std()` method estimates the standard deviation of the samples.
+
+\begin{equation*}
+\sigma[X] = \sqrt{\mathbb{V}[X]}
+\end{equation*}
+
+**Parameters**
+
+`n` : _int_
+: Number of considered samples from each sample pool. Must be an integer greater than 2.
+
+`function` : _function_
+: Function to apply to the samples. By default, the `function` argument is set as the identity function.
+
+`correction` : _bool_
+: Specify if the Bessel correction should be applied to the standard deviation. If `true`, the estimated standard deviation is multiplied by $\sqrt\frac{n}{n-1}$.
+
+**Returns**
+
+_np.ndarray_
+: Estimated value of $\sigma[f(X)^n]$ for each sample pool.
+
+#### .standard_error()
+
+```python
+.standard_error(n = None, function = lambda x: x, correction = True)
+```
+
+The `standard_error()` method estimates the standard error of the samples.
+
+\begin{equation*}
+\bar\sigma[X] = \frac{\sigma[X]}{\sqrt{n}}
+\end{equation*}
+
+**Parameters**
+
+`n` : _int_
+: Number of considered samples from each sample pool. Must be an integer greater than 2.
+
+`function` : _function_
+: Function to apply to the samples. By default, the `function` argument is set as the identity function.
+
+`correction` : _bool_
+: Specify if the Bessel correction should be applied to the standard error. If `true`, the estimated standard error is multiplied by $\sqrt\frac{n}{n-1}$.
+
+**Returns**
+
+_np.ndarray_
+: Estimated value of $\bar\sigma[f(X)^n]$ for each sample pool.
+
+
+### Confidence Intervals & Curves
+
 #### .half_width()
 ```python
 .half_width(n = None, function = lambda x: x, confidence = 0.95, type = "normal", variance = None)
 ```
 
-The `half_width()` method returns an approximation of the confidence interval half-width, deduced from normality assumptions.
+The `half_width()` method returns an approximation of the confidence interval half-width of the estimator of $\mathbb{E}[f(X)]$, deduced from normality assumptions.
 The confidence interval can be computed with a known or an unknown variance of normally distributed samples, with the normal or Student's t-distribution quantile.
 
 Let $X_n$ be the mean estimator deduced from the first $n$ samples.
@@ -126,43 +239,13 @@ an estimated variance.
 _np.ndarray_
 : Estimated value of the half-width of the confidence interval of confidence level $1-\alpha$ for each sample pool.
 
-#### .moment()
+#### .confidence_interval()
 
 ```python
-.moment(order=1, n=None, function = lambda x: x)
+.confidence_interval(n=None, function = lambda x: x, confidence = 0.95,type = "normal", variance = None)
 ```
 
-The `moment()` method estimates the moment of a given order with the Law of Large Numbers.
-
-The moment of order $r\in \mathbb{N}$ of a function of a random variable $f(X)$ is defined as $\mathbb{E}[f(X)^n]$.
-
-**Parameters**
-
-`order` : _int_
-: Moment order $r$. Must be a positive integer.
-
-`n` : _int_
-: Number of considered samples from each sample pool. Must be an integer greater than 2.
-
-`function` : _function_
-: Function to apply to the samples. By default, the `function` argument is set as the identity function.
-
-**Returns**
-
-_np.ndarray_
-: Estimated value of $\mathbb{E}[f(X)^n]$ for each sample pool.
-
-#### .variance()
-
-```python
-.variance(n=None, function = lambda x: x, correction=True)
-```
-
-The `variance()` method estimates the variance of the samples with the König-Huygens formula.
-
-\begin{equation*}
-\mathbb{V}[X] = \mathbb{E}[X^2] - \mathbb{E}[X]^2
-\end{equation*}
+The `confidence_interval()` method estimates the confidence interval of a given confidence level and type of the estimator of $\mathbb{E}[f(X)]$.
 
 **Parameters**
 
@@ -172,74 +255,61 @@ The `variance()` method estimates the variance of the samples with the König-Hu
 `function` : _function_
 : Function to apply to the samples. By default, the `function` argument is set as the identity function.
 
-`correction` : _bool_
-: Specify if the Bessel correction should be applied to the variance. If `true`, the estimated variance is multiplied by $\frac{n}{n-1}$.
+`confidence` : _float_
+: Confidence level $1-\alpha$ of the confidence interval. Must be a float between 0 and 1.
+
+`type` : _str_
+: Type of confidence interval. Must be one of the following: `normal` or `student`.
+
+`variance` : _float_ or `None`
+: Exact variance of the samples. If `None`, the variance is estimated from the samples.
 
 **Returns**
 
-_np.ndarray_
-: Estimated value of $\mathbb{V}[f(X)^n]$ for each sample pool.
+_tuple_ : (_np.ndarray_, _np.ndarray_)
+: Estimated confidence interval bounds of confidence level $1-\alpha$ for each sample pool.
 
-#### .std()
+- The first element of the tuple is the array of lower bounds of the confidence interval for each sample pool.
+- The second element of the tuple is the array of upper bounds of the confidence interval for each sample pool.
+
+>[!NOTE]
+> If `type` is set as `"normal"` and `variance` is not set, then the method returns an approximation the confidence interval of confidence level $1-\alpha$ deduced from the Normal distribution with
+an estimated variance.
+
+#### .confidence_curve()
 
 ```python
-.std(n=None, function = lambda x: x, correction=True)
+.confidence_curve(n = None, n_pool = 0, function = lambda x: x, confidence = 0.95,type = "normal", variance = None)
 ```
 
-The `std()` method estimates the standard deviation of the samples.
-
-\begin{equation*}
-\sigma[X] = \sqrt{\mathbb{V}[X]}
-\end{equation*}
+The `confidence_curve()` method plots the confidence interval of a given confidence level and type of the estimator of $\mathbb{E}[f(X)]$ along the interval $[1,n]\cap \mathbb{N}$ for a specified sample pool.
 
 **Parameters**
 
 `n` : _int_
 : Number of considered samples from each sample pool. Must be an integer greater than 2.
 
-`function` : _function_
-: Function to apply to the samples. By default, the `function` argument is set as the identity function.
-
-`correction` : _bool_
-: Specify if the Bessel correction should be applied to the standard deviation. If `true`, the estimated standard deviation is multiplied by $\sqrt\frac{n}{n-1}$.
-
-**Returns**
-
-_np.ndarray_
-: Estimated value of $\sigma[f(X)^n]$ for each sample pool.
-
-#### .std()
-
-```python
-.standard_error(n=None, function = lambda x: x, correction=True)
-```
-
-The `standard_error()` method estimates the standard error of the samples.
-
-\begin{equation*}
-\bar\sigma[X] = \frac{\sigma[X]}{\sqrt{n}}
-\end{equation*}
-
-**Parameters**
-
-`n` : _int_
-: Number of considered samples from each sample pool. Must be an integer greater than 2.
+`n_pool` : _int_
+: Index of the sample pool to work with. Must be an integer between 0 and the first dimension of the `samples` attribute.
 
 `function` : _function_
 : Function to apply to the samples. By default, the `function` argument is set as the identity function.
 
-`correction` : _bool_
-: Specify if the Bessel correction should be applied to the standard error. If `true`, the estimated standard error is multiplied by $\sqrt\frac{n}{n-1}$.
+`confidence` : _float_
+: Confidence level $1-\alpha$ of the confidence interval. Must be a float between 0 and 1.
+
+`type` : _str_
+: Type of confidence interval. Must be one of the following: `normal` or `student`.
+
+`variance` : _float_ or `None`
+: Exact variance of the samples. If `None`, the variance is estimated from the samples.
 
 **Returns**
 
-_np.ndarray_
-: Estimated value of $\bar\sigma[f(X)^n]$ for each sample pool.
-
-
-### Confidence Intervals & Curves
+No return value.
 
 ### Statistical errors
+
 
 ### Descriptive statistics
 
