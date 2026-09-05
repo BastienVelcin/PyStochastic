@@ -614,7 +614,7 @@ Let us consider an asset $S$, and let us represent the price of $S$ as a random 
 \begin{equation*}
 dS_t = 0.05 S_t dt + 0.2 S_t dW_t
 \end{equation*}
-and $S_0=100$, where $(W_t)_{t\geq 0}$ is a unidimensional standard Brownian motion. We consider the time interval $[0,T]$.
+and $S_0=100$, where $(W_t)_{t\geq 0}$ is a unidimensional standard Brownian motion. We consider the time interval $[0,1]$.
 
 Let $K=100$ be the strike price of a European call option. Its payoff at maturity is given by
 

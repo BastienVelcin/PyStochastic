@@ -12,6 +12,7 @@ import numpy as np
 
 from pystochastic.sde.eulermaruyama import EulerMaruyama
 from pystochastic.sde.milstein import Milstein
+from pystochastic.sde.rungekutta import RungeKutta
 
 
 # ---------------------------------------------------------------------
@@ -66,8 +67,8 @@ def benchmark_euler(n_simulations, n_steps, mu, sigma, n_runs=3, dim=1, parallel
     x_0 = np.ones(dim)
     times = []
     for _ in range(n_runs):
-        solver = EulerMaruyama(drift=mu, diffusion=sigma, initial=x_0, t_0=0, t_n=1,
-                                n_steps=n_steps)
+        solver = EulerMaruyama(drift=mu, diffusion=sigma, initial=1.0, T=1,
+                           steps=n_steps)
         start = time.perf_counter()
         solver.solve(plot=False, parallel=parallel, n_workers=n_workers,n_simulations=n_simulations)
         end = time.perf_counter()
@@ -78,8 +79,19 @@ def benchmark_euler(n_simulations, n_steps, mu, sigma, n_runs=3, dim=1, parallel
 def benchmark_milstein(n_simulations, n_steps, mu, sigma, n_runs=3):
     times = []
     for _ in range(n_runs):
-        solver = Milstein(drift=mu, diffusion=sigma, initial=1.0, t_0=0, t_n=1,
-                           n_steps=n_steps)
+        solver = Milstein(drift=mu, diffusion=sigma, initial=1.0, T=1,
+                           steps=n_steps)
+        start = time.perf_counter()
+        solver.solve(plot=False, n_simulations=n_simulations)
+        end = time.perf_counter()
+        times.append(end - start)
+    return np.mean(times), np.min(times), np.max(times)
+
+def benchmark_rungekutta(n_simulations, n_steps, mu, sigma, n_runs=3):
+    times = []
+    for _ in range(n_runs):
+        solver = RungeKutta(drift=mu, diffusion=sigma, initial=1.0, T=1,
+                           steps=n_steps)
         start = time.perf_counter()
         solver.solve(plot=False, n_simulations=n_simulations)
         end = time.perf_counter()
@@ -147,7 +159,22 @@ def run_milstein_benchmark(simulations, time_steps, n_runs=3):
             print(f"Simulations : {n_simulations:<8,} : {mean_t:.4f} s (min={min_t:.4f}, max={max_t:.4f})")
         print("-" * 70)
 
+def run_rungekutta_benchmark(simulations, time_steps, n_runs=3):
+    print("=" * 70)
+    print("Runge-Kutta benchmark (always vectorized)")
+    print("=" * 70)
+    print(f"Runs : {n_runs}")
+    print("-" * 70)
 
+    for n_steps in time_steps:
+        print(f"Number of time steps : {n_steps}")
+        print("-" * 70)
+        for n_simulations in simulations:
+            mean_t, min_t, max_t = benchmark_rungekutta(
+                n_simulations, n_steps, milstein_drift, milstein_diffusion, n_runs=n_runs,
+            )
+            print(f"Simulations : {n_simulations:<8,} : {mean_t:.4f} s (min={min_t:.4f}, max={max_t:.4f})")
+        print("-" * 70)
 # ---------------------------------------------------------------------
 # Main benchmark
 # ---------------------------------------------------------------------
@@ -179,6 +206,7 @@ def main():
     )
 
     run_milstein_benchmark(simulations, time_steps, n_runs=n_runs)
+    run_rungekutta_benchmark(simulations, time_steps, n_runs=n_runs)
 
 
 if __name__ == "__main__":

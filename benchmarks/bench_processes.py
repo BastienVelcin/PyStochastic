@@ -4,7 +4,7 @@ GeometricBrownianMotion, Poisson, Brownian).
 
 Measures simulation time as a function of the number of simulations and
 time steps, for each available method ("exact", "euler-maruyama",
-"milstein" when applicable).
+"milstein", "runge-kutta" when applicable).
 """
 
 import time
@@ -14,9 +14,13 @@ from pystochastic.processes.diffusion.vasicek import Vasicek
 from pystochastic.processes.diffusion.cir import CIR
 from pystochastic.processes.diffusion.ornstein_uhlenbeck import OrnsteinUhlenbeck
 from pystochastic.processes.diffusion.geometric_brownian_motion import GeometricBrownianMotion
-from pystochastic.processes.jump.poisson import Poisson
+from pystochastic.processes.diffusion.constant_elasticity_variance import CEV
+from pystochastic.processes.diffusion.heston import Heston
+from pystochastic.processes.diffusion.hull_white import HullWhite
+from pystochastic.processes.jump.compound_poisson import CompoundPoisson
+from pystochastic.processes.jump.poisson import PoissonProcess
 from pystochastic.processes.elementary.brownian import Brownian
-
+from pystochastic.dist import Normal
 
 # ---------------------------------------------------------------------
 # Benchmark helper
@@ -101,12 +105,12 @@ def main():
 
     simulations = [100, 1_000, 5_000, 10_000]
     time_steps = [100, 500]
-    methods = ["exact", "euler-maruyama", "milstein"]
+    methods = ["exact", "euler-maruyama", "milstein", "runge-kutta"]
     n_runs = 3
 
     run_process_group(
         "Vasicek",
-        build_process=lambda n_steps: Vasicek(reversion_speed=2, mu=1.5, volatility=0.3, r_0=0, n_steps=n_steps),
+        build_process=lambda n_steps: Vasicek(speed=2, mean=1.5, volatility=0.3, initial=0, steps=n_steps),
         methods=methods,
         simulations=simulations,
         time_steps=time_steps,
@@ -115,7 +119,7 @@ def main():
 
     run_process_group(
         "CIR",
-        build_process=lambda n_steps: CIR(a=2, b=0.05, sigma=0.1, r_0=0.03, n_steps=n_steps),
+        build_process=lambda n_steps: CIR(mean=2, speed=0.05, volatility=0.1, initial=0.03, steps=n_steps),
         methods=methods,
         simulations=simulations,
         time_steps=time_steps,
@@ -124,7 +128,7 @@ def main():
 
     run_process_group(
         "OrnsteinUhlenbeck",
-        build_process=lambda n_steps: OrnsteinUhlenbeck(mu=2, sigma=0.5, theta=1.5, r_0=0, n_steps=n_steps),
+        build_process=lambda n_steps: OrnsteinUhlenbeck(speed=2, volatility=0.5, initial=0, steps=n_steps),
         methods=methods,
         simulations=simulations,
         time_steps=time_steps,
@@ -133,26 +137,56 @@ def main():
 
     run_process_group(
         "GeometricBrownianMotion",
-        build_process=lambda n_steps: GeometricBrownianMotion(mu=0.05, sigma=0.2, S_0=100, n_steps=n_steps),
+        build_process=lambda n_steps: GeometricBrownianMotion(mu=0.05, volatility=0.2, initial=100, steps=n_steps),
         methods=methods,
         simulations=simulations,
         time_steps=time_steps,
         n_runs=n_runs,
     )
 
-    # Poisson has not been vectorized yet (see conversation) -- expect this
-    # to scale much more slowly than the processes above.
+    run_process_group(
+        "CEV",
+        build_process=lambda n_steps: CEV(speed=0.05, volatility=0.2, elasticity=0.4, initial=100, steps=n_steps),
+        methods=methods,
+        simulations=simulations,
+        time_steps=time_steps,
+        n_runs=n_runs,
+    )
+    run_process_group(
+        "Heston",
+        build_process=lambda n_steps: Heston(mu=0.05, long_variance=0.2, reverting_rate=0.05, variance_volatility=0.3, correlation = 0.6, initial_price = 100, initial_variance= 0.9, steps=n_steps),
+        methods=methods,
+        simulations=simulations,
+        time_steps=time_steps,
+        n_runs=n_runs,
+    )
+    run_process_group(
+        "Hull-White",
+        build_process=lambda n_steps: HullWhite(reversion_speed=0.05, calibration = lambda t : 0.05 + 0.01 * np.sin(2 * np.pi * t) , volatility= lambda t : 0.02 + 0.005 * t, initial=100, steps=n_steps),
+        methods=methods,
+        simulations=simulations,
+        time_steps=time_steps,
+        n_runs=n_runs,
+    )
     run_no_method_group(
         "Poisson",
-        build_process=lambda n_steps: Poisson(intensity=3, n_steps=n_steps),
+        build_process=lambda n_steps: PoissonProcess(intensity=3, steps=n_steps),
         simulations=[100, 1_000, 5_000],
         time_steps=time_steps,
         n_runs=n_runs,
     )
 
     run_no_method_group(
+        "Compound Poisson",
+        build_process=lambda n_steps: CompoundPoisson(intensity = 1, distribution = Normal(0,1),steps = n_steps),
+        simulations=simulations,
+        time_steps=time_steps,
+        n_runs=n_runs,
+    )
+
+    run_no_method_group(
         "Brownian",
-        build_process=lambda n_steps: Brownian(1, n_steps=n_steps),
+        build_process=lambda n_steps: Brownian(1, steps=n_steps),
         simulations=simulations,
         time_steps=time_steps,
         n_runs=n_runs,
