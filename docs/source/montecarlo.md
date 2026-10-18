@@ -510,7 +510,7 @@ _float_ or _np.ndarray_
 : Skewness of each sample pool.
 
 
-#### .skewness()
+#### .kurtosis()
 
 ```python
 .kurtosis(n=None, function = lambda x: x)
@@ -658,6 +658,6 @@ print(f"Estimated expected payoff: {payoff.item():.4f} monetary units")
 
 The used Monte-Carlo estimator is the empirical mean estimator:
 \begin{equation*}
-\mathbb{E}\left[(S_1-K)^+\right] \approx \frac{1}{N}\sum_{i=1}^n (S_1^{(i)} - K)^+.
+\mathbb{E}\left[(S_1-K)^+\right] \approx \frac{1}{N}\sum_{i=1}^N (S_1^{(i)} - K)^+.
 \end{equation*}
 
