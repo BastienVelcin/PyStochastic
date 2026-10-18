@@ -351,7 +351,8 @@ class GeometricBrownianMotion(DiffusionProcess):
             )
 
         t = _validate_t(t)
-
+        x = np.asarray(x)
         if t == 0:
-            return np.array([0])
-        return 1/(x*self.volatility*np.sqrt(2*np.pi*t)) * np.exp(-(np.log(x)-(np.log(self.initial)+(self.mu-0.5*self.volatility**2)*t))**2/(2*self.volatility**2 * t)) if x > 0 else np.array([0])
+            return np.zeros(x.size)
+
+        return np.where(x > 0, 1/(x*self.volatility*np.sqrt(2*np.pi*t)) * np.exp(-(np.log(x)-(np.log(self.initial)+(self.mu-0.5*self.volatility**2)*t))**2/(2*self.volatility**2 * t)),0)

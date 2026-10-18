@@ -150,6 +150,6 @@ class PoissonProcess(JumpProcess):
 
         t = _validate_t(t)
         if t == 0:
-            return np.array([0])
+            return 0
         P = Poisson(lam  = t*self.intensity)
         return P.pmf(np.floor(x))

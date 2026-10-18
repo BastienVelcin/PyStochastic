@@ -135,6 +135,10 @@ class Bessel(Process):
 
         return self.path
 
+    def expectation(self,t):
+        t = _validate_t(t)
+        return np.sqrt(2*t) * scipy.special.gamma((self.order+1)/2) / scipy.special.gamma(self.order/2)
+
     def density(self,t,x):
 
         if self.dim > 1:
@@ -143,7 +147,9 @@ class Bessel(Process):
             )
 
         t = _validate_t(t)
+        x = np.asarray(x)
 
         if t == 0:
-            return np.array([0])
-        return 1/(2**((self.order/2)-1)*scipy.special.gamma(self.order/2) * np.sqrt(t)) * (x/np.sqrt(t))**(self.order-1) * np.exp(-x**2 /(2*t)) if x > 0 else np.array([0])
+            return np.zeros(x.size)
+
+        return np.where(x>0, 1/(2**((self.order/2)-1)*scipy.special.gamma(self.order/2) * np.sqrt(t)) * (x/np.sqrt(t))**(self.order-1) * np.exp(-x**2 /(2*t)),0)

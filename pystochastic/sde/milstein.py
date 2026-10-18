@@ -175,7 +175,7 @@ class Milstein:
             W.simulate(self.n_simulations)
             dW = W.increments
         else:
-            if not brownian_increments.shape == (self.n_simulations, self.steps, 1) or not brownian_increments == (self.n_simulations, self.steps):
+            if not brownian_increments.shape == (self.n_simulations, self.steps, 1) or not brownian_increments.shape == (self.n_simulations, self.steps):
                 raise ValueError(
                     "The brownian sequence must have the same shape as the number of simulations."
                 )

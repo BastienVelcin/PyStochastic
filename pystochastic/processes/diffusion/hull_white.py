@@ -212,9 +212,11 @@ class HullWhite(DiffusionProcess):
     def density(self,t,x):
 
         t = _validate_t(t)
+        x = np.asarray(x)
 
         if t == 0:
-            return np.array([0])
+            return np.zeros(x.size)
+
         x = np.asarray(x)
         int1 = scipy.integrate.quad(lambda s : np.exp(self.reversion_speed * s)*self.calibration(s), 0, t)[0]
         int2 = scipy.integrate.quad(lambda s : np.exp(2 * self.reversion_speed * s)*self.volatility(s)**2, 0, t)[0]

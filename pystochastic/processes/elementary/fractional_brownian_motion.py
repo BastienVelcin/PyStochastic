@@ -181,8 +181,10 @@ class FractionalBrownianMotion(Process):
             )
 
         t = _validate_t(t)
+        x = np.asarray(x)
 
         if t == 0:
-            return np.array([0])
+            return np.zeros(x.size)
+
         N = Normal(mu=0, var=t ** (2 * self.hurst))
         return N.pdf(x)

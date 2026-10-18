@@ -147,8 +147,11 @@ class BrownianBridge(Process):
             )
 
         t = _validate_t(t)
+        x = np.asarray(x)
+        x = np.asarray(x)
 
         if t == 0 or t == self.T:
-            return np.array([0])
+            return np.zeros(x.size)
+
         N = Normal(mu = 0, var = t*(self.T - t)/self.T)
         return N.pdf(x)

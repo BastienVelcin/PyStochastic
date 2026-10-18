@@ -1,17 +1,19 @@
 import numpy as np
 import plotly.graph_objects as go
 from abc import abstractmethod, ABC
-
+import pystochastic.processes.plot
 def _validate_t(t):
-    if not 0 <= t :
-        raise ValueError(
-            f"The time must be a real number greater than 0, but {t} was given."
-        )
-    if not isinstance(t, (int, np.integer, float, np.floating)):
+    t = np.asarray(t)
+    if not np.issubdtype(t.dtype, np.number):
         raise ValueError(
             f"The time must be a real number greater than 0."
         )
+    if not np.all(0 <= t):
+        raise ValueError(
+            f"The time must be a real number greater than 0, but {t} was given."
+        )
     return t
+
 class Process(ABC):
 
     def __init__(
@@ -57,6 +59,9 @@ class Process(ABC):
     def simulate(self):
         pass
 
+    def plot(self, density=True, n_bins=30, width=None):
+        return pystochastic.processes.plot.plot_graph(self, density=density, n_bins=n_bins, width=width)
+
     def expectation(self,t):
 
         raise NotImplementedError(
@@ -81,242 +86,6 @@ class Process(ABC):
         raise NotImplementedError(
             "There is no explicit formula for the variance of this process yet."
         )
-
-    def plot(self, density = True):
-
-        if self.path is None:
-            raise ValueError(
-                "The path has not been simulated yet. Please run the simulate method first."
-            )
-
-        if self.dim > 3:
-            raise ValueError(
-                "The path can be plotted only for 1D, 2D and 3D."
-            )
-
-        if self.dim == 1:
-
-            paths = self.path[:, :, 0]
-
-            # Mean
-            mean_path = np.mean(paths, axis=0)
-
-            if density:
-                from plotly.subplots import make_subplots
-                # Figure
-                fig = make_subplots(rows=1,
-                                    cols=2,
-                                    shared_yaxes=True,
-                                    horizontal_spacing=0.02,
-                                    column_widths=[0.8, 0.2],
-                                    subplot_titles=("Simulated paths", "Distribution"))
-
-                # Simulated paths
-                for sim in range(self.n_simulations):
-                    fig.add_trace(
-                        go.Scatter(x=self.t,
-                                   y=paths[sim],
-                                   mode="lines",
-                                   line=dict(width=1),
-                                   name=f"Path {sim + 1}",
-                                   opacity=0.5,
-                                   showlegend=False),
-                        row=1,
-                        col=1)
-
-                # Mean path
-                fig.add_trace(
-                    go.Scatter(x=self.t,
-                               y=mean_path,
-                               mode="lines",
-                               line=dict(width=3),
-                               name="Mean path"),
-                    row=1,
-                    col=1)
-
-                final_values = paths[:, -1]
-
-                fig.add_trace(go.Histogram(y=final_values,orientation="h",
-                                           nbinsy=30,
-                                           name="Histogram",
-                                           histnorm="probability density",
-                                           marker = dict(color="rgba(59, 130, 246, 0.65)"),
-                                           showlegend=False),
-                              row=1,
-                              col=2)
-
-                # If the density is available for the effective process, we will plot it on the histogram
-
-                density_available = True
-
-                # We want to know if the density is known for the process.
-                try:
-                    x_density = np.linspace(np.min(final_values),np.max(final_values),300)
-
-                    density_values = self.density(self.t[-1],x_density)
-
-                except (AttributeError, NotImplementedError, ValueError):
-                    density_available = False
-
-                if density_available:
-                    fig.add_trace(go.Scatter(x=density_values,
-                                             y=x_density,
-                                             mode="lines",
-                                             line=dict(width=3),
-                                             name="Density",
-                                             marker=dict(color='#ff4b7d'),
-                                             showlegend=True),
-                                  row=1,
-                                  col=2)
-
-                frames = []
-
-                for i, t in enumerate(self.t):
-
-                    values = paths[:, i]
-
-                    frame_data = [go.Histogram(y=values,
-                                               orientation="h",
-                                               nbinsy=30,
-                                               histnorm="probability density",
-                                               marker=dict(color="rgba(59, 130, 246, 0.65)"))]
-
-                    if density_available:
-                        x_density = np.linspace(np.min(values),np.max(values),300)
-
-                        density_values = self.density(t,x_density)
-
-                        frame_data.append(go.Scatter(x=density_values,
-                                                     y=x_density,
-                                                     mode="lines",
-                                                     line=dict(width=3),
-                                                     name="Density"))
-                    frames.append(go.Frame(name=str(i),
-                                           data=frame_data,
-                                           traces=([self.n_simulations + 1] if not density_available else [self.n_simulations + 1, self.n_simulations + 2])))
-
-                fig.frames = frames
-
-                sliders = [
-                    {"active": self.t.size - 1,
-                     "currentvalue": {
-                         "prefix": "t = ",
-                         "visible": True
-                     },
-                     "pad": {"t": 50},
-                     "steps": [{"label": f"{t:.2f}",
-                                "method": "animate",
-                                "args": [[str(i)],
-                                         {"mode": "immediate",
-                                          "frame": {
-                                              "duration": 0,
-                                              "redraw": True
-                                          },
-                                          "transition": {
-                                              "duration": 0
-                                        }
-                                    }
-                                ]
-                            }
-                            for i, t in enumerate(self.t)
-                        ]
-                    }
-                ]
-
-                fig.update_layout(title=f"Simulations of {self.name}",
-                                  template="plotly_white",
-                                  sliders=sliders,
-                                  xaxis_title="t",
-                                  xaxis2_title="Frequency",
-                                  yaxis_title=self.name,
-                                  bargap=0.05)
-
-                # Make the histogram appear horizontally
-                fig.update_xaxes(autorange=True,
-                                 row=1,
-                                 col=2)
-                fig.show()
-
-            else:
-
-                fig = go.Figure()
-
-                for sim in range(self.n_simulations):
-                    fig.add_trace(
-                        go.Scatter(
-                            x=self.t,
-                            y=self.path[sim,:, 0],
-                            mode="lines",
-                            line=dict(width=2),
-                            name=f"Path {sim + 1}"
-                        )
-                    )
-
-                fig.update_layout(
-                    title=f"Simulations of {self.name}",
-                    scene=dict(
-                        xaxis_title="t",
-                        yaxis_title=self.name,
-                    ),
-                    template="plotly_white"
-                )
-                fig.show()
-
-
-
-        elif self.dim == 2:
-
-            fig = go.Figure()
-
-            for sim in range(self.n_simulations):
-
-                fig.add_trace(
-                    go.Scatter(
-                        x=self.path[sim, :, 0],
-                        y=self.path[sim, :, 1],
-                        mode="lines",
-                        line=dict(width=2),
-                        name=f"Path {sim + 1}"
-                    )
-                )
-
-            fig.update_layout(
-                title=f"Simulations of {self.name}",
-                xaxis_title="X",
-                yaxis_title="Y",
-                template="plotly_white"
-            )
-
-            fig.show()
-
-        else:
-
-            fig = go.Figure()
-
-            for sim in range(self.n_simulations):
-
-                fig.add_trace(
-                    go.Scatter3d(
-                        x=self.path[sim, :, 0],
-                        y=self.path[sim, :, 1],
-                        z=self.path[sim, :, 2],
-                        mode="lines",
-                        line=dict(width=2),
-                        name=f"Path {sim + 1}"
-                    )
-                )
-
-            fig.update_layout(
-                title=f"Simulations of {self.name}",
-                scene=dict(
-                    xaxis_title="X",
-                    yaxis_title="Y",
-                    zaxis_title="Z"
-                ),
-                template="plotly_white"
-            )
-
-            fig.show()
 
     def final_position(self):
 

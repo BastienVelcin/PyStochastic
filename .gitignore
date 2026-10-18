@@ -76,3 +76,4 @@ Thumbs.db
 docs/temp/
 
 pystochastic/sde/em2.py
+pystochastic/testfile.py

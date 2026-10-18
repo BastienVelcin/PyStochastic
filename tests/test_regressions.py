@@ -17,7 +17,7 @@ import numpy as np
 import pytest
 
 from pystochastic.processes.diffusion.vasicek import Vasicek
-from pystochastic.processes.diffusion.cir import CIR
+from pystochastic.processes.diffusion.cox_ingersoll_ross import CIR
 from pystochastic.processes.elementary.brownian import Brownian
 from pystochastic.processes.elementary.brownian_bridge import BrownianBridge
 from pystochastic.sde.rungekutta import RungeKutta

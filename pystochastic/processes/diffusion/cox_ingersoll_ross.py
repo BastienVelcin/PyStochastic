@@ -250,10 +250,10 @@ class CIR(DiffusionProcess):
         """
 
         t = _validate_t(t)
+        x = np.asarray(x)
 
-
-        if not x > 0 or t == 0:
-            return np.array([0])
+        if t == 0:
+            return np.zeros(x.size)
 
         x = np.asarray(x)
 
@@ -265,4 +265,4 @@ class CIR(DiffusionProcess):
 
         noncentrality = nc_factor * self.initial
 
-        return scipy.stats.ncx2.pdf(x / c,df=nu,nc=noncentrality) / c
+        return np.where(x> 0, scipy.stats.ncx2.pdf(x / c,df=nu,nc=noncentrality) / c, 0)

@@ -230,17 +230,17 @@ class Brownian(Process):
 
     def density(self,t,x):
 
-
-
         if self.dim > 1:
             raise ValueError(
                 "The density is only implemented for 1D processes yet."
             )
 
         t = _validate_t(t)
+        x = np.asarray(x)
 
         if t == 0:
-            return np.array([0])
+            return np.zeros(x.size)
+
         N = Normal(mu=0,var = t*self.cov)
         return N.pdf(x)
 
