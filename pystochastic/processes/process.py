@@ -59,8 +59,9 @@ class Process(ABC):
     def simulate(self):
         pass
 
-    def plot(self, density=True, n_bins=30, width=None):
-        return pystochastic.processes.plot.plot_graph(self, density=density, n_bins=n_bins, width=width)
+    def plot(self, n_bins=30, points=1000, slider_steps=100):
+        return pystochastic.processes.plot.plot(self, n_bins, points, slider_steps)
+
 
     def expectation(self,t):
 

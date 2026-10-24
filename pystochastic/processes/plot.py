@@ -185,6 +185,48 @@ def _distribution_traces(process, t, n_bins=30, points=1000, density_available=T
 
     return traces, x_max
 
+def _distribution_traces_2d(process,t, bins=30):
+
+    x = process.path[:,t,0]
+    y =  process.path[:,t,1]
+
+    # Histogramme bidimensionnel
+    counts, x_edges, y_edges = np.histogram2d(x, y, bins=bins)
+
+    # Largeurs des classes
+    dx = np.diff(x_edges)
+    dy = np.diff(y_edges)
+
+    # Densité : fréquence / aire de la classe
+    density = counts / (np.length(x) * dx[:, None] * dy[None, :])
+
+    # Centres des classes
+    x_centers = (x_edges[:-1] + x_edges[1:]) / 2
+    y_centers = (y_edges[:-1] + y_edges[1:]) / 2
+
+    fig = go.Figure(
+        data=[
+            go.Surface(
+                x=x_centers,
+                y=y_centers,
+                z=density.T,
+                colorscale="Viridis",
+                colorbar=dict(title="Densité"),
+            )
+        ]
+    )
+
+    fig.update_layout(
+        title="Densité empirique jointe",
+        scene=dict(
+            xaxis_title="X",
+            yaxis_title="Y",
+            zaxis_title="Densité",
+        ),
+    )
+
+    return fig
+
 def _plot_1d(process, n_bins=30, points=1000, slider_steps=100):
 
     """
@@ -195,7 +237,7 @@ def _plot_1d(process, n_bins=30, points=1000, slider_steps=100):
     Parameters
     ----------
     process : pystochastic.processes.Process
-        Process to be simulated.
+        Process to be plotted.
     n_bins : int, optional
         Number of bins of the histogram, by default 30.
     points : int, optional
@@ -241,7 +283,7 @@ def _plot_1d(process, n_bins=30, points=1000, slider_steps=100):
                 go.Scatter(x=process.t, y=exp_path, mode="lines", line=dict(width=3, color=_EXP_COLOR, dash="dash"),
                            name=r"$\mathbb{E}[X_t]$"), row=1, col=1)
 
-    # If the density is not available for the effective process, we return None.
+    # If the expectation is not available for the effective process, we return None.
     except (AttributeError, NotImplementedError, ValueError, TypeError,
             ZeroDivisionError, FloatingPointError):
         print("No expectation available for the effective process")
@@ -321,3 +363,129 @@ def _plot_1d(process, n_bins=30, points=1000, slider_steps=100):
     ##################################################################################################################
 
     process_figure.show()
+
+def _plot_2d(process):
+
+    """
+    Plot 2D function
+
+    Plot the simulated process paths for 2D process.
+
+    Parameters
+    ----------
+    process : pystochastic.processes.Process
+        Process to be plotted.
+    """
+
+    if process.path is None:
+        raise ValueError("The path has not been simulated yet.")
+
+    t = process.t[-1]
+    t_nb = process.t.size
+    ##################################################################################################################
+
+    # The right panel shares the y axis with the paths, so the distribution is drawn horizontally
+    process_figure = go.Figure()
+
+    # We display the paths for each simulation, colored according to their final value
+    colors = _path_colors(process.path[:, -1, 0])
+
+    for i in range(process.n_simulations):
+        process_figure.add_trace(go.Scatter(x=process.path[i, :, 0], y=process.path[i, :, 1], mode="lines",
+                                            line=dict(color=colors[i]),
+                                            name=f"Path {i + 1}", showlegend=False))
+
+    ##################################################################################################################
+
+    # Computation and display of the mean path
+
+    mean_path = np.mean(process.path, axis=0)
+    process_figure.add_trace(
+        go.Scatter(x=mean_path[:, 0], y=mean_path[:, 1], mode="lines", line=dict(width=3, color=_MEAN_COLOR),
+                   name="Mean path"))
+
+    ##################################################################################################################
+
+    # We add several details to the plot
+
+    process_figure.update_layout(bargap=0)
+
+    process_figure.update_xaxes(title_text="Dim. 1")
+    process_figure.update_yaxes(title_text="Dim. 2")
+    process_figure.update_annotations(font=dict(size=13))
+
+    process_figure.update_layout(title=f"Simulation : 2D {process.name}")
+
+    ##################################################################################################################
+
+    process_figure.show()
+
+
+def _plot_3d(process):
+
+    """
+    Plot 3D function
+
+    Plot the simulated process paths for 2D process.
+
+    Parameters
+    ----------
+    process : pystochastic.processes.Process
+        Process to be plotted.
+    """
+
+    if process.path is None:
+        raise ValueError("The path has not been simulated yet.")
+
+    t = process.t[-1]
+    t_nb = process.t.size
+    ##################################################################################################################
+
+    # The right panel shares the y axis with the paths, so the distribution is drawn horizontally
+    process_figure = go.Figure()
+
+    # We display the paths for each simulation, colored according to their final value
+    colors = _path_colors(process.path[:, -1, 0])
+
+    for i in range(process.n_simulations):
+        process_figure.add_trace(go.Scatter3d(x=process.path[i, :, 0], y=process.path[i, :, 1], z=process.path[i, :, 2], mode="lines",
+                                            line=dict(color=colors[i]),
+                                            name=f"Path {i + 1}", showlegend=False))
+
+    ##################################################################################################################
+
+    # Computation and display of the mean path
+
+    mean_path = np.mean(process.path, axis=0)
+    process_figure.add_trace(
+        go.Scatter3d(x=mean_path[:, 0], y=mean_path[:, 1], z = mean_path[:, 2] , mode="lines", line=dict(width=3, color=_MEAN_COLOR),
+                   name="Mean path"))
+
+    ##################################################################################################################
+
+    # We add several details to the plot
+
+    process_figure.update_layout(bargap=0)
+
+    process_figure.update_layout(scene=dict(xaxis_title="Dim. 1",
+                                            yaxis_title="Dim. 2",
+                                            zaxis_title="Dim. 3"))
+
+    process_figure.update_annotations(font=dict(size=13))
+
+    process_figure.update_layout(title=f"Simulation : 3D {process.name}")
+
+    ##################################################################################################################
+
+    process_figure.show()
+
+
+def plot(process, n_bins=30, points=1000, slider_steps=100):
+    if process.dim == 1:
+        return _plot_1d(process, n_bins, points, slider_steps)
+    elif process.dim == 2:
+        return _plot_2d(process)
+    elif process.dim == 3:
+        return _plot_3d(process)
+    else:
+        raise ValueError("The dimension of the process is not supported. Please specify a process with a dimension between 1 and 3.")
