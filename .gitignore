@@ -76,4 +76,6 @@ Thumbs.db
 docs/temp/
 
 pystochastic/sde/em2.py
+pystochastic/sde/em3.py
 pystochastic/testfile.py
+pystochastic/sde/convergence

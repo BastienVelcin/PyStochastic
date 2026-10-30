@@ -10,7 +10,6 @@ _COLORSCALE = [[k / (len(_SCALE) - 1), c] for k, c in enumerate(_SCALE)]
 _EXP_COLOR = "#6A66A3"
 _MEAN_COLOR = "#542E71"
 
-
 def colors(colorscale = "RdPu", expectation=None, mean=None):
     global _SCALE, _COLORSCALE, _EXP_COLOR, _MEAN_COLOR
 
