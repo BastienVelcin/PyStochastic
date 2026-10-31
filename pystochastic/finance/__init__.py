@@ -1,3 +1,3 @@
 from pystochastic.finance.models import *
 
-__all__ = ["BlackScholes"]
+__all__ = ["BlackScholes", "BinomialTree"]

@@ -320,4 +320,3 @@ class BlackScholes:
 
         Console().print()
         Console().print(table)
-
