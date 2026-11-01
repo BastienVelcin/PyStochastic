@@ -75,6 +75,21 @@ class MonteCarlo:
 
     def __init__(self,samples):
 
+        samples = np.asarray(samples)
+
+        if samples.ndim not in (1, 2, 3):
+            raise ValueError("Samples must have 1, 2 or 3 dimensions.")
+
+        if samples.size == 0:
+            raise ValueError("Samples cannot be empty.")
+
+        if not np.issubdtype(samples.dtype, np.number):
+            raise TypeError("Samples must contain numerical values.")
+
+        if not np.all(np.isfinite(samples)):
+            raise ValueError("Samples must contain only finite values.")
+
+        self.samples = np.atleast_3d(samples)
         self.samples = np.atleast_3d(samples)
         self.n_simulations = self.samples.shape[0]
         self.n_pool_values = self.samples.shape[1]
@@ -325,7 +340,7 @@ class MonteCarlo:
         n = self._validate_n(n)
 
         mean_est = self.estimate(n, function=function)
-        half_width = self.half_width(n,function=function,confidence=confidence,type=type, variance = None)
+        half_width = self.half_width(n,function=function,confidence=confidence,type=type, variance = variance)
 
         return mean_est - half_width, mean_est + half_width
 
@@ -345,7 +360,7 @@ class MonteCarlo:
                 "The confidence level must be a float between 0 and 1."
             )
 
-        if not 0 <= n_pool < self.n_pool_values:
+        if not isinstance(n_pool, (int, np.integer)) or not (0 <= n_pool < self.n_simulations):
             raise ValueError(
                 "The number of considered sample pool must be inferior to the number of sample pools."
             )
@@ -354,8 +369,8 @@ class MonteCarlo:
 
         # Computation of the mean and variance of the estimator
         samples = function(self.samples[n_pool])
-        S1 = np.cumsum(samples[:])[1:n]
-        S2 = np.cumsum(samples[:n] ** 2)[1:n]
+        S1 = np.cumsum(samples[:], axis=0)[1:n]
+        S2 = np.cumsum(samples[:n] ** 2, axis=0)[1:n]
         cum_mean = S1 / n_axis
 
         if variance is None :
@@ -721,7 +736,7 @@ class MonteCarlo:
                                          name=f"Target PDF ({type(distribution).__name__})"))
             fig.show()
 
-        return histograms
+        return histograms, bins_val
 
     def ecdf(self,n=None, n_pool=0, function = lambda x: x, plot=True, distribution=None):
 
@@ -741,7 +756,7 @@ class MonteCarlo:
 
         min_val = np.min(self.min(n, function))
         max_val = np.max(self.max(n, function))
-
+        results = []
 
         if plot :
             fig = go.Figure()
@@ -749,6 +764,7 @@ class MonteCarlo:
 
                 x = np.sort(function(self.samples[i, :n, n_pool]))
                 f = np.arange(1, len(x) + 1) / len(x)
+                results.append((x, f))
                 fig.add_trace(go.Scatter(x=x,
                                          y=f,
                                          mode="lines",
@@ -774,4 +790,5 @@ class MonteCarlo:
             for i in range(self.n_simulations):
                 x = np.sort(function(self.samples[i, :n, n_pool]))
                 f = np.arange(1, len(x) + 1) / len(x)
-        return x,f
+                results.append((x, f))
+        return results
