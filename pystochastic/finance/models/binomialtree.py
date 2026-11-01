@@ -20,7 +20,7 @@ class BinomialTree:
             raise ValueError("The number of steps must be an integer.")
 
         if down > up:
-            raise ValueError("The down rate must be greater than the up rate.")
+            raise ValueError("The up rate must be greater than the down rate.")
 
         self.initial = initial
         self.up = up
