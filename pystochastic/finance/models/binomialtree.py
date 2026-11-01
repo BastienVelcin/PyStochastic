@@ -4,13 +4,13 @@ from plotly import graph_objects as go
 class BinomialTree:
     def __init__(self, initial, up, down, T, steps):
 
-        if not isinstance(initial, (int, np.integer, float, np.floating)) or not np.isfinite(initial) or np.isnan(initial):
+        if not isinstance(initial, (int, np.integer, float, np.floating))and not 0 < initial or not np.isfinite(initial) or np.isnan(initial):
             raise ValueError("The initial value must be a finite real number.")
 
-        if not isinstance(up, (int, np.integer, float, np.floating)) or not 0 <= up or not np.isfinite(up) or np.isnan(up):
+        if not isinstance(up, (int, np.integer, float, np.floating)) or not 0 < up or not np.isfinite(up) or np.isnan(up):
             raise ValueError("The up rate must be a finite real number.")
 
-        if not isinstance(down, (int, np.integer, float, np.floating)) or not 0 <= down or not np.isfinite(down) or np.isnan(down):
+        if not isinstance(down, (int, np.integer, float, np.floating)) or not 0 < down or not np.isfinite(down) or np.isnan(down):
             raise ValueError("The down rate must be a finite real number.")
 
         if not isinstance(T, (int, np.integer, float, np.floating)) or not T > 0 or not np.isfinite(T) or np.isnan(T):
