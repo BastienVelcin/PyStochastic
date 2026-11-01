@@ -94,6 +94,8 @@ class BinomialTreePricer:
 
     def tree(self,option, initial):
 
+        dt = option.maturity / self.steps
+
         up = np.exp(self.volatility * np.sqrt(dt))
         down = np.exp(-self.volatility * np.sqrt(dt))
 
@@ -101,10 +103,12 @@ class BinomialTreePricer:
     
     def price(self, option, initial):
 
+        dt = option.maturity / self.steps
+
         up = np.exp(self.volatility * np.sqrt(dt))
         down = np.exp(-self.volatility * np.sqrt(dt))
         
-        dt = option.maturity / self.steps
+
         _validate_parameters(initial, option.option_type)
 
         tree = self.tree(option, initial)
