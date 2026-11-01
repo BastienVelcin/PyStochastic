@@ -21,7 +21,7 @@ This modules provides a class for a pricer with the Heston model, with the follo
 Examples
 --------
 >> put = EuropeanOption(100, 1, 'put')
->> model = BinomialTreePricer(rf_ir = 0.02, volatility = 0.25, dividend = 0.01, T = 1, steps = 365)
+>> model = HestonPricer(0.05, 0.04, 2, 10, -0.70,0,0)
 >> put.price(model, 90)
 """
 
