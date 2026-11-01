@@ -732,7 +732,7 @@ class MonteCarlo:
                 "The considered dimension must be a strictly positive integer that is inferior to the number of dimensions of the samples."
             )
 
-        if distribution is not None and isinstance(distribution, Distribution):
+        if distribution is not None and not isinstance(distribution, Distribution):
             raise ValueError(
                 "The distribution must be a Distribution object (pystochastic.dist.Distribution)."
             )

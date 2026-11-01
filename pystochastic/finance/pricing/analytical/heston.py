@@ -20,7 +20,7 @@ This modules provides a class for a pricer with the Heston model, with the follo
 
 Examples
 --------
->> put = AmericanOption(100, 1, 'put')
+>> put = EuropeanOption(100, 1, 'put')
 >> model = BinomialTreePricer(rf_ir = 0.02, volatility = 0.25, dividend = 0.01, T = 1, steps = 365)
 >> put.price(model, 90)
 """
@@ -97,7 +97,7 @@ class HestonPricer:
         if not isinstance(variance_volatility, (int, np.integer, float, np.floating)) or variance_volatility <= 0 or not np.isfinite(variance_volatility) or np.isnan(variance_volatility):
             raise ValueError("The volatility parameter of the variance must be a strictly positive float.")
 
-        if not isinstance(correlation, (int, np.integer, float, np.floating)) or not -1 <= correlation <= 1:
+        if not isinstance(correlation, (int, np.integer, float, np.floating)) or not -1 <= correlation <= 1 or not np.isfinite(correlation) or np.isnan(correlation):
             raise ValueError("The correlation parameter must be between -1 and 1.")
 
         if not isinstance(initial_variance, (int, np.integer, float, np.floating)) or initial_variance < 0 or not np.isfinite(initial_variance) or np.isnan(initial_variance):
@@ -121,14 +121,16 @@ class HestonPricer:
                 "The Feller condition is not satisfied. The variance process may reach zero."
             )
 
-    def underlying(self, option, initial):
+    def underlying(self, option, initial, steps = 365):
         return Heston(mu = self.rf_ir - self.dividend,
                       long_variance = self.long_variance,
                       reverting_rate = self.reverting_rate,
                       variance_volatility = self.variance_volatility,
                       correlation = self.correlation,
                       initial_variance = self.initial_variance,
-                      T = option.maturity)
+                      initial = initial,
+                      T = option.maturity,
+                      steps = steps)
 
 
     def price(self, option, initial):

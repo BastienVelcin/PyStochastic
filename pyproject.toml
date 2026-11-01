@@ -17,7 +17,7 @@ dependencies = [
     "plotly",
     "sympy",
     "multiprocess",
-    "pandas"
+    "rich"
 ]
 
 classifiers = [

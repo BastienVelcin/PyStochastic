@@ -78,11 +78,11 @@ class BlackScholesPricer:
 
         self.name = "Black-Scholes Pricer"
 
-    def underlying(self, option, initial):
+    def underlying(self, option, initial, steps = 365):
 
         # Under the risk-neutral measure, the underlying asset is a Geometric Brownian Motion of drift x-> rf_ir * x and diffusion x -> volatility * x.
 
-        return GeometricBrownianMotion(mu = self.rf_ir - self.dividend, volatility = self.volatility, initial = initial, T=option.maturity)
+        return GeometricBrownianMotion(mu = self.rf_ir - self.dividend, volatility = self.volatility, initial = initial, T=option.maturity, steps = steps)
 
     def price(self, option, initial):
 

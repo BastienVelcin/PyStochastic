@@ -64,7 +64,7 @@ def multivariate_normal(mu = [0,0], cov = np.eye(2), n = 1):
     diag_matrix_sqrt = np.diag(np.sqrt(np.real(diag[0])))
     eigv_matrix = np.real(diag[1])
 
-    B = eigv_matrix * diag_matrix_sqrt
+    B = eigv_matrix @ diag_matrix_sqrt
 
     return np.repeat([mu], n, axis=0) - (B @ N).T
 

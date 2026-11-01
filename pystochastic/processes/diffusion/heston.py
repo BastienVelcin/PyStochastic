@@ -124,9 +124,9 @@ class Heston(DiffusionProcess):
             raise ValueError(
                 "The initial price must be strictly positive."
             )
-        if initial_variance <= 0:
+        if initial_variance < 0:
             raise ValueError(
-                "The initial variance must be strictly positive."
+                "The initial variance must be positive."
             )
         if long_variance <= 0:
             raise ValueError(

@@ -13,13 +13,14 @@ class BinomialTree:
         if not isinstance(down, (int, np.integer, float, np.floating)) or not 0 <= down or not np.isfinite(down) or np.isnan(down):
             raise ValueError("The down rate must be a finite real number.")
 
-        if not isinstance(T, (int, np.integer, float, np.floating)) or not np.isfinite(T) or np.isnan(T):
+        if not isinstance(T, (int, np.integer, float, np.floating)) or not T > 0 or not np.isfinite(T) or np.isnan(T):
             raise ValueError("The time horizon must be a finite real number.")
 
-        if not isinstance(steps, (int, np.integer)) or not np.isfinite(steps) or np.isnan(steps):
+        if not isinstance(steps, (int, np.integer)) or not steps > 0 or not np.isfinite(steps) or np.isnan(steps):
             raise ValueError("The number of steps must be an integer.")
 
-
+        if down > up:
+            raise ValueError("The down rate must be greater than the up rate.")
 
         self.initial = initial
         self.up = up
