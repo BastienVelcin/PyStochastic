@@ -1,38 +1,31 @@
 import numpy as np
 from pystochastic.dist import Normal
-from rich.console import Console
-from rich.table import Table
-from rich import box
-from pystochastic.random.setseed import seed as _setseed
+from pystochastic.processes.diffusion import GeometricBrownianMotion
+from pystochastic.finance.pricing.validation import _validate_parameters
+
 """
 ============================================================
-Module BLACK-SCHOLES
+Module BLACK-SCHOLES PRICER
 ============================================================
 
 Description
 -----------
-This module provides a way to price an european option using the Black-Scholes formula.
+This module provides a way to price an european option using the Black-Scholes formula. The pricing is done under the risk-neutral measure.
+This modules provides  a class for a pricer with the Black-Scholes model, with the following methods:
+    - .underlying() : Returns the underlying asset of the option, considered under the risk-neutral measure. For the Black-Scholes model, 
+                      the underlying asset is a Geometric Brownian Motion. The return object is the instance of the GeometricBrownianMotion class
+                      from pystochastic.processes.diffusion.geometricbrownianmotion.
+    - .price() : Price an option under the risk-neutral measure, with a specified spot price.
 
 Examples
 --------
->> model = BlackScholes(rf_ir = 0.02, volatility = 0.25, maturity = 1, strike = 10)
+>> model = BlackScholesPricer(rf_ir = 0.02, volatility = 0.25, dividend = 0.01)
 """
-
-def _validate_parameters(initial , dividend, option_type):
-
-    if not isinstance(initial, (int, np.integer, float, np.floating)) or initial <= 0 or not np.isfinite(initial) or np.isnan(initial):
-        raise ValueError("The initial value must be a strictly positive real number.")
-
-    if not isinstance(dividend, (int, np.integer, float, np.floating)) or dividend < 0 or not np.isfinite(dividend) or np.isnan(dividend):
-        raise ValueError("The continuous dividend rate must be a positive or zero real number.")
-
-    if not option_type in ["call", "put"]:
-        raise ValueError("The option type must be either 'call' or 'put'.")
 
 class BlackScholesPricer:
 
     """
-    Black-Scholes class
+    Black-Scholes Pricer class
 
     The Black-Scholes formula prices a european option (put or call) depending on an underlying asset (with a constant
     mean interest rate and volatility), a risk-free interest rate, a maturity date (in year) and a strike value.
@@ -45,10 +38,8 @@ class BlackScholesPricer:
         Risk-free interest rate of the market.
     volatility : float
         Volatility of the underlying asset.
-    maturity : float
-        Maturity date of the option. The maturity date is given in year.
-    strike : float
-        Strike price of the option.
+    dividend : float
+        Continuous dividend rate of the option.
 
     Attributes
     ----------
@@ -56,13 +47,18 @@ class BlackScholesPricer:
         Risk-free interest rate of the market.
     volatility : float
         Volatility of the underlying asset.
-    maturity : float
-        Maturity date of the option. The maturity date is given in year.
-    strike : float
-        Strike of the option.
+    dividend : float
+        Continuous dividend rate of the option.
+
     Examples
     --------
+    >> call = EuropeanOption(100, 1, 'call')
+    >> model = BlackScholesPricer(rf_ir = 0.02, volatility = 0.25, dividend = 0.01)
+    >> call.price(model, 90)
 
+    Notes
+    -----
+    The computation of the Geometrical Brownian Motion is done under the risk-neutral measure.
     """
 
     def __init__(self, rf_ir, volatility, dividend=0):
@@ -74,24 +70,43 @@ class BlackScholesPricer:
             raise ValueError("The volatility parameter must be a strictly positive float.")
 
         if not isinstance(dividend, (int, np.integer, float, np.floating)) or dividend < 0 or not np.isfinite(dividend) or np.isnan(dividend):
-            raise ValueError("The maturity date must be a positive float.")
+            raise ValueError("The continuous dividend rate must be a positive float.")
 
         self.rf_ir = rf_ir
         self.volatility = volatility
         self.dividend = dividend
 
-        self.name = "Black-Scholes"
+        self.name = "Black-Scholes Pricer"
+
+    def underlying(self, option, initial):
+
+        # Under the risk-neutral measure, the underlying asset is a Geometric Brownian Motion of drift x-> rf_ir * x and diffusion x -> volatility * x.
+
+        return GeometricBrownianMotion(mu = self.rf_ir - self.dividend, volatility = self.volatility, initial = initial, T=option.maturity)
 
     def price(self, option, initial):
+
+        # BLACK - SCHOLES FORMULA FOR AN EUROPEAN CALL
+        #
+        # The call price is given by the following formula:
+        # C = S * exp(-q * T) * N(d1) - K * exp(-r * T) * N(d2)
+        #
+        # The put price is given by the following formula:
+        # P = K * exp(-r * T) * N(-d2) - S * exp(-q * T) * N(-d1)
+        #
+        # Where S is the spot price, r is the risk-free interest rate, q is the continuous dividend rate, T is the maturity date, N(x) is the standard normal
+        # cumulative distribution function, and d1 = (ln(S/K) + (r - q + 0.5 * v^2)T) / (v * sqrt(T)) and d2 = d1 - v * sqrt(T).
+
 
         option_type = option.option_type
         strike = option.strike
         maturity = option.maturity
 
-        _validate_parameters(initial, self.dividend, option_type)
+        _validate_parameters(initial, option_type)
 
         d1 = (np.log(initial / strike) + (self.rf_ir - self.dividend + 0.5 * self.volatility ** 2)*maturity) / (self.volatility * np.sqrt(maturity))
         d2 = d1 - self.volatility * np.sqrt(maturity)
+
         phi = Normal(0,1).cdf
 
         if option_type == "call":

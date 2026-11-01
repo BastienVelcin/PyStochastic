@@ -6,27 +6,26 @@ Module MONTE CARLO
 Description
 -----------
 This module provides some Monte Carlo methods, for both random variables and processes.
-This modules provides two classes, with the following methods:
-    - MonteCarlo : Monte Carlo methods for samples from a given random variable.
-        - .estimate() : Estimates the mean of a function of a given random variable.
-        - .half_width() : Estimates the half-width of the confidence interval of the mean estimator.
-        - .moment() : Estimates a moment of a given order of a function of a samples from a random variable.
-        - .variance() : Estimates the variance of a function of samples from a random variable.
-        - .std() : Estimates the standard deviation of a function of samples from a random variable.
-        - .standard_error() : Estimates the standard error of a function of samples from a random variable.
-        - .confidence_interval() : Estimates the confidence interval of the mean estimator of a given random variable.
-        - .confidence_curve() : Plots the mean estimator and the confidence interval of the mean estimator for all estimations, from 2 samples to the maximum number of samples specified in attributes.
-        - .bias_estimator() : Estimates the bias of the likelihood estimator of E[f(X)] when E[f(X)] is known.
-        - .mse_estimator() : Estimates the mean squared error of the likelihood estimator of E[f(X)] when E[f(X)] is known.
-        - .rmse_estimator() : Estimates the root mean squared error of the likelihood estimator of E[f(X)] when E[f(X)] is known.
-        - .quantile() : Estimates the quantile of order q of a specified array of values.
-        - .min() : Estimates the minimum value from samples.
-        - .max() : Estimates the maximum value from samples.
-        - .median() : Estimates the median value from samples.
-        - .skewness() : Estimates the skewness of a function of samples from a random variable.
-        - .kurtosis() : Estimates the kurtosis of a function of samples from a random variable.
-        - .histogram() : Plots the histogram of samples.
-        - .ecdf() : Plots the empirical cumulative distribution function of samples.
+This modules provides a general Monte-Carlo class, with the following methods:
+    - .estimate() : Estimates the mean of a function of a given random variable.
+    - .half_width() : Estimates the half-width of the confidence interval of the mean estimator.
+    - .moment() : Estimates a moment of a given order of a function of a samples from a random variable.
+    - .variance() : Estimates the variance of a function of samples from a random variable.
+    - .std() : Estimates the standard deviation of a function of samples from a random variable.
+    - .standard_error() : Estimates the standard error of a function of samples from a random variable.
+    - .confidence_interval() : Estimates the confidence interval of the mean estimator of a given random variable.
+    - .confidence_curve() : Plots the mean estimator and the confidence interval of the mean estimator for all estimations, from 2 samples to the maximum number of samples specified in attributes.
+    - .bias_estimator() : Estimates the bias of the likelihood estimator of E[f(X)] when E[f(X)] is known.
+    - .mse_estimator() : Estimates the mean squared error of the likelihood estimator of E[f(X)] when E[f(X)] is known.
+    - .rmse_estimator() : Estimates the root mean squared error of the likelihood estimator of E[f(X)] when E[f(X)] is known.
+    - .quantile() : Estimates the quantile of order q of a specified array of values.
+    - .min() : Estimates the minimum value from samples.
+    - .max() : Estimates the maximum value from samples.
+    - .median() : Estimates the median value from samples.
+    - .skewness() : Estimates the skewness of a function of samples from a random variable.
+    - .kurtosis() : Estimates the kurtosis of a function of samples from a random variable.
+    - .histogram() : Plots the histogram of samples.
+    - .ecdf() : Plots the empirical cumulative distribution function of samples.
 
 
 Examples
