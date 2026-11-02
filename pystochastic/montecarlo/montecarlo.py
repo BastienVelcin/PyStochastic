@@ -232,10 +232,8 @@ class MonteCarlo:
         """
         Variance method.
 
-        Provides an estimation of the variance of a function of samples from a random variable with the
-        Konig-Huygens formula :
-                                       Var(f(X)) = E(f(X)^2) - E(f(X))^2
-        Both corrected and uncorrected variance can be computed with this method.
+        Provides an estimation of the variance of a function of samples from a random variable using the NumPy variance
+        function. Both corrected and uncorrected variance can be computed with this method.
 
         Parameters
         ----------
@@ -258,11 +256,8 @@ class MonteCarlo:
             raise ValueError(
                 "The correction argument must be a boolean."
             )
-
-        var = self.estimate(n, lambda x : function(x)**2) - (self.estimate(n, lambda x : function(x)))**2
-
-        if correction:
-            return n*var/(n-1)
+        values = function(self.samples[:, :n])
+        var = np.var(values, axis=1, ddof=int(correction))
 
         return var
 
@@ -359,10 +354,11 @@ class MonteCarlo:
 
         n = self._validate_n(n)
 
-        if variance is not None or not isinstance(variance, (int, np.integer, float, np.floating, None)) or variance < 0:
-            raise ValueError(
-                "The variance must be a positive real number or None."
-            )
+        if variance is not None:
+            if not isinstance(variance, (int, np.integer, float, np.floating)) or not np.isfinite(variance)or variance < 0:
+                raise ValueError(
+                    "The variance must be a positive finite real number or None."
+                )
 
         if not 0 < confidence < 1:
             raise ValueError(
@@ -539,7 +535,7 @@ class MonteCarlo:
 
         n = self._validate_n(n)
 
-        if not isinstance(q, (int, np.integer, float, np.floating)) or not (0 <= q < 1):
+        if not isinstance(q, (int, np.integer, float, np.floating)) or not (0 <= q <= 1):
             raise ValueError(
                 "The quantile must be a real number between 0 and 1."
             )

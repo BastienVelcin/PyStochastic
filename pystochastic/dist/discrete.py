@@ -303,7 +303,7 @@ class Bernoulli(DiscreteDistribution):
         return self.p * self.q
 
     def entropy(self):
-        return -self.q*np.log(self.q) - self.p*np.log(self.p) if not self.p in [0,1] else None
+        return -self.q*np.log(self.q) - self.p*np.log(self.p) if not self.p in [0,1] else 0
 
     def support(self):
         return {0,1}
@@ -388,7 +388,7 @@ class Rademacher(DiscreteDistribution):
         return 4*self.p * (1 - self.p)
 
     def entropy(self):
-        return -self.q*np.log(self.q) - self.p*np.log(self.p) if not self.p in [0,1] else None
+        return -self.q*np.log(self.q) - self.p*np.log(self.p) if not self.p in [0,1] else 0
 
     def support(self):
         return {-1,1}

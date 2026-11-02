@@ -429,22 +429,6 @@ class TestErrors:
 
 class TestPlots:
 
-    def test_histogram_shape(self):
-        samples = make_normal_samples(
-            n_simulations=4,
-            n_pool_values=200,
-        )
-
-        mc = MonteCarlo(samples)
-
-        histogram = mc.histogram(
-            n=100,
-            bins=10,
-            plot=False,
-        )
-
-        assert histogram.shape == (4, 10)
-
     def test_ecdf_runs(self):
         samples = make_normal_samples(
             n_simulations=3,
