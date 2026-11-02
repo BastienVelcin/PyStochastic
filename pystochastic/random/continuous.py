@@ -58,10 +58,6 @@ def uniform(a=0,b=1,n=1):
     Examples
     --------
     >> uniform(a=0,b=1,n=10)
-
-    Notes
-    -----
-    If a > b, the function automatically swaps the bounds.
     """
 
     if n < 1 or not isinstance(n, (int, np.integer)):

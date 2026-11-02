@@ -697,9 +697,9 @@ class Geometric(DiscreteDistribution):
 
     def __init__(self,p=0.5):
 
-        if not isinstance(p, (int, np.integer, float, np.floating)) or not np.isfinite(p) or np.isnan(p) or not 0 < p <= 1:
+        if not isinstance(p, (int, np.integer, float, np.floating)) or not np.isfinite(p) or np.isnan(p) or not 0 < p < 1:
             raise ValueError(
-                "The success probability must be a real number between 0 (strictly) and 1."
+                "The success probability must be a real number strictly between 0 and 1."
             )
 
         self.p = p
@@ -781,9 +781,9 @@ class NegativeBinomial(DiscreteDistribution):
 
     def __init__(self,p=0.5,n=1):
 
-        if not isinstance(p, (int, np.integer, float, np.floating)) or not np.isfinite(p) or np.isnan(p) or not 0 < p <= 1:
+        if not isinstance(p, (int, np.integer, float, np.floating)) or not np.isfinite(p) or np.isnan(p) or not 0 < p < 1:
             raise ValueError(
-                "The success probability must be a real number between 0 (strictly) and 1."
+                "The success probability must be a real number stricly between 0 and 1."
             )
 
         if not isinstance(n, (int, np.integer)) or not np.isfinite(n) or np.isnan(n) or n < 1:

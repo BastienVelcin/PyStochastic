@@ -31,6 +31,13 @@ import numpy as np
 from pystochastic.random.continuous import uniform, exponential
 from math import comb
 
+def _validate_n(n):
+    if not isinstance(n, (int, np.integer)) or not np.isfinite(n) or np.isnan(n) or n <= 0:
+        raise ValueError(
+            "The number of samples must be a strictly positive integer."
+        )
+
+
 def duniform(N=2,n=1):
 
     """
@@ -55,12 +62,14 @@ def duniform(N=2,n=1):
     >> duniform(N=3,n=10)
     """
 
-    if n < 1 or not isinstance(n, (int, np.integer)):
+    if not isinstance(N, (int, np.integer)) or not np.isfinite(N) or np.isnan(N) or N <= 1:
         raise ValueError(
-            "The number of samples must be a strictly positive integer."
+            "The number of outcome values must be an integer strictly greater than 1."
         )
 
-    return (np.ceil(uniform(0, N, n ))).astype(int)
+    _validate_n(n)
+
+    return get_rng().integers(1, N + 1, size=n)
 
 def bernoulli(p=0.5,n=1):
 
@@ -86,17 +95,14 @@ def bernoulli(p=0.5,n=1):
     >> bernoulli(p=0.6,n=8)
     """
 
-    if not 0 <= p <= 1:
+    if not isinstance(p, (int, np.integer, float, np.floating)) or not np.isfinite(p) or np.isnan(p) or not 0 <= p <= 1:
         raise ValueError(
-            "The success probability must be between 0 and 1."
+            "The success probability must be a real number between 0 and 1."
         )
 
-    if n < 1 or not isinstance(n, (int, np.integer)):
-        raise ValueError(
-            "The number of samples must be a strictly positive integer."
-        )
+    _validate_n(n)
 
-    return (duniform(2, n) < p).astype(int)
+    return (uniform(0,1, n) < p).astype(int)
 
 def rademacher(p=0.5, n=1):
 
@@ -127,15 +133,12 @@ def rademacher(p=0.5, n=1):
     of just p=1/2.
     """
 
-    if not 0 <= p <= 1:
+    if not isinstance(p, (int, np.integer, float, np.floating)) or not np.isfinite(p) or np.isnan(p) or not 0 <= p <= 1:
         raise ValueError(
-            "The gain probability must be between 0 and 1."
+            "The success probability must be a real number between 0 and 1."
         )
 
-    if n < 1 or not isinstance(n, (int, np.integer)):
-        raise ValueError(
-            "The number of samples must be a strictly positive integer."
-        )
+    _validate_n(n)
 
     return bernoulli(p,n)*2-1
 
@@ -166,22 +169,19 @@ def binomial(p,k,n=1):
     >> binomial(p=0.6,k=10,n=3)
     """
 
-    if not 0 <= p <= 1:
+    if not isinstance(p, (int, np.integer, float, np.floating)) or not np.isfinite(p) or np.isnan(p) or not 0 <= p <= 1:
         raise ValueError(
-            "The success probability must be between 0 and 1."
+            "The success probability must be a real number between 0 and 1."
         )
 
-    if k < 1 or type(n) != int:
+    if not isinstance(k, (int, np.integer)) or not np.isfinite(k) or np.isnan(k) or k < 1:
         raise ValueError(
-            "The number of samples must be a strictly positive integer."
+            "The number of repetition must be a strictly positive integer."
         )
 
-    if n < 1 or not isinstance(n, (int, np.integer)):
-        raise ValueError(
-            "The number of samples must be a strictly positive integer."
-        )
+    _validate_n(n)
 
-    ber = np.array([bernoulli(p,n) for _ in range(k)])
+    ber = (uniform(0, 1, k*n).reshape(k, n) < p)
     return np.sum(ber,axis=0)
 
 def poisson(lam=1,n=1):
@@ -208,15 +208,13 @@ def poisson(lam=1,n=1):
     >> poisson(lam=4,n=12)
     """
 
-    if lam <= 0:
+    if not isinstance(lam, (int, np.integer, float, np.floating)) or not np.isfinite(lam) or np.isnan(
+            lam) or not lam > 0:
         raise ValueError(
-            "The rate parameter must be greater than 0."
+            "The intensity must be a strictly positive real number."
         )
 
-    if n < 1 or not isinstance(n, (int, np.integer)):
-        raise ValueError(
-            "The number of samples must be a strictly positive integer."
-        )
+    _validate_n(n)
 
 
     count = np.zeros(n, dtype=int)
@@ -269,30 +267,27 @@ def hypergeometric(N=2,k=1,m=1,n=1):
     >> hypergeometric(N=12,k=6,m=3,n=10)
     """
 
-    if not isinstance(N, (int, np.integer)) or N < 1:
+    if not isinstance(N, (int, np.integer)) or not np.isfinite(N) or np.isnan(N) or N < 1:
         raise ValueError(
             "The population size must be a strictly positive integer."
         )
 
-    if type(m) != int or m < 0:
+    if not isinstance(m, (int, np.integer)) or not np.isfinite(m) or np.isnan(m) or m < 0:
         raise ValueError(
             "The number of success states in the considered population must be a positive integer."
         )
 
-    if not isinstance(k, (int, np.integer)) or k < 0:
+    if not isinstance(k, (int, np.integer)) or not np.isfinite(k) or np.isnan(k) or k < 0:
         raise ValueError(
             "The number of draws must be a positive integer."
         )
 
-    if not (0 <= k <= N and 0 <= m <= N):
+    if not (0 <= k <= N and 0 <= m < N):
         raise ValueError(
             "The parameters must satisfy 0 <= k <= N and 0 <= m < N."
         )
 
-    if n < 1 or not isinstance(n, (int, np.integer)):
-        raise ValueError(
-            "The number of samples must be a strictly positive integer."
-        )
+    _validate_n(n)
 
     probas = np.array([comb(m,i)*comb(N-m,k-i)/comb(N,k) for i in range(k+1)])
 
@@ -313,7 +308,7 @@ def geometric(p=0.5,n=1):
     Parameters
     ----------
     p : float
-        Success probability. Must be between 0 and 1.
+        Success probability. Must be between 0 and 1 strictly.
     n : int
         Number of samples. Must be a strictly positive integer.
 
@@ -327,18 +322,17 @@ def geometric(p=0.5,n=1):
     >> geometric(p=0.4,n=10)
     """
 
-    if not 0 <= p <= 1:
+    if not isinstance(p, (int, np.integer, float, np.floating)) or not np.isfinite(p) or np.isnan(p) or not 0 < p < 1:
         raise ValueError(
-            "The success probability must be between 0 and 1."
+            "The success probability must be a real number strictly between 0 and 1."
         )
 
-    if n < 1 or not isinstance(n, (int, np.integer)):
-        raise ValueError(
-            "The number of samples must be a strictly positive integer."
-        )
+    _validate_n(n)
 
-    U = np.random.rand(n)
-    return np.ceil(np.log(1 - U) / np.log(1 - p)).astype(int)
+    U = 1 - uniform(0,1,n)
+
+    # We use log1p(x) instead of log(1+x) for better approximations.
+    return np.ceil(np.log(U) / np.log1p(-p)).astype(int)
 
 def negative_binomial(p=0.5,k=1,n=1):
 
@@ -367,22 +361,19 @@ def negative_binomial(p=0.5,k=1,n=1):
     >> negative_binomial(p=0.4,k=5,n=10)
     """
 
-    if not 0 <= p <= 1:
+    if not isinstance(p, (int, np.integer, float, np.floating)) or not np.isfinite(p) or np.isnan(p) or not 0 < p < 1:
         raise ValueError(
-            "The success probability must be between 0 and 1."
+            "The success probability must be a real number strictly between 0 and 1."
         )
 
-    if type(k) != int or k < 1:
+    if not isinstance(k, (int, np.integer)) or not np.isfinite(k) or np.isnan(k) or k < 1:
         raise ValueError(
             "The number of target success occurrence must be a strictly positive integer."
         )
 
-    if n < 1 or not isinstance(n, (int, np.integer)):
-        raise ValueError(
-            "The number of samples must be a strictly positive integer."
-        )
+    _validate_n(n)
 
-    G = np.array([geometric(p,n) for _ in range(k)])
+    G = geometric(p,n*k).reshape(n,k)
     return np.sum(G,axis=0)
 
 def yule_simon(rho=1,n=1):
@@ -409,16 +400,13 @@ def yule_simon(rho=1,n=1):
     >> yule_simon(rho=2,n=7)
     """
 
-    if rho <= 0:
+    if not isinstance(rho, (int, np.integer, float, np.floating)) or not np.isfinite(rho) or np.isnan(rho) or rho <= 0:
         raise ValueError(
-            "The shape parameter must be strictly positive."
+            "The shape parameter must be a strictly positive real number."
         )
 
-    if n < 1 or not isinstance(n, (int, np.integer)):
-        raise ValueError(
-            "The number of samples must be a strictly positive integer."
-        )
-
+    _validate_n(n)
     W = exponential(rho,n)
+    U = 1 - uniform(0, 1, n)
 
-    return np.array([geometric(np.exp(-W[i])).item() for i in range(n)])
+    return np.maximum(np.ceil(np.log(U) / np.log(-np.expm1(-W))), 1).astype(int)
