@@ -55,7 +55,7 @@ class MonteCarlo:
     Parameters
     ----------
     samples : np.ndarray
-        Independent samples from a given distribution.
+        Independent samples of the form (n_simulations, n_samples, n_dimensions) or (n_samples, n_dimensions)
     n_simulations : None or int
         Number of used simulations for the estimation. If None, it is set to the number of samples. Must be a integer greater than 2 and inferior to the number of samples.
 
@@ -90,7 +90,6 @@ class MonteCarlo:
             raise ValueError("Samples must contain only finite values.")
 
         self.samples = np.atleast_3d(samples)
-        self.samples = np.atleast_3d(samples)
         self.n_simulations = self.samples.shape[0]
         self.n_pool_values = self.samples.shape[1]
         self.dim = self.samples.shape[2]
@@ -102,7 +101,7 @@ class MonteCarlo:
 
         if not n >= 2 or not isinstance(n, (int, np.integer)):
             raise ValueError(
-                "The number of considered samples n must be strictly an integer strictly greater than 2."
+                "The number of considered samples n must be strictly an integer greater than 2."
             )
 
         if not n <= self.n_pool_values:
@@ -220,7 +219,7 @@ class MonteCarlo:
 
         n = self._validate_n(n)
 
-        if order < 1 or not isinstance(order, int):
+        if order < 1 or not isinstance(order, (int, np.integer)):
             raise ValueError(
                 "The order must be a strictly positive integer."
             )
@@ -254,6 +253,11 @@ class MonteCarlo:
         """
 
         n = self._validate_n(n)
+
+        if not isinstance(correction, bool):
+            raise ValueError(
+                "The correction argument must be a boolean."
+            )
 
         var = self.estimate(n, lambda x : function(x)**2) - (self.estimate(n, lambda x : function(x)))**2
 
@@ -350,10 +354,15 @@ class MonteCarlo:
         Confidence Curve method.
 
         Plot the mean estimator and the confidence interval of the mean estimator for all estimations, from 2 samples to
-        the maximum number of samples specified in attributes
+        the maximum number of samples specified in attributes. The function must return a scalar in this case.
         """
 
         n = self._validate_n(n)
+
+        if variance is not None or not isinstance(variance, (int, np.integer, float, np.floating, None)) or variance < 0:
+            raise ValueError(
+                "The variance must be a positive real number or None."
+            )
 
         if not 0 < confidence < 1:
             raise ValueError(
@@ -530,6 +539,10 @@ class MonteCarlo:
 
         n = self._validate_n(n)
 
+        if not isinstance(q, (int, np.integer, float, np.floating)) or not (0 <= q < 1):
+            raise ValueError(
+                "The quantile must be a real number between 0 and 1."
+            )
         return np.quantile(function(self.samples[:,:n]),q, axis=1)
 
     def min(self,n = None,function = lambda x: x):
@@ -779,7 +792,11 @@ class MonteCarlo:
             )
 
             if distribution is not None:
-                t = np.linspace(min_val, max_val, int(1000 * np.floor(max_val - min_val)))
+                if min_val != max_val:
+                    t = np.linspace(min_val, max_val, 1000)
+                else:
+                    t = np.linspace(min_val-1, min_val+1, 100)
+
                 fig.add_trace(go.Scatter(x=t,
                                          y=distribution.cdf(t),
                                          mode="lines",
