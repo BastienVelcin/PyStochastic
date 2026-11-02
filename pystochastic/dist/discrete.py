@@ -303,7 +303,7 @@ class Bernoulli(DiscreteDistribution):
         return self.p * self.q
 
     def entropy(self):
-        return -self.q*np.log(self.q) - self.p*np.log(self.p)
+        return -self.q*np.log(self.q) - self.p*np.log(self.p) if not self.p in [0,1] else None
 
     def support(self):
         return {0,1}
@@ -371,7 +371,7 @@ class Rademacher(DiscreteDistribution):
             print(f"| {self.q} if -1 <= x < 1")
             print(f"| 1 for x >= 1")
         else:
-            if x < 0:
+            if x < -1:
                 return 0
             elif -1 <= x < 1:
                 return self.q
@@ -388,7 +388,7 @@ class Rademacher(DiscreteDistribution):
         return 4*self.p * (1 - self.p)
 
     def entropy(self):
-        return -self.q*np.log(self.q) - self.p*np.log(self.p)
+        return -self.q*np.log(self.q) - self.p*np.log(self.p) if not self.p in [0,1] else None
 
     def support(self):
         return {-1,1}
@@ -609,7 +609,7 @@ class Hypergeometric(DiscreteDistribution):
                 "The number of success states in the considered population must be a positive integer."
             )
 
-        if not isinstance(K, (int, np.integer, float, np.floating)) or not np.isfinite(K) or np.isnan(K) or K < 0:
+        if not isinstance(K, (int, np.integer)) or not np.isfinite(K) or np.isnan(K) or K < 0:
             raise ValueError(
                 "The number of draws must be a positive integer."
             )
@@ -659,7 +659,7 @@ class Hypergeometric(DiscreteDistribution):
         return discrete.hypergeometric(self.N, self.K, self.m, n)
 
     def mean(self):
-        return self.m * self.K / self.N
+        return self.m * self.K / self.N if self.N >= 2 else None
 
     def variance(self):
         return self.m * (self.K/self.N) * ((self.N-self.K)/self.N) * ((self.N-self.m)/(self.N-1))
@@ -746,7 +746,7 @@ class Geometric(DiscreteDistribution):
         return self.q/(self.p**2)
 
     def entropy(self):
-        return (-self.q*np.log(self.q) - self.p * np.log(self.p))/self.p
+        return (-self.q*np.log(self.q) - self.p * np.log(self.p))/self.p if not self.p in [0,1] else None
 
     def support(self):
         return "N*"

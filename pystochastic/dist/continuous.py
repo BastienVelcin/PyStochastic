@@ -585,7 +585,7 @@ class Weibull(ContinuousDistribution):
             print(f"| 0 for x < 0")
             print(f"| 1 - exp(-(x/{self.l})^{self.k}) for x >= 0")
         else:
-            return 1 - np.exp(-(x/self.l)**self.k)
+            return 1 - np.exp(-(x/self.l)**self.k) if x >= 0 else 0
 
     def sample(self, n=1):
         return continuous.weibull(self.k, self.l, n)
