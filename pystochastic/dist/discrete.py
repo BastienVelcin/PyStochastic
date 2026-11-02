@@ -482,7 +482,7 @@ class Binomial(DiscreteDistribution):
         return self.n * self.p * self.q
 
     def entropy(self):
-        return 0.5*np.log(2*np.pi*self.n*np.e*self.p*self.q)
+        return None
 
     def support(self):
         return set(range(self.n+1))
