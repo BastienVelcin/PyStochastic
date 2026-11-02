@@ -49,17 +49,6 @@ The available distributions are :
     - Pareto
     - Rayleigh
 
-    DISCRETE DISTRIBUTIONS
-    - Discrete-Time Uniform
-    - Bernoulli
-    - Rademacher
-    - Binomial
-    - Poisson
-    - Hypergeometric
-    - Geometric
-    - Negative Binomial
-    - Yule Simon
-
 Examples
 --------
 >> N = Normal(0,1,10) #Normal distribution with mean 0 and standard deviation 1
@@ -173,6 +162,16 @@ class Uniform(ContinuousDistribution):
 
     def __init__(self,a=0,b=1):
 
+        if not isinstance(a, (int, np.integer, float, np.floating)) or not np.isfinite(a) or np.isnan(a):
+            raise ValueError(
+                "The lower bound must be a real number."
+            )
+
+        if not isinstance(b, (int, np.integer, float, np.floating)) or not np.isfinite(b) or np.isnan(b):
+            raise ValueError(
+                "The upper bound must be a real number."
+            )
+
         if a == b:
             raise ValueError(
                 "The lower and upper bound must be different."
@@ -249,7 +248,7 @@ class Exponential(ContinuousDistribution):
 
     def __init__(self,alpha=1):
 
-        if alpha <=0:
+        if not isinstance(alpha, (int, np.integer, float, np.floating)) or not np.isfinite(alpha) or np.isnan(alpha) or alpha <=0:
             raise ValueError(
                 "The parameter must be greater than 0."
             )
@@ -325,9 +324,14 @@ class Normal(ContinuousDistribution):
 
     def __init__(self,mu=0,var=1):
 
-        if var <=0:
+        if not isinstance(mu, (int, np.integer, float, np.floating)) or not np.isfinite(mu) or np.isnan(mu):
             raise ValueError(
-                "The variance must be greater than 0."
+                "The mean parameter must be a real number."
+            )
+
+        if not isinstance(var, (int, np.integer, float, np.floating)) or not np.isfinite(var) or np.isnan(var) or var <=0:
+            raise ValueError(
+                "The variance parameter must be greater than 0."
             )
 
         self.mu = mu
@@ -393,12 +397,12 @@ class Gamma(ContinuousDistribution):
 
     def __init__(self,k=1,theta=1):
 
-        if k <=0:
+        if not isinstance(k, (int, np.integer, float, np.floating)) or k <= 0 or not np.isfinite(k) or np.isnan(k):
             raise ValueError(
                 "The shape parameter must be greater than 0."
             )
 
-        if theta <=0:
+        if not isinstance(theta, (int, np.integer, float, np.floating)) or theta <= 0 or not np.isfinite(theta) or np.isnan(theta):
             raise ValueError(
                 "The rate parameter must be greater than 0."
             )
@@ -430,13 +434,13 @@ class Gamma(ContinuousDistribution):
         return continuous.gamma(self.k, self.theta, n)
 
     def mean(self):
-        return self.k/self.theta
+        return self.k / self.theta
 
     def variance(self):
-        return self.k/(self.theta**2)
+        return self.k/(self.theta ** 2)
 
     def entropy(self):
-        return self.k/self.theta + (1-self.k)*np.log(1/self.theta) + np.log(scipy.special.gamma(self.k)) + (1+self.k)*scipy.special.digamma(self.k)
+        return self.k - np.log(self.theta) + scipy.special.gammaln(self.k) + (1 - self.k) * scipy.special.digamma(self.k)
 
     def support(self):
         return (0,np.inf)
@@ -471,13 +475,13 @@ class Beta(ContinuousDistribution):
 
     def __init__(self,a=1,b=1):
 
-        if a <= 0:
+        if not isinstance(a, (int, np.integer, float, np.floating)) or not np.isfinite(a) or np.isnan(a) or a <= 0:
             raise ValueError(
-                "The first shape parameter must be greater than 0."
+                "The first shape parameter must be a strictly positive real number."
             )
-        if b <= 0:
+        if not isinstance(b, (int, np.integer, float, np.floating)) or not np.isfinite(b) or np.isnan(b) or b <= 0:
             raise ValueError(
-                "The second shape parameter must be greater than 0."
+                "The second shape parameter must be a strictly positive real number."
             )
 
         self.a = a
@@ -552,14 +556,14 @@ class Weibull(ContinuousDistribution):
 
     def __init__(self,k=1,l=1):
 
-        if k <=0:
+        if not isinstance(k, (int, np.integer, float, np.floating)) or not np.isfinite(k) or np.isnan(k) or k <=0:
             raise ValueError(
-                "The shape parameter must be greater than 0."
+                "The shape parameter must be a strictly positive real number."
             )
 
-        if l <=0:
+        if not isinstance(l, (int, np.integer, float, np.floating)) or not np.isfinite(l) or np.isnan(l) or l <=0:
             raise ValueError(
-                "The scale parameter must be greater than 0."
+                "The scale parameter must be a strictly positive real number"
             )
 
         self.k = k
@@ -632,14 +636,19 @@ class Frechet(ContinuousDistribution):
 
     def __init__(self,a=1,s=1,m=0):
 
-        if a <= 0:
+        if not isinstance(a, (int, np.integer, float, np.floating)) or not np.isfinite(a) or np.isnan(a) or a <= 0:
             raise ValueError(
-                "The shape parameter must be greater than 0."
+                "The shape parameter must be a strictly positive real number."
             )
 
-        if s <= 0:
+        if not isinstance(s, (int, np.integer, float, np.floating)) or not np.isfinite(s) or np.isnan(s) or s <= 0:
             raise ValueError(
-                "The scale parameter must be greater than 0."
+                "The scale parameter must be a strictly positive real number."
+            )
+
+        if not isinstance(m, (int, np.integer, float, np.floating)) or not np.isfinite(m) or np.isnan(m):
+            raise ValueError(
+                "The position parameter must be a real number."
             )
 
         self.a = a
@@ -715,9 +724,14 @@ class Cauchy(ContinuousDistribution):
 
     def __init__(self,x_0=0,a=1):
 
-        if a <= 0:
+        if not isinstance(x_0, (int, np.integer, float, np.floating)) or not np.isfinite(x_0) or np.isnan(x_0):
             raise ValueError(
-                "The scale parameter must be greater than 0."
+                "The position parameter must be a real number."
+            )
+
+        if not isinstance(a, (int, np.integer, float, np.floating)) or not np.isfinite(a) or np.isnan(a) or a <= 0:
+            raise ValueError(
+                "The scale parameter must be a strictly positive real number."
             )
 
         self.x_0 = x_0
@@ -782,9 +796,14 @@ class Gumbel(ContinuousDistribution):
 
     def __init__(self,mu=0,beta=1):
 
-        if beta <= 0:
+        if not isinstance(mu, (int, np.integer, float, np.floating)) or not np.isfinite(mu) or np.isnan(mu):
             raise ValueError(
-                "The scale parameter must be greater than 0."
+                "The position parameter must be a real number."
+            )
+
+        if not isinstance(beta, (int, np.integer, float, np.floating)) or not np.isfinite(beta) or np.isnan(beta) or beta <= 0:
+            raise ValueError(
+                "The scale parameter must be a strictly positive real number."
             )
 
         self.mu = mu
@@ -850,14 +869,14 @@ class Kumaraswamy(ContinuousDistribution):
 
     def __init__(self,a=1,b=1):
 
-        if a <= 0:
+        if not isinstance(a, (int, np.integer, float, np.floating)) or not np.isfinite(a) or np.isnan(a) or a <= 0:
             raise ValueError(
-                "The first shape parameter must be greater than 0."
+                "The first shape parameter must be a strictly positive real number."
             )
 
-        if b <= 0:
+        if not isinstance(b, (int, np.integer, float, np.floating)) or not np.isfinite(b) or np.isnan(b) or b <= 0:
             raise ValueError(
-                "The second shape parameter must be greater than 0."
+                "The second shape parameter must be a strictly positive real number."
             )
 
         self.a = a
@@ -932,12 +951,12 @@ class Fisher(ContinuousDistribution):
 
     def __init__(self,d1=1,d2=1):
         
-        if d1 < 1 or not isinstance(d1, (int, np.integer)):
+        if not isinstance(d1, (int, np.integer)) or not np.isfinite(d1) or np.isnan(d1) or d1 < 1:
             raise ValueError(
                 "The first degree of freedom must be a strictly positive integer."
             )
 
-        if d2 < 1 or not isinstance(d1, (int, np.integer)):
+        if not isinstance(d2, (int, np.integer)) or not np.isfinite(d2) or np.isnan(d2) or d2 < 1:
             raise ValueError(
                 "The second degree of freedom must be a strictly positive integer."
             )
@@ -1012,14 +1031,14 @@ class Pareto(ContinuousDistribution):
 
     def __init__(self,x_m=1,k=1):
 
-        if x_m <= 0:
+        if not isinstance(x_m, (int, np.integer, float, np.floating)) or not np.isfinite(x_m) or np.isnan(x_m) or x_m <= 0:
             raise ValueError(
-                "The position parameter must be greater than 0."
+                "The position parameter must be a strictly positive real number."
             )
 
-        if k <= 0:
+        if not isinstance(k, (int, np.integer, float, np.floating)) or not np.isfinite(k) or np.isnan(k) or k <= 0:
             raise ValueError(
-                "The shape parameter must be greater than 0."
+                "The shape parameter must be a strictly positive real number."
             )
 
         self.x_m = x_m
@@ -1088,9 +1107,9 @@ class Rayleigh(ContinuousDistribution):
 
     def __init__(self,s=1):
 
-        if s <= 0:
+        if not isinstance(s, (int, np.integer, float, np.floating)) or not np.isfinite(s) or np.isnan(s) or s <= 0:
             raise ValueError(
-                "The scale parameter must be greater than 0."
+                "The scale parameter must be a strictly positive real number."
             )
 
         self.s = s

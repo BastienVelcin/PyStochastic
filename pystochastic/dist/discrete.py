@@ -174,7 +174,7 @@ class DUniform(DiscreteDistribution):
 
     def __init__(self,N=2):
 
-        if N <= 1 or not isinstance(N, (int, np.integer)):
+        if not isinstance(N, (int, np.integer)) or not np.isfinite(N) or np.isnan(N) or N <= 1:
             raise ValueError(
                 "The number of outcome values must be an integer strictly greater than 1."
             )
@@ -252,9 +252,9 @@ class Bernoulli(DiscreteDistribution):
 
     def __init__(self,p=0.5):
 
-        if not 0 <= p <= 1:
+        if not isinstance(p, (int, np.integer, float, np.floating)) or not np.isfinite(p) or np.isnan(p) or not 0 <= p <= 1:
             raise ValueError(
-                "The success probability must be between 0 and 1."
+                "The success probability must be a real number between 0 and 1."
             )
 
         self.p = p
@@ -286,7 +286,7 @@ class Bernoulli(DiscreteDistribution):
             print(f"| {self.q} if 0 <= x < 1")
             print(f"| 1 for x >= 1")
         else:
-            if x < -1:
+            if x < 0:
                 return 0
             elif 0 <= x < 1:
                 return self.q
@@ -336,9 +336,9 @@ class Rademacher(DiscreteDistribution):
 
     def __init__(self,p=0.5):
 
-        if not 0 <= p <= 1:
+        if not isinstance(p, (int, np.integer, float, np.floating)) or not np.isfinite(p) or np.isnan(p) or not 0 <= p <= 1:
             raise ValueError(
-                "The success probability must be between 0 and 1."
+                "The success probability must be a real number between 0 and 1."
             )
 
         self.p = p
@@ -379,13 +379,13 @@ class Rademacher(DiscreteDistribution):
                 return 1
 
     def sample(self, n=1):
-        return discrete.bernoulli(self.p, n)
+        return discrete.rademacher(self.p, n)
 
     def mean(self):
         return 2*self.p - 1
 
     def variance(self):
-        return 1
+        return 4*self.p * (1 - self.p)
 
     def entropy(self):
         return -self.q*np.log(self.q) - self.p*np.log(self.p)
@@ -425,12 +425,12 @@ class Binomial(DiscreteDistribution):
 
     def __init__(self,p=0.5,n=2):
 
-        if not 0 <= p <= 1:
+        if not isinstance(p, (int, np.integer, float, np.floating)) or not np.isfinite(p) or np.isnan(p) or not 0 <= p <= 1:
             raise ValueError(
-                "The success probability must be between 0 and 1."
+                "The success probability must be a real number between 0 and 1."
             )
 
-        if  n < 1 or not isinstance(n, (int, np.integer)):
+        if not isinstance(n, (int, np.integer)) or not np.isfinite(n) or np.isnan(n) or  n < 1:
             raise ValueError(
                 "The number of repetition must be a strictly positive integer."
             )
@@ -465,10 +465,12 @@ class Binomial(DiscreteDistribution):
             print(f"| IncBeta({self.q}, {self.n} - floor(x), 1 + floor(x) ) if 0 <= x < n")
             print(f"| 1 for x >= n")
         else:
-            if 0 <= x:
+            if x < 0:
+                return 0
+            if 0 <= x < self.n:
                 return scipy.special.betainc(self.n-np.floor(x), 1+np.floor(x), self.q)
             else:
-                return 1 if x >= self.n else 0
+                return 1
 
     def sample(self, n=1):
         return discrete.binomial(self.p, self.n, n)
@@ -511,9 +513,9 @@ class Poisson(DiscreteDistribution):
 
     def __init__(self,lam=0.5):
 
-        if not lam > 0:
+        if not isinstance(lam, (int, np.integer, float, np.floating)) or not np.isfinite(lam) or np.isnan(lam) or not lam > 0:
             raise ValueError(
-                "The intensity must be strictly positive."
+                "The intensity must be a strictly positive real number."
             )
 
         self.lam = lam
@@ -597,17 +599,17 @@ class Hypergeometric(DiscreteDistribution):
 
     def __init__(self,N=2,K=1,m=1):
 
-        if not isinstance(N, (int, np.integer)) or N < 1:
+        if not isinstance(N, (int, np.integer)) or not np.isfinite(N) or np.isnan(N) or N < 1:
             raise ValueError(
                 "The population size must be a strictly positive integer."
             )
 
-        if type(m) != int or m < 0:
+        if not isinstance(m, (int, np.integer)) or not np.isfinite(m) or np.isnan(m) or m < 0:
             raise ValueError(
                 "The number of success states in the considered population must be a positive integer."
             )
 
-        if not isinstance(K, (int, np.integer)) or K < 0:
+        if not isinstance(K, (int, np.integer, float, np.floating)) or not np.isfinite(K) or np.isnan(K) or K < 0:
             raise ValueError(
                 "The number of draws must be a positive integer."
             )
@@ -620,6 +622,7 @@ class Hypergeometric(DiscreteDistribution):
         self.N = N
         self.K = K
         self.m = m
+
     def pmf(self, k=None):
 
         if k is None:
@@ -694,9 +697,9 @@ class Geometric(DiscreteDistribution):
 
     def __init__(self,p=0.5):
 
-        if not 0 < p <= 1:
+        if not isinstance(p, (int, np.integer, float, np.floating)) or not np.isfinite(p) or np.isnan(p) or not 0 < p <= 1:
             raise ValueError(
-                "The success probability must be between 0 (strictly) and 1."
+                "The success probability must be a real number between 0 (strictly) and 1."
             )
 
         self.p = p
@@ -778,12 +781,12 @@ class NegativeBinomial(DiscreteDistribution):
 
     def __init__(self,p=0.5,n=1):
 
-        if not 0 < p <= 1:
+        if not isinstance(p, (int, np.integer, float, np.floating)) or not np.isfinite(p) or np.isnan(p) or not 0 < p <= 1:
             raise ValueError(
-                "The success probability must be between 0 and 1."
+                "The success probability must be a real number between 0 (strictly) and 1."
             )
 
-        if type(n) != int or n < 1:
+        if not isinstance(n, (int, np.integer)) or not np.isfinite(n) or np.isnan(n) or n < 1:
             raise ValueError(
                 "The number of target success occurrence must be a strictly positive integer."
             )
@@ -862,9 +865,9 @@ class YuleSimon(DiscreteDistribution):
 
     def __init__(self,rho=1):
 
-        if rho <= 0:
+        if not isinstance(rho, (int, np.integer, float, np.floating)) or not np.isfinite(rho) or np.isnan(rho) or rho <= 0:
             raise ValueError(
-                "The shape parameter must be strictly positive."
+                "The shape parameter must be a strictly positive real number."
             )
 
         self.rho = rho

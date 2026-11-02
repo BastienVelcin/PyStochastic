@@ -122,8 +122,8 @@ class Distribution(ABC):
         """
 
         supp = self.support()
-        mu = self.mean() if callable(self.mean) else 0
-        sd = np.sqrt(self.variance()) if callable(self.variance) else 1
+        mu = self.mean if callable(self.mean) or self.mean is not None else 0
+        sd = np.sqrt(self.variance) if callable(self.variance) or self.variance is not None else 1
 
         lo_bound = supp[0] if supp[0] > -np.inf else mu - 8 * sd
         up_bound = supp[1] if supp[1] < np.inf else mu + 8 * sd
