@@ -597,7 +597,7 @@ class Weibull(ContinuousDistribution):
         return self.l ** 2 * scipy.special.gamma(1 + 2 / self.k) - self.mean()**2
 
     def entropy(self):
-        return scipy.special.digamma(1-1/self.k)+(self.l/self.k)**self.k+np.log(self.l)-np.log(self.l/self.k)
+        return np.euler_gamma * (1-1/self.k) + np.log(self.l/self.k) + 1
 
     def support(self):
         return (0, np.inf)
@@ -742,7 +742,7 @@ class Cauchy(ContinuousDistribution):
             print("Probability density function :")
             print(f"| 1/(pi*{self.a}*(1+(x-{self.x_0})/{self.a})^2)")
         else:
-            return 1/(np.pi*self.a*(1+(x-self.x_0)/self.a)**2)
+            return 1/(np.pi*self.a*(1+((x-self.x_0)/self.a)**2))
 
     def cdf(self, x=None):
         if x is None:

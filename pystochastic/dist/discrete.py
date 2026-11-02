@@ -659,10 +659,10 @@ class Hypergeometric(DiscreteDistribution):
         return discrete.hypergeometric(self.N, self.K, self.m, n)
 
     def mean(self):
-        return self.m * self.K / self.N if self.N >= 2 else None
+        return self.m * self.K / self.N if self.N >= 1 else None
 
     def variance(self):
-        return self.m * (self.K/self.N) * ((self.N-self.K)/self.N) * ((self.N-self.m)/(self.N-1))
+        return self.m * (self.K/self.N) * ((self.N-self.K)/self.N) * ((self.N-self.m)/(self.N-1)) if self.N >= 2 else None
 
     def entropy(self):
         return "Unknown"
@@ -808,7 +808,7 @@ class NegativeBinomial(DiscreteDistribution):
                     "The evaluation point must be an integer."
                 )
 
-            if k >= 1:
+            if k >= 0:
                 return comb(k+self.n-1, k)*self.p**self.n*(self.q)**k
             else:
                 return 0
@@ -820,7 +820,7 @@ class NegativeBinomial(DiscreteDistribution):
             print(f"| 0 otherwise")
 
         else:
-            if x >= 1:
+            if x >= 0:
                 return scipy.special.betainc(self.n,np.floor(x)+1,self.p)
             else:
                 return 0
@@ -838,7 +838,7 @@ class NegativeBinomial(DiscreteDistribution):
         return "Unknown"
 
     def support(self):
-        return "N*"
+        return "N"
 
 class YuleSimon(DiscreteDistribution):
 
